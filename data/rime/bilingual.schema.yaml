@@ -1,0 +1,27 @@
+schema:
+  schema_id: bilingual
+  name: BilingualInput Prototype
+  version: "0.0.1"
+switches:
+  - name: ascii_mode
+    reset: 0
+engine:
+  processors:
+    - speller
+    - selector
+    - express_editor
+  segmentors:
+    - abc_segmentor
+    - fallback_segmentor
+  translators:
+    - script_translator
+speller:
+  alphabet: abcdefghijklmnopqrstuvwxyz
+  delimiter: "'"
+translator:
+  dictionary: bilingual
+  enable_user_dict: false
+  enable_sentence: true
+  enable_completion: true
+menu:
+  page_size: 5

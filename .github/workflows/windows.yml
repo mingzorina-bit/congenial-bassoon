@@ -16,3 +16,24 @@ jobs:
         run: cmake --build build --config Release
       - name: Test core
         run: ctest --test-dir build -C Release --output-on-failure
+      - uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d
+        with:
+          dotnet-version: '8.0.425'
+      - name: Build audited Rime without plugins
+        shell: pwsh
+        run: ./scripts/Prepare-Rime.ps1
+      - name: Build real native adapter
+        run: |
+          cmake -S . -B build -A x64 -DBI_WITH_RIME=ON -DRIME_ROOT="${{ github.workspace }}/.vendor/rime"
+          cmake --build build --config Release
+      - name: Test real engine
+        run: ctest --test-dir build -C Release --output-on-failure
+      - name: Publish Windows prototype
+        shell: pwsh
+        run: ./scripts/Package.ps1
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: BilingualInput-v0.0.1-win-x64
+          path: artifacts/BilingualInput-v0.0.1-win-x64.zip
+          if-no-files-found: error
+          retention-days: 30

@@ -1,0 +1,5 @@
+config_version: "0.1"
+schema_list:
+  - schema: bilingual
+menu:
+  page_size: 5

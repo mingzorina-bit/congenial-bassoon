@@ -1,0 +1,100 @@
+# Project-authored prototype mappings. No imported third-party dictionary.
+---
+name: bilingual
+version: "0.0.1"
+sort: by_weight
+use_preset_vocabulary: false
+...
+优化	you hua	1000
+油画	you hua	900
+有话	you hua	800
+学习	xue xi	1000
+工作	gong zuo	1000
+中国	zhong guo	1000
+你好	ni hao	1000
+我们	wo men	1000
+你们	ni men	1000
+他们	ta men	1000
+方案	fang an	1000
+设计	she ji	1000
+改进	gai jin	1000
+完成	wan cheng	1000
+问题	wen ti	1000
+计划	ji hua	1000
+这个	zhe ge	1000
+可以	ke yi	1000
+继续	ji xu	1000
+觉得	jue de	1000
+输入	shu ru	1000
+中文	zhong wen	1000
+英文	ying wen	1000
+语言	yu yan	1000
+时间	shi jian	1000
+今天	jin tian	1000
+明天	ming tian	1000
+现在	xian zai	1000
+需要	xu yao	1000
+测试	ce shi	1000
+体验	ti yan	1000
+自然	zi ran	1000
+表达	biao da	1000
+选择	xuan ze	1000
+候选	hou xuan	1000
+保存	bao cun	1000
+谢谢	xie xie	1000
+朋友	peng you	1000
+方法	fang fa	1000
+电脑	dian nao	1000
+内容	nei rong	1000
+开始	kai shi	1000
+结束	jie shu	1000
+喜欢	xi huan	1000
+帮助	bang zhu	1000
+支持	zhi chi	1000
+开发	kai fa	1000
+一个	yi ge	1000
+还是	hai shi	1000
+但是	dan shi	1000
+因为	yin wei	1000
+所以	suo yi	1000
+非常	fei chang	1000
+已经	yi jing	1000
+什么	shen me	1000
+怎么	zen me	1000
+为什么	wei shen me	1000
+我	wo	100
+你	ni	100
+他	ta	100
+她	ta	90
+是	shi	100
+时	shi	90
+事	shi	80
+十	shi	70
+有	you	100
+油	you	90
+优	you	80
+话	hua	100
+画	hua	90
+化	hua	80
+好	hao	100
+的	de	100
+了	le	100
+在	zai	100
+不	bu	100
+也	ye	100
+还	hai	100
+很	hen	100
+和	he	100
+可	ke	100
+以	yi	100
+一	yi	90
+中	zhong	100
+国	guo	100
+学	xue	100
+习	xi	100
+工	gong	100
+作	zuo	100
+这	zhe	100
+个	ge	100
+方	fang	100
+案	an	100
