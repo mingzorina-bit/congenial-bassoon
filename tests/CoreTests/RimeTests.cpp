@@ -7,6 +7,8 @@ using namespace bilingual;
 int main(int argc,char** argv) {
  if(argc!=3) return 2;
  try {
+  std::string sentinel="privacyuniquesentinelxfqk";
+  {
   RimeAdapter engine(argv[1],argv[2]);
   for (const auto& pair:std::vector<std::pair<std::string,std::string>>{
        {"youhua","优化"},{"xuexi","学习"},{"gongzuo","工作"},{"zhongguo","中国"}}) {
@@ -32,8 +34,8 @@ int main(int argc,char** argv) {
   for(char c:std::string("asdfg")) session.type(c);
   session.press(Key::Enter);
   if(session.takeCommit()!="asdfg") return 1;
-  std::string sentinel="privacyuniquesentinelxfqk";
   engine.query(sentinel);
+  } // Audit after session destruction and Rime finalization flush any writes.
   for(const auto& entry:std::filesystem::recursive_directory_iterator(std::filesystem::u8path(argv[2]))) {
     if(!entry.is_regular_file()) continue;
     std::ifstream f(entry.path(),std::ios::binary);

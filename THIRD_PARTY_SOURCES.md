@@ -34,7 +34,7 @@ source_id、name、type（CODE/DATA/AUDIO/MODEL/SERVICE）、version/snapshot da
 | marisa | rime/marisa-trie 0d4e8ab58eec355facf8f65ff11ef811b330e373 | Rime 字典索引 / 选择 BSD 许可分支 | 附 COPYING |
 | yaml | jbeder/yaml-cpp f7320141120f720aecc4c32be25586e7da9eb978 | Rime schema / MIT | 附 LICENSE |
 | opencc-code | BYVoid/OpenCC e5d6c5f1b78e28a5797e7ad3ede3513314e544b7 | Rime 必需代码 / Apache-2.0 | 附 LICENSE；不带 OpenCC 数据库 |
-| boost | Windows runner 预装 Boost headers，具体路径记录在 build log | Rime headers / Boost Software License 1.0 | 附 LICENSE；构建环境项 |
+| boost | Boost 1.84.0 官方源码 headers；SHA256 A5800F405508F5DF8114558CA9855D2640A2DE8F0445F051FA1C7C3383045724 | Rime headers / Boost Software License 1.0 | 附 LICENSE；构建环境项 |
 | rime-deps | official release rime-deps-1c23358-Windows-msvc-x64.7z | 上述静态库和 headers；SHA256 3EDE059E6C1F4CDD5843CED3205F76666B706E5F55CCF8E56E2D04791A376FF6 | 不整体分发，不复制 share 数据/工具 |
 | rime-data-own | data/rime/*.yaml v0.0.1 | 项目自有有限词表/schema | OWN / PROTOTYPE_ONLY；非大词库 |
 | windowsappsdk | NuGet Microsoft.WindowsAppSDK 1.8.260804001 | WinUI 与应用运行时 | 官方 redistributable 随应用，不单独销售；包级许可一并收集 |
@@ -42,3 +42,4 @@ source_id、name、type（CODE/DATA/AUDIO/MODEL/SERVICE）、version/snapshot da
 | msvc-runtime | GitHub Windows 2022 runner VC143 x64 CRT | app-local Microsoft redistributable runtime | 仅可再分发列表中的 CRT DLL，不含开发工具 |
 
 所有 third-party 库原样使用。除 Rime 配置禁用日志/插件外无上游代码修改。来源清单、NuGet 解析依赖和文件 SHA256 inventory 随 artifact 保存；最终商业/签名发行仍须独立 Release Review。
+
