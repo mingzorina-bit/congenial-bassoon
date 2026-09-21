@@ -1,0 +1,9 @@
+build/
+artifacts/
+.vendor/
+**/bin/
+**/obj/
+.vs/
+*.user
+*.zip
+docs/source/
