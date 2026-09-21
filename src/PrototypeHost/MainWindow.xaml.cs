@@ -27,26 +27,17 @@ public sealed partial class MainWindow : Window {
   (Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(key)&CoreVirtualKeyStates.Down)!=0;
  private void EditorKeyDown(object sender,KeyRoutedEventArgs e) {
   if(session==null) return;
-  if(Down(VirtualKey.Control)||Down(VirtualKey.Menu)) {
-    // Preserve pending composition before editor shortcuts such as paste/cut.
-    if(session.Raw.Length>0){session.Key(0);Refresh();}
-    return;
-  }
   bool shift=Down(VirtualKey.Shift);
   int code=(int)e.Key;
-  if(code>=65 && code<=90) {
-   bool caps=(Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.CapitalLock)&CoreVirtualKeyStates.Locked)!=0;
-   session.Type((char)((shift^caps)?code:code+32));e.Handled=true;
-  } else if(code>=49 && code<=57 && !shift && session.Raw.Length>0) {
-   // Reserved selection keys do not leak digits into the editor when no such candidate exists.
-   session.Select(code-49);e.Handled=true;
-  } else if(shift && code>=49 && code<=53 && session.Raw.Length>0) { e.Handled=true; }
-  else {
-   int key=e.Key switch {
-    VirtualKey.Enter=>0, VirtualKey.Space=>1, VirtualKey.Back=>2,
-    VirtualKey.Left=>3,VirtualKey.Right=>4,VirtualKey.Up=>5,VirtualKey.Down=>6,VirtualKey.Escape=>7,_=>-1};
-   if(key>=0) e.Handled=session.Key(key,shift);
-   else if(e.Key==VirtualKey.Tab && session.Raw.Length>0) e.Handled=true;
+  bool caps=(Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.CapitalLock)&CoreVirtualKeyStates.Locked)!=0;
+  var decision=KeyboardRouter.Decide(code,shift,caps,session.Raw.Length>0,Down(VirtualKey.Control)||Down(VirtualKey.Menu));
+  switch(decision.Action) {
+   case InputAction.Type: session.Type((char)decision.Value);e.Handled=true;break;
+   case InputAction.CoreKey: e.Handled=session.Key(decision.Value,shift);break;
+   case InputAction.Select: session.Select(decision.Value);e.Handled=true;break;
+   case InputAction.Reserve: e.Handled=true;break;
+   case InputAction.FlushPrimary: session.Key(1);break;
+   case InputAction.FlushRaw: session.Key(0);break;
   }
   Refresh();
   if(shift && e.Key==VirtualKey.Enter) Status.Text="Shadow 将在 v0.0.2 加入；当前内容已保留。";

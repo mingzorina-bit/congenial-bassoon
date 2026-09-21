@@ -19,6 +19,8 @@ jobs:
       - uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d
         with:
           dotnet-version: '8.0.425'
+      - name: Test Host keyboard routing
+        run: dotnet run --project tests/HostRoutingTests/HostRoutingTests.csproj -c Release
       - name: Build audited Rime without plugins
         shell: pwsh
         run: ./scripts/Prepare-Rime.ps1
@@ -28,6 +30,13 @@ jobs:
           cmake --build build --config Release
       - name: Test real engine
         run: ctest --test-dir build -C Release --output-on-failure
+      - name: Save native verification files
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: native-verification
+          path: build/Release/*
+          retention-days: 3
       - name: Publish Windows prototype
         shell: pwsh
         run: ./scripts/Package.ps1

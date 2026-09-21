@@ -36,12 +36,26 @@ std::vector<std::string> RimeAdapter::query(const std::string& raw) {
   for (unsigned char ch:raw) api_->process_key(session_, ch, 0);
   RIME_STRUCT(RimeContext, context);
   std::vector<std::string> result;
+  int count=0;
   if (api_->get_context(session_, &context)) {
-    for (int i=0;i<context.menu.num_candidates;++i)
-      result.emplace_back(context.menu.candidates[i].text);
+    count=context.menu.num_candidates;
     api_->free_context(&context);
   }
-  // Never commit into the Rime user dictionary; Core owns commit intent.
+  // Rime can return prefix candidates. Core commits an entire expression, so
+  // expose only candidates whose real selection consumes the entire raw input.
+  // This schema has user-dictionary learning disabled and incognito enabled.
+  for(int i=0;i<count;++i) {
+    api_->clear_composition(session_);
+    for(unsigned char ch:raw) api_->process_key(session_,ch,0);
+    api_->select_candidate_on_current_page(session_,static_cast<size_t>(i));
+    const char* remaining=api_->get_input(session_);
+    bool complete=!remaining || !*remaining;
+    RIME_STRUCT(RimeCommit, selected);
+    if(api_->get_commit(session_,&selected)) {
+      if(complete && selected.text && *selected.text) result.emplace_back(selected.text);
+      api_->free_commit(&selected);
+    }
+  }
   api_->clear_composition(session_);
   RIME_STRUCT(RimeCommit, unused);
   if (api_->get_commit(session_, &unused)) api_->free_commit(&unused);
