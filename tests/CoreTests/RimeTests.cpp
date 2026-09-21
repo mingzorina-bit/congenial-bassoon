@@ -16,6 +16,11 @@ int main(int argc,char** argv) {
    }
   }
   auto words=engine.query("youhua");
+  for(const auto& word:engine.query("nihaozzz")) {
+    if(word.find("zzz")==std::string::npos) {
+      std::cerr<<"FAIL partial candidate would discard raw suffix\n"; return 1;
+    }
+  }
   for(auto word:{"油画","有话"})
     if(std::find(words.begin(),words.end(),word)==words.end()) return 1;
   InputSession session(engine);

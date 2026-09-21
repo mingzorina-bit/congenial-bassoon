@@ -17,11 +17,17 @@ if (-not (Test-Path $archive)) {
 if ((Get-FileHash $archive -Algorithm SHA256).Hash -ne '3EDE059E6C1F4CDD5843CED3205F76666B706E5F55CCF8E56E2D04791A376FF6') { throw 'Dependency archive hash mismatch' }
 7z x $archive "-o$source" -y | Out-Null
 if ($LASTEXITCODE) { throw 'Dependency extraction failed' }
-$boost = Get-ChildItem 'C:/local' -Directory -Filter 'boost_*' | Sort-Object Name -Descending | Select-Object -First 1
-if (-not $boost) { throw 'Runner Boost headers unavailable' }
+$boostRoot = Join-Path $vendor 'boost_1_84_0'
+if (-not (Test-Path "$boostRoot/boost/version.hpp")) {
+  $boostArchive = Join-Path $vendor 'boost_1_84_0.tar.gz'
+  Invoke-WebRequest 'https://archives.boost.io/release/1.84.0/source/boost_1_84_0.tar.gz' -OutFile $boostArchive
+  if ((Get-FileHash $boostArchive).Hash -ne 'A5800F405508F5DF8114558CA9855D2640A2DE8F0445F051FA1C7C3383045724') { throw 'Boost hash mismatch' }
+  tar -xf $boostArchive -C $vendor boost_1_84_0/boost boost_1_84_0/LICENSE_1_0.txt
+  if ($LASTEXITCODE) { throw 'Boost extraction failed' }
+}
 $build = Join-Path $vendor 'rime-build'
 $dist = Join-Path $vendor 'rime'
-cmake -S $source -B $build -A x64 "-DBOOST_ROOT=$($boost.FullName)" '-DBoost_NO_BOOST_CMAKE=ON' '-DCMAKE_POLICY_VERSION_MINIMUM=3.5' '-DBUILD_TEST=OFF' '-DBUILD_STATIC=ON' '-DENABLE_LOGGING=OFF' '-DBUILD_MERGED_PLUGINS=OFF' '-DENABLE_EXTERNAL_PLUGINS=OFF' "-DCMAKE_INSTALL_PREFIX=$dist"
+cmake -S $source -B $build -A x64 "-DBOOST_ROOT=$boostRoot" '-DBoost_NO_BOOST_CMAKE=ON' '-DCMAKE_POLICY_VERSION_MINIMUM=3.5' '-DBUILD_TEST=OFF' '-DBUILD_STATIC=ON' '-DENABLE_LOGGING=OFF' '-DBUILD_MERGED_PLUGINS=OFF' '-DENABLE_EXTERNAL_PLUGINS=OFF' "-DCMAKE_INSTALL_PREFIX=$dist"
 if ($LASTEXITCODE) { throw 'Rime configuration failed' }
 cmake --build $build --config Release --target rime --parallel 4
 if ($LASTEXITCODE) { throw 'Rime build failed' }
