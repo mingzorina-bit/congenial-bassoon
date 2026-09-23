@@ -1,38 +1,48 @@
 <Window x:Class="BilingualInput.MainWindow"
  xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
  xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
- <Grid x:Name="Root" Padding="36" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-  <Grid><StackPanel Spacing="8">
-   <TextBlock Text="Bilingual Input" FontSize="30" FontWeight="SemiBold"/>
-   <TextBlock Text="熟悉的输入，从这里开始。" FontSize="16" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-  </StackPanel>
-  <ComboBox x:Name="ThemeChoice" Header="外观" HorizontalAlignment="Right" Width="120" SelectedIndex="0" SelectionChanged="ThemeChanged">
-    <ComboBoxItem Content="跟随系统"/><ComboBoxItem Content="浅色"/><ComboBoxItem Content="深色"/>
-  </ComboBox></Grid>
-  <Border Grid.Row="1" Margin="0,24,0,18" Padding="16" CornerRadius="8" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
-   <StackPanel Spacing="5">
-    <TextBlock Text="v0.0.1 · 候选输入体验" FontWeight="SemiBold"/>
-    <TextBlock Text="试着输入 youhua、xuexi 或 gongzuo。空格提交候选，Enter 保留原文。" TextWrapping="Wrap"/>
-    <TextBlock Text="本阶段使用有限原型词表；双语 Shadow 将在下一阶段加入。" FontSize="12" Foreground="{ThemeResource TextFillColorSecondaryBrush}" TextWrapping="Wrap"/>
+ <ScrollViewer VerticalScrollBarVisibility="Auto">
+ <Grid x:Name="Root" Padding="28" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+  <StackPanel Spacing="18">
+   <Grid><StackPanel Spacing="6"><TextBlock Text="Bilingual Input" FontSize="28" FontWeight="SemiBold"/>
+    <TextBlock x:Name="Subtitle" Text="同样的输入，连接另一种表达。" TextWrapping="Wrap"/>
+   </StackPanel></Grid>
+   <StackPanel Orientation="Horizontal" Spacing="12">
+    <ComboBox x:Name="ThemeChoice" Header="外观 / Appearance" Width="160" SelectedIndex="0" SelectionChanged="ThemeChanged">
+     <ComboBoxItem Content="System / 跟随系统"/><ComboBoxItem Content="Light / 浅色"/><ComboBoxItem Content="Dark / 深色"/>
+    </ComboBox>
+    <Button x:Name="ReplayButton" Content="重新体验 / Demo" VerticalAlignment="Bottom" Click="ReplayClick"/>
    </StackPanel>
-  </Border>
-  <Grid Grid.Row="2">
-   <Grid.RowDefinitions><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
-   <TextBox x:Name="Editor" PlaceholderText="在这里连续输入…" AcceptsReturn="True" TextWrapping="Wrap"
-     FontSize="20" Padding="20" VerticalContentAlignment="Top" IsSpellCheckEnabled="False"
-     IsTextPredictionEnabled="False" IsEnabled="False" PreviewKeyDown="EditorKeyDown"/>
-   <Border Grid.Row="1" x:Name="CandidateCard" Margin="0,12,0,0" Padding="16" CornerRadius="8"
-      BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
-      Background="{ThemeResource CardBackgroundFillColorDefaultBrush}" HorizontalAlignment="Left" MinWidth="380">
-    <StackPanel Spacing="10">
-     <TextBlock x:Name="Composition" Text="准备输入" FontSize="14" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
-     <StackPanel x:Name="CandidateRow" Orientation="Horizontal" Spacing="6"/>
-     <TextBlock Text="Space 选中  ·  1–5 选择  ·  ← → 导航  ·  Enter 原文" FontSize="11" Foreground="{ThemeResource TextFillColorTertiaryBrush}"/>
+   <Border x:Name="GuideCard" Padding="20" CornerRadius="8" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
+    <StackPanel Spacing="12">
+     <TextBlock x:Name="StepLabel" FontSize="12"/>
+     <TextBlock x:Name="GuideTitle" FontSize="22" FontWeight="SemiBold" TextWrapping="Wrap"/>
+     <StackPanel x:Name="GuideBody" Spacing="10"/>
+     <StackPanel Orientation="Horizontal" Spacing="12">
+      <Button x:Name="BackButton" Content="上一步" Click="BackClick"/>
+      <Button x:Name="NextButton" Content="继续" Click="NextClick" Style="{StaticResource AccentButtonStyle}"/>
+     </StackPanel>
     </StackPanel>
    </Border>
-  </Grid>
-  <TextBlock Grid.Row="3" x:Name="Status" Text="正在准备本地输入…" Margin="0,16,0,0" FontSize="12" TextWrapping="Wrap"
-    Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+   <StackPanel x:Name="InputPanel" Spacing="12">
+    <TextBlock x:Name="Hint" TextWrapping="Wrap"/>
+    <TextBox x:Name="Editor" PlaceholderText="在这里连续输入…" AcceptsReturn="True" TextWrapping="Wrap"
+      FontSize="20" Padding="16" Height="210" VerticalContentAlignment="Top" IsSpellCheckEnabled="False"
+      IsTextPredictionEnabled="False" IsEnabled="False" PreviewKeyDown="EditorKeyDown"/>
+    <Border Padding="16" CornerRadius="8" BorderThickness="1" BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+      Background="{ThemeResource CardBackgroundFillColorDefaultBrush}">
+     <StackPanel Spacing="12">
+      <TextBlock x:Name="Composition" Text="准备输入" TextWrapping="Wrap"/>
+      <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled"><StackPanel x:Name="CandidateRow" Orientation="Horizontal" Spacing="6"/></ScrollViewer>
+      <StackPanel Orientation="Horizontal" Spacing="8"><TextBlock x:Name="ShadowLanguage" VerticalAlignment="Center" FontSize="12"/><ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled"><StackPanel x:Name="ShadowRow" Orientation="Horizontal" Spacing="6"/></ScrollViewer></StackPanel>
+      <TextBlock x:Name="ShadowHint" FontSize="12" TextWrapping="Wrap" Foreground="{ThemeResource TextFillColorSecondaryBrush}"/>
+      <TextBlock Text="Space · 1–5 · ← →   |   Enter: raw   |   Shift+Enter · Shift+1–3: Shadow" FontSize="11" TextWrapping="Wrap"/>
+     </StackPanel>
+    </Border>
+   </StackPanel>
+   <TextBlock x:Name="Status" Text="正在准备本地输入…" FontSize="12" TextWrapping="Wrap"/>
+   <TextBlock x:Name="SaveStatus" FontSize="12" TextWrapping="Wrap"/>
+  </StackPanel>
  </Grid>
+ </ScrollViewer>
 </Window>

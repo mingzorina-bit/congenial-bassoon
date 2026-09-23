@@ -1,6 +1,7 @@
 #pragma once
 #include <string>
 #include <vector>
+#include "LexicalStore.h"
 namespace bilingual {
 enum class PrivacyMode { Normal, Private, Secure };
 struct PrivacyPolicy {
@@ -22,6 +23,9 @@ class InputSession {
   bool select(int index);
   void highlight(int index);
   void setPrivacy(PrivacyMode mode);
+  void setLexical(const LexicalStore* store) { lexical_ = store; }
+  std::vector<ShadowCandidate> shadows() const;
+  bool selectShadow(int index);
   const std::string& raw() const { return raw_; }
   const std::vector<std::string>& candidates() const { return candidates_; }
   int highlighted() const { return highlighted_; }
@@ -30,6 +34,7 @@ class InputSession {
   void refresh();
   void commit(const std::string& text);
   PrimaryEngine& engine_;
+  const LexicalStore* lexical_ = nullptr;
   std::string raw_, pending_;
   std::vector<std::string> candidates_;
   int highlighted_ = 0;

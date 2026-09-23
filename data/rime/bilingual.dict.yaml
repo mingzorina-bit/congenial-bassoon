@@ -1,7 +1,7 @@
 # Project-authored prototype mappings. No imported third-party dictionary.
 ---
 name: bilingual
-version: "0.0.1"
+version: "0.0.2"
 sort: by_weight
 use_preset_vocabulary: false
 ...
@@ -98,3 +98,10 @@ use_preset_vocabulary: false
 个	ge	100
 方	fang	100
 案	an	100
+优化方案	you hua fang an	1200
+优化方法	you hua fang fa	1200
+继续优化	ji xu you hua	1200
+自然表达	zi ran biao da	1200
+学习语言	xue xi yu yan	1200
+解决问题	jie jue wen ti	1200
+

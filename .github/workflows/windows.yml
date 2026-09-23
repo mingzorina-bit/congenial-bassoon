@@ -21,6 +21,8 @@ jobs:
           dotnet-version: '8.0.425'
       - name: Test Host keyboard routing
         run: dotnet run --project tests/HostRoutingTests/HostRoutingTests.csproj -c Release
+      - name: Test onboarding and preferences
+        run: dotnet run --project tests/OnboardingTests/OnboardingTests.csproj -c Release
       - name: Build audited Rime without plugins
         shell: pwsh
         run: ./scripts/Prepare-Rime.ps1
@@ -42,7 +44,8 @@ jobs:
         run: ./scripts/Package.ps1
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: BilingualInput-v0.0.1-win-x64
-          path: artifacts/BilingualInput-v0.0.1-win-x64.zip
+          name: BilingualInput-v0.0.2-win-x64
+          path: artifacts/BilingualInput-v0.0.2-win-x64.zip
           if-no-files-found: error
           retention-days: 30
+
