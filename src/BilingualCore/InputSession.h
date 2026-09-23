@@ -24,8 +24,8 @@ class InputSession {
   void highlight(int index);
   void setPrivacy(PrivacyMode mode);
   void setLexical(const LexicalStore* store) { lexical_ = store; }
-  std::vector<ShadowCandidate> shadows() const { return {}; }
-  bool selectShadow(int) { return false; }
+  std::vector<ShadowCandidate> shadows() const;
+  bool selectShadow(int index);
   const std::string& raw() const { return raw_; }
   const std::vector<std::string>& candidates() const { return candidates_; }
   int highlighted() const { return highlighted_; }

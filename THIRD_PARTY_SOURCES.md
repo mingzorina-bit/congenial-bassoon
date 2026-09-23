@@ -43,3 +43,6 @@ source_id、name、type（CODE/DATA/AUDIO/MODEL/SERVICE）、version/snapshot da
 
 所有 third-party 库原样使用。除 Rime 配置禁用日志/插件外无上游代码修改。来源清单、NuGet 解析依赖和文件 SHA256 inventory 随 artifact 保存；最终商业/签名发行仍须独立 Release Review。
 
+
+## v0.0.2 新增自有数据
+仅新增 data/lexical/own-v0.0.2.tsv（OWN / PROTOTYPE_ONLY）及自有短语拼音映射。每行 sourceId/entryId 可追溯，来源与语义复核见 data/lexical/README.md。不引入新外部依赖、CC-CEDICT/ECDICT、IPA、音频或云服务；复用 v0.0.1 固定工具链与许可。

@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot -Parent
-$out = Join-Path $repo 'artifacts/BilingualInput-v0.0.1-win-x64'
+$out = Join-Path $repo 'artifacts/BilingualInput-v0.0.2-win-x64'
 New-Item -ItemType Directory -Path $out -Force | Out-Null
 dotnet publish "$repo/src/PrototypeHost/PrototypeHost.csproj" -c Release -r win-x64 --self-contained true -o $out
 if ($LASTEXITCODE) { throw 'WinUI publish failed' }
@@ -35,5 +35,6 @@ $inventory = foreach($f in $files) {
  [ordered]@{path=[IO.Path]::GetRelativePath($out,$f.FullName);sha256=(Get-FileHash $f.FullName).Hash}
 }
 $inventory | ConvertTo-Json -Depth 3 | Set-Content "$out/FILES.sha256.json" -Encoding utf8
-Compress-Archive -Path "$out/*" -DestinationPath "$repo/artifacts/BilingualInput-v0.0.1-win-x64.zip" -Force
-Get-FileHash "$repo/artifacts/BilingualInput-v0.0.1-win-x64.zip" | Format-List
+Compress-Archive -Path "$out/*" -DestinationPath "$repo/artifacts/BilingualInput-v0.0.2-win-x64.zip" -Force
+Get-FileHash "$repo/artifacts/BilingualInput-v0.0.2-win-x64.zip" | Format-List
+
