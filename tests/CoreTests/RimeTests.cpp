@@ -44,6 +44,18 @@ int main(int argc,char** argv) {
   for(char c:std::string("asdfg")) session.type(c);
   session.press(Key::Enter);
   if(session.takeCommit()!="asdfg") return 1;
+  session.setContext("这个方案","EN");
+  for(char c:std::string("youhha"))session.type(c);
+  if(session.candidates().empty()||session.candidates()[0]!="优化"||session.shadows().empty()||session.shadows()[0].text!="optimize")return 1;
+  session.press(Key::Enter);if(session.takeCommit()!="youhha")return 1;
+  session.setContext("这个 ");for(char c:std::string("design"))session.type(c);
+  session.press(Key::Space);if(session.takeCommit()!="design")return 1;
+  session.setContext("这个 design ");for(char c:std::string("haikeyi"))session.type(c);
+  session.press(Key::Space);if(session.takeCommit()!="还可以")return 1;
+  session.setContext("I think this ");for(char c:std::string("fangan"))session.type(c);
+  session.press(Key::Space);if(session.takeCommit()!="方案")return 1;
+  auto gap=LanguageContextResolver::completeGaps("I think this 方案 is better",LanguageContextResolver::analyze("I think this 方案 is better"),lexical);
+  if(gap.size()!=1||gap[0].text!="I think this approach is better")return 1;
   engine.query(sentinel);
   } // Audit after session destruction and Rime finalization flush any writes.
   for(const auto& entry:std::filesystem::recursive_directory_iterator(std::filesystem::u8path(argv[2]))) {
