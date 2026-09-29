@@ -28,7 +28,7 @@ internal sealed class NativeSession : IDisposable {
  public ShadowItem[] Shadows=>Enumerable.Range(0,bi_shadow_count(handle)).Select(i=>new ShadowItem(Copy(bi_shadow_field(handle,i,0)),Copy(bi_shadow_field(handle,i,1)),Copy(bi_shadow_field(handle,i,2)),Copy(bi_shadow_field(handle,i,3)))).ToArray();
  public bool SelectShadow(int i)=>bi_select_shadow(handle,i)!=0;
  public NativeSession() {
-  var user = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"BilingualInput","rime-v003");
+  var user = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"BilingualInput","rime-v004");
   handle=bi_create(Path.Combine(AppContext.BaseDirectory,"data","rime"),user);
   if(handle==IntPtr.Zero) throw new InvalidOperationException("Input session unavailable.");
  }
@@ -44,3 +44,4 @@ internal sealed class NativeSession : IDisposable {
  public string TakeCommit()=>Copy(bi_take_commit(handle));
  public void Dispose(){if(handle!=IntPtr.Zero){bi_destroy(handle);handle=IntPtr.Zero;}}
 }
+

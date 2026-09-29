@@ -43,3 +43,6 @@ D=Deterministic；S=Semantic；M=Human/manual。下表是测试追踪计划；�
 
 执行期间记录：未执行/执行中/已完成，另设最终判定字段。Milestone 子集完成不自动让整项 AC PASS；例如 AC-20 的真实 Natural Expression 到 v0.0.6 才齐全。最终 AC-30 的人类 UX/Product 判定不可由 agent 代签。
 
+
+## v0.0.4 执行证据
+AC-17/18/19/20/26 的本里程碑子集见 [v0.0.4 记录](releases/v0.0.4.md)。不将局部测试等同整项 PASS：英式 IPA 未收录、无本机英式声线听感、第二机部署、后续 Learning/AI 仍保留对应限制。
