@@ -13,10 +13,15 @@ public sealed partial class MainWindow : Window {
  private readonly PreferenceStore store=new(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"BilingualInput","preferences.json"));
  private UserPreferences prefs=new();
  private readonly OnboardingProgress guide=new();
+ private readonly PrivacyGate privacy=new();
+ private readonly EncounterTracker encounters=new();
+ private readonly LearningStore learning;
  private string T(string zh,string en)=>prefs.UiLanguage=="EN"?en:zh;
  public MainWindow(){
   InitializeComponent();prefs=store.Load();showGuide=!prefs.OnboardingComplete;
-  Title="Bilingual Input — v0.0.4 Hover / Deep Dive";
+  learning=new(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"BilingualInput","learning-v005.db"),privacy);
+  privacy.Set(prefs.PrivateMode?LearningPrivacy.Private:LearningPrivacy.Normal);
+  Title="Bilingual Input — v0.0.5 Learning";
   AppWindow.Resize(new Windows.Graphics.SizeInt32(980,900));
   ThemeChoice.SelectedIndex=prefs.Theme;ApplyTheme();initialized=true;
   Editor.InputScope=new InputScope{Names={new InputScopeName(InputScopeNameValue.AlphanumericHalfWidth)}};
@@ -27,7 +32,7 @@ public sealed partial class MainWindow : Window {
   Closed+=(_,_)=>{closed=true;CloseDetails();speech.Dispose();session?.Dispose();};
   RenderGuide();
   Root.Loaded+=async(_,_)=>{
-   try{var created=await Task.Run(()=>new NativeSession());if(closed){created.Dispose();return;}session=created;
+   try{var created=await Task.Run(()=>new NativeSession());if(closed){created.Dispose();return;}session=created;created.Privacy(privacy.Mode);
     Status.Text=created.Ready?T("本地输入已就绪 · 无需网络或 API Key","Local input ready · No network or API key required"):T("候选词表不可用，仍可用 Enter 提交原文","Primary data unavailable; Enter still commits raw input");
    }catch{Status.Text=T("本地候选未启动，编辑区仍可直接输入","Local engine unavailable; editor still accepts text");}
    if(!closed){Editor.IsEnabled=true;UpdateContext();Refresh();if(!showGuide||guide.Step==4)Editor.Focus(FocusState.Programmatic);}
@@ -43,7 +48,7 @@ public sealed partial class MainWindow : Window {
   InputPanel.Visibility=!showGuide||guide.Step==4?Visibility.Visible:Visibility.Collapsed;
   ReplayButton.Visibility=showGuide?Visibility.Collapsed:Visibility.Visible;
   if(!showGuide)return;
-  StepLabel.Text=$"{guide.Step+1} / 5 · v0.0.4";
+  StepLabel.Text=$"{guide.Step+1} / 5 · v0.0.5";
   BackButton.Content=T("上一步","Back");BackButton.Visibility=guide.Step==0?Visibility.Collapsed:Visibility.Visible;
   NextButton.Content=guide.Step==4?T("开始使用","Start using"):T("继续","Continue");
   NextButton.IsEnabled=guide.Step!=4||guide.CanFinish;
@@ -53,7 +58,7 @@ public sealed partial class MainWindow : Window {
     GuideTitle.Text=T("欢迎使用 Bilingual Input","Welcome to Bilingual Input");
     GuideBody.Children.Add(Paragraph(T("用你熟悉的语言，自然连接另一种表达。","Use your familiar language to connect with another expression.")));
     GuideBody.Children.Add(Paragraph(T("自然输入 · 双语表达 · 在真实使用中学习","Natural input · Bilingual expression · Learn through use")));
-    GuideBody.Children.Add(Paragraph(T("本次试用：悬停查看词义与发音，Tab 展开详情。学习收藏将在下一版加入。","This trial adds Hover Quick Peek, pronunciation and Tab details. Learning collections come next.")));break;
+    GuideBody.Children.Add(Paragraph(T("本次试用：从详情收藏词条，在词库中查看，再次遇见时记录次数。","This trial adds saving words from details, a Library, and encounter counts.")));break;
    case 1:
     GuideTitle.Text=T("你更熟悉哪种语言？","Which language feels more familiar?");
     var primary=new ComboBox{Header=T("Primary Language（不代表英语水平）","Primary language (not a proficiency rating)"),Width=300};
@@ -150,6 +155,8 @@ public sealed partial class MainWindow : Window {
  }
  private void RenderShadows(){
   if(session==null)return;SyncDetailContext();ShadowRow.Children.Clear();var items=session.Shadows;
+  if(session.Raw.Length==0)encounters.Reset();
+  else if(privacy.LearningAllowed){bool changed=false;foreach(var item in items){var key=LearningKey(item.Text);if(learning.Contains(key)&&encounters.Observe(session.Raw,key,true))changed|=learning.Encounter(key);}if(changed&&LibraryCard.Visibility==Visibility.Visible)RenderLibraryBody();}
   if(session.Raw.Length==0&&expressionShadow.Length>0){
    ShadowLanguage.Text="EN";ShadowHint.Text=T("补全当前表达中的中文缺口 · Shift+Enter 应用","Complete Chinese gaps in this expression · Shift+Enter to apply");
    var button=new Button{Content=new TextBlock{Text=expressionShadow,TextWrapping=TextWrapping.Wrap},FontSize=14,IsTabStop=false,MaxWidth=720};

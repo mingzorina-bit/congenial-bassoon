@@ -79,7 +79,17 @@ public sealed partial class MainWindow {
     }));
    };actions.Children.Add(speak);
   }
-  var save=new Button{Content=T("☆ 收藏（下一版）","☆ Save (next version)"),IsEnabled=false,IsTabStop=false};actions.Children.Add(save);panel.Children.Add(actions);panel.Children.Add(feedback);
+  var save=new Button{Content=T("☆ 收藏","☆ Save"),IsEnabled=entry!=null&&privacy.LearningAllowed,IsTabStop=false};
+  if(entry!=null){var saved=learning.Contains(LearningKey(entry.English));if(saved)save.Content=T("★ 已收藏","★ Saved");
+   save.Click+=(_,_)=>{
+    if(!privacy.LearningAllowed)return;
+    var pronunciation=phonetics.Find(entry.English,prefs.PronunciationLocale);
+    var item=new LearningItem(LearningKey(entry.English),entry.English,"EN",entry.ZhMeaning,"own-v004",pronunciation?.Value??"",pronunciation?.SourceId??"",entry.Pos,"WindowsSpeech:"+prefs.PronunciationLocale+":"+entry.English,DateTimeOffset.UtcNow,0);
+    if(learning.Save(item)){if(session?.Raw.Length>0)encounters.SavedInCurrentComposition(item.Key);else encounters.Reset();save.Content=T("★ 已收藏","★ Saved");feedback.Text=T("已存入收藏词库","Saved to Library");}
+    else feedback.Text=T("词库暂时不可用；输入仍可继续。","Library unavailable; typing still works.");
+   };
+  }
+  actions.Children.Add(save);panel.Children.Add(actions);panel.Children.Add(feedback);
   return panel;
  }
  private void OpenDetails(){
@@ -121,6 +131,10 @@ public sealed partial class MainWindow {
   var installed=WindowsSpeechProvider.InstalledLocales();SettingsBody.Children.Add(Paragraph(T("可用系统声线：","Installed voice locales: ")+(installed.Length>0?string.Join(", ",installed):T("未检测到","none detected"))));
   Toggle("Natural Expression",prefs.NaturalExpression,v=>prefs.NaturalExpression=v);Toggle("Phrase Breakdown",prefs.PhraseBreakdown,v=>prefs.PhraseBreakdown=v);Toggle("Vocabulary",prefs.Vocabulary,v=>prefs.Vocabulary=v);Toggle("Examples",prefs.Examples,v=>prefs.Examples=v);
   Toggle("IPA",prefs.Ipa,v=>prefs.Ipa=v);Toggle(T("发音","Pronunciation"),prefs.Pronunciation,v=>prefs.Pronunciation=v);Toggle(T("释义","Meaning"),prefs.Meaning,v=>prefs.Meaning=v);Toggle(T("词性","Part of speech"),prefs.PartOfSpeech,v=>prefs.PartOfSpeech=v);
+  Toggle(T("Private Mode：不记录学习行为","Private Mode: no learning records"),prefs.PrivateMode,v=>{prefs.PrivateMode=v;SetPrivacy(PrivacyGate.Effective(v,secureSimulation));});
+  var secure=new CheckBox{Content=T("模拟安全输入区（本次窗口）","Simulate secure field (this window)"),IsChecked=secureSimulation};
+  secure.Checked+=(_,_)=>{secureSimulation=true;SetPrivacy(PrivacyGate.Effective(prefs.PrivateMode,secureSimulation));};
+  secure.Unchecked+=(_,_)=>{secureSimulation=false;SetPrivacy(PrivacyGate.Effective(prefs.PrivateMode,secureSimulation));};SettingsBody.Children.Add(secure);
   SettingsCard.Visibility=Visibility.Visible;
  }
 }

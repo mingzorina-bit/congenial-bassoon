@@ -18,6 +18,7 @@ internal sealed class UserPreferences {
  public bool Pronunciation {get;set;}=true;
  public bool Meaning {get;set;}=true;
  public bool PartOfSpeech {get;set;}=true;
+ public bool PrivateMode {get;set;}
 }
 internal sealed class PreferenceStore(string path) {
  private static UserPreferences Normalize(UserPreferences p) {

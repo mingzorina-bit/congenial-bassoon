@@ -12,6 +12,8 @@ internal sealed class NativeSession : IDisposable {
  [DllImport(Dll, CallingConvention=CallingConvention.Cdecl)] private static extern IntPtr bi_create([MarshalAs(UnmanagedType.LPUTF8Str)] string shared,[MarshalAs(UnmanagedType.LPUTF8Str)] string user);
  [DllImport(Dll, CallingConvention=CallingConvention.Cdecl)] private static extern void bi_destroy(IntPtr h);
  [DllImport(Dll, CallingConvention=CallingConvention.Cdecl)] private static extern int bi_ready(IntPtr h);
+ [DllImport(Dll, CallingConvention=CallingConvention.Cdecl)] private static extern void bi_privacy(IntPtr h,int mode);
+ public void Privacy(LearningPrivacy mode)=>bi_privacy(handle,(int)mode);
  [DllImport(Dll, CallingConvention=CallingConvention.Cdecl)] private static extern int bi_type(IntPtr h,int ch);
  [DllImport(Dll, CallingConvention=CallingConvention.Cdecl)] private static extern int bi_key(IntPtr h,int key,int shift);
  [DllImport(Dll, CallingConvention=CallingConvention.Cdecl)] private static extern int bi_select(IntPtr h,int index);
@@ -28,7 +30,7 @@ internal sealed class NativeSession : IDisposable {
  public ShadowItem[] Shadows=>Enumerable.Range(0,bi_shadow_count(handle)).Select(i=>new ShadowItem(Copy(bi_shadow_field(handle,i,0)),Copy(bi_shadow_field(handle,i,1)),Copy(bi_shadow_field(handle,i,2)),Copy(bi_shadow_field(handle,i,3)))).ToArray();
  public bool SelectShadow(int i)=>bi_select_shadow(handle,i)!=0;
  public NativeSession() {
-  var user = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"BilingualInput","rime-v004");
+  var user = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"BilingualInput","rime-v005");
   handle=bi_create(Path.Combine(AppContext.BaseDirectory,"data","rime"),user);
   if(handle==IntPtr.Zero) throw new InvalidOperationException("Input session unavailable.");
  }
