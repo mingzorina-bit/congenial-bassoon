@@ -1,6 +1,6 @@
 # Acceptance Traceability Matrix
 
-D=Deterministic；S=Semantic；M=Human/manual。下表是测试计划，**尚未执行**；不预填 PASS。最终结果仅 PASS/FAIL/NOT IN PHASE 0，后者仅适用于真正不在 Phase 0 范围的事项（如 AC-29），不能用来隐藏延后/失败项。
+D=Deterministic；S=Semantic；M=Human/manual。下表是测试追踪计划；各版已执行证据见 docs/releases，不预填整项 PASS。最终结果仅 PASS/FAIL/NOT IN PHASE 0，后者仅适用于真正不在 Phase 0 范围的事项（如 AC-29），不能用来隐藏延后/失败项。
 
 | AC | 能力 | 里程碑 | 层级 | 关键证据 |
 |---|---|---|---|---|

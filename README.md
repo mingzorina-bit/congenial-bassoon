@@ -3,6 +3,8 @@
 Windows 原生输入原型，采用 WinUI 3/C# 与 C++20 Core、真实 librime。当前推进第三个里程碑，等待实际试用反馈；完整 Phase 0 尚未完成。
 
 ## 试用
+[下载 v0.0.3 Windows x64 试用包](https://github.com/mingzorina-bit/congenial-bassoon/actions/runs/36581940133/artifacts/11040157020) · [验证记录](docs/releases/v0.0.3.md)。
+
 按 [体验指南](README-TRY.md) 下载成功 Actions 构建中的 BilingualInput-v0.0.3-win-x64，完整解压后运行 BilingualInput.exe。无需 API Key。有限自有词表用于验证候选交互；已加入本地上下文判断、英文保留与中文 gap 补全；规则和词表有限，学习、AI 与系统级输入尚未实现。
 
 ## 规格与推进
