@@ -2,6 +2,7 @@ namespace BilingualInput;
 
 internal enum LearningPrivacy { Normal, Private, Secure }
 internal sealed class PrivacyGate {
+ public static LearningPrivacy Effective(bool privateMode,bool secureMode)=>secureMode?LearningPrivacy.Secure:privateMode?LearningPrivacy.Private:LearningPrivacy.Normal;
  public LearningPrivacy Mode {get;private set;}
  public long Revision {get;private set;}
  public bool LearningAllowed=>Mode==LearningPrivacy.Normal;

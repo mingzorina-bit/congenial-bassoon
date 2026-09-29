@@ -10,6 +10,7 @@ try{
  Check(store.Encounter(item.Key)&&store.All().Single().EncounterCount==1,"persist encounter");
  var ticket=gate.Ticket();gate.Set(LearningPrivacy.Private);Check(!gate.Accept(ticket)&&!store.Encounter(item.Key)&&!store.Save(item)&&store.All().Count==0,"private blocks learning and stale task");
  gate.Set(LearningPrivacy.Secure);Check(!gate.CloudAllowed&&!gate.LearningAllowed&&!gate.ContentLoggingAllowed&&!gate.PersistentTextCacheAllowed,"secure gate");
+ Check(PrivacyGate.Effective(true,true)==LearningPrivacy.Secure&&PrivacyGate.Effective(false,true)==LearningPrivacy.Secure&&PrivacyGate.Effective(true,false)==LearningPrivacy.Private,"secure remains dominant when private setting changes");
  gate.Set(LearningPrivacy.Normal);Check(store.All().Single().EncounterCount==1,"private did not mutate saved data");
  var unavailable=new LearningStore(dir,gate);Check(!unavailable.Save(item)&&unavailable.All().Count==0,"database failure degrades");
  var sentinel="privacyuniquesentinelxfqk";tracker.Observe(sentinel,item.Key,false);

@@ -131,9 +131,10 @@ public sealed partial class MainWindow {
   var installed=WindowsSpeechProvider.InstalledLocales();SettingsBody.Children.Add(Paragraph(T("可用系统声线：","Installed voice locales: ")+(installed.Length>0?string.Join(", ",installed):T("未检测到","none detected"))));
   Toggle("Natural Expression",prefs.NaturalExpression,v=>prefs.NaturalExpression=v);Toggle("Phrase Breakdown",prefs.PhraseBreakdown,v=>prefs.PhraseBreakdown=v);Toggle("Vocabulary",prefs.Vocabulary,v=>prefs.Vocabulary=v);Toggle("Examples",prefs.Examples,v=>prefs.Examples=v);
   Toggle("IPA",prefs.Ipa,v=>prefs.Ipa=v);Toggle(T("发音","Pronunciation"),prefs.Pronunciation,v=>prefs.Pronunciation=v);Toggle(T("释义","Meaning"),prefs.Meaning,v=>prefs.Meaning=v);Toggle(T("词性","Part of speech"),prefs.PartOfSpeech,v=>prefs.PartOfSpeech=v);
-  Toggle(T("Private Mode：不记录学习行为","Private Mode: no learning records"),prefs.PrivateMode,v=>{prefs.PrivateMode=v;SetPrivacy(v?LearningPrivacy.Private:LearningPrivacy.Normal);});
-  var secure=new CheckBox{Content=T("模拟安全输入区（本次窗口）","Simulate secure field (this window)"),IsChecked=privacy.Mode==LearningPrivacy.Secure};
-  secure.Checked+=(_,_)=>SetPrivacy(LearningPrivacy.Secure);secure.Unchecked+=(_,_)=>SetPrivacy(prefs.PrivateMode?LearningPrivacy.Private:LearningPrivacy.Normal);SettingsBody.Children.Add(secure);
+  Toggle(T("Private Mode：不记录学习行为","Private Mode: no learning records"),prefs.PrivateMode,v=>{prefs.PrivateMode=v;SetPrivacy(PrivacyGate.Effective(v,secureSimulation));});
+  var secure=new CheckBox{Content=T("模拟安全输入区（本次窗口）","Simulate secure field (this window)"),IsChecked=secureSimulation};
+  secure.Checked+=(_,_)=>{secureSimulation=true;SetPrivacy(PrivacyGate.Effective(prefs.PrivateMode,secureSimulation));};
+  secure.Unchecked+=(_,_)=>{secureSimulation=false;SetPrivacy(PrivacyGate.Effective(prefs.PrivateMode,secureSimulation));};SettingsBody.Children.Add(secure);
   SettingsCard.Visibility=Visibility.Visible;
  }
 }

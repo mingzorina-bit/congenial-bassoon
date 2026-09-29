@@ -2,6 +2,7 @@ using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 namespace BilingualInput;
 public sealed partial class MainWindow {
+ private bool secureSimulation;
  private static string LearningKey(string lemma)=>"own-v004:"+lemma.ToLowerInvariant();
  private void SetPrivacy(LearningPrivacy mode){
   privacy.Set(mode);encounters.Reset();session?.Privacy(mode);CloseDetails();LibraryCard.Visibility=Visibility.Collapsed;
