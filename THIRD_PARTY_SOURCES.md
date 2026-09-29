@@ -46,3 +46,6 @@ source_id、name、type（CODE/DATA/AUDIO/MODEL/SERVICE）、version/snapshot da
 
 ## v0.0.2 新增自有数据
 仅新增 data/lexical/own-v0.0.2.tsv（OWN / PROTOTYPE_ONLY）及自有短语拼音映射。每行 sourceId/entryId 可追溯，来源与语义复核见 data/lexical/README.md。不引入新外部依赖、CC-CEDICT/ECDICT、IPA、音频或云服务；复用 v0.0.1 固定工具链与许可。
+
+## v0.0.4 sources
+User approved CMUdict proposal on 2026-09-29. See data/pronunciation/SOURCE.md and docs/reviews/V0_0_4_DEPENDENCY_PROPOSAL.md. Package the standalone cmudict-us.tsv and licenses/CMUdict-LICENSE.txt together; no en-GB IPA shipped. WindowsSpeechProvider uses existing Windows SDK APIs and installed voices, no new binary or network service. data/details/own-v004.tsv contains project-authored prototype POS/glosses, kept separate from CMUdict.

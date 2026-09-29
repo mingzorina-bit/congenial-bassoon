@@ -16,13 +16,13 @@ public sealed partial class MainWindow : Window {
  private string T(string zh,string en)=>prefs.UiLanguage=="EN"?en:zh;
  public MainWindow(){
   InitializeComponent();prefs=store.Load();showGuide=!prefs.OnboardingComplete;
-  Title="Bilingual Input — v0.0.3 Bilingual Context";
+  Title="Bilingual Input — v0.0.4 Hover / Deep Dive";
   AppWindow.Resize(new Windows.Graphics.SizeInt32(980,900));
   ThemeChoice.SelectedIndex=prefs.Theme;ApplyTheme();initialized=true;
   Editor.InputScope=new InputScope{Names={new InputScopeName(InputScopeNameValue.AlphanumericHalfWidth)}};
   Editor.TextChanged+=(_,_)=>{if(!updating)UpdateContext();};
   Editor.SelectionChanged+=(_,_)=>{if(!updating)UpdateContext();};
-  Closed+=(_,_)=>{closed=true;session?.Dispose();};
+  Closed+=(_,_)=>{closed=true;CloseDetails();speech.Dispose();session?.Dispose();};
   RenderGuide();
   Root.Loaded+=async(_,_)=>{
    try{var created=await Task.Run(()=>new NativeSession());if(closed){created.Dispose();return;}session=created;
@@ -41,7 +41,7 @@ public sealed partial class MainWindow : Window {
   InputPanel.Visibility=!showGuide||guide.Step==4?Visibility.Visible:Visibility.Collapsed;
   ReplayButton.Visibility=showGuide?Visibility.Collapsed:Visibility.Visible;
   if(!showGuide)return;
-  StepLabel.Text=$"{guide.Step+1} / 5 · v0.0.3";
+  StepLabel.Text=$"{guide.Step+1} / 5 · v0.0.4";
   BackButton.Content=T("上一步","Back");BackButton.Visibility=guide.Step==0?Visibility.Collapsed:Visibility.Visible;
   NextButton.Content=guide.Step==4?T("开始使用","Start using"):T("继续","Continue");
   NextButton.IsEnabled=guide.Step!=4||guide.CanFinish;
@@ -51,7 +51,7 @@ public sealed partial class MainWindow : Window {
     GuideTitle.Text=T("欢迎使用 Bilingual Input","Welcome to Bilingual Input");
     GuideBody.Children.Add(Paragraph(T("用你熟悉的语言，自然连接另一种表达。","Use your familiar language to connect with another expression.")));
     GuideBody.Children.Add(Paragraph(T("自然输入 · 双语表达 · 在真实使用中学习","Natural input · Bilingual expression · Learn through use")));
-    GuideBody.Children.Add(Paragraph(T("本次试用：本地中英上下文、英文保留与中文缺口补全。发音与学习收藏将在后续版本加入。","This trial adds local bilingual context and Chinese gap completion. Pronunciation and learning collections come later.")));break;
+    GuideBody.Children.Add(Paragraph(T("本次试用：悬停查看词义与发音，Tab 展开详情。学习收藏将在下一版加入。","This trial adds Hover Quick Peek, pronunciation and Tab details. Learning collections come next.")));break;
    case 1:
     GuideTitle.Text=T("你更熟悉哪种语言？","Which language feels more familiar?");
     var primary=new ComboBox{Header=T("Primary Language（不代表英语水平）","Primary language (not a proficiency rating)"),Width=300};
@@ -109,6 +109,7 @@ public sealed partial class MainWindow : Window {
  }
  private void EditorKeyDown(object sender,KeyRoutedEventArgs e){
   if(session==null)return;UpdateContext();bool shift=Down(VirtualKey.Shift);string raw=session.Raw;
+  if(e.Key==VirtualKey.Tab&&!shift&&!Down(VirtualKey.Control)&&!Down(VirtualKey.Menu)&&DetailText().Length>0){OpenDetails();e.Handled=true;return;}
   if(raw.Length==0&&shift&&e.Key==VirtualKey.Enter&&expressionShadow.Length>0){CommitExpression();e.Handled=true;return;}
   bool caps=(Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.CapitalLock)&CoreVirtualKeyStates.Locked)!=0;
   var d=KeyboardRouter.Decide((int)e.Key,shift,caps,raw.Length>0,Down(VirtualKey.Control)||Down(VirtualKey.Menu));
@@ -146,7 +147,7 @@ public sealed partial class MainWindow : Window {
   }
  }
  private void RenderShadows(){
-  if(session==null)return;ShadowRow.Children.Clear();var items=session.Shadows;
+  if(session==null)return;SyncDetailContext();ShadowRow.Children.Clear();var items=session.Shadows;
   if(session.Raw.Length==0&&expressionShadow.Length>0){
    ShadowLanguage.Text="EN";ShadowHint.Text=T("补全当前表达中的中文缺口 · Shift+Enter 应用","Complete Chinese gaps in this expression · Shift+Enter to apply");
    var button=new Button{Content=new TextBlock{Text=expressionShadow,TextWrapping=TextWrapping.Wrap},FontSize=14,IsTabStop=false,MaxWidth=720};
@@ -157,7 +158,7 @@ public sealed partial class MainWindow : Window {
   for(int i=0;i<items.Length;i++){
    int index=i;var item=items[i];var button=new Button{Content=item.Text,FontSize=14,IsTabStop=false};
    var snapshot=new CandidateSnapshot(session.Raw,index,item.Text);
-   button.Click+=(_,_)=>{if(!snapshot.Matches(session.Raw,session.Shadows.Select(s=>s.Text).ToArray())){Refresh();return;}string before=session.Raw;session.SelectShadow(index);Refresh(before,true);Editor.Focus(FocusState.Programmatic);};ShadowRow.Children.Add(button);
+   button.Click+=(_,_)=>{if(!snapshot.Matches(session.Raw,session.Shadows.Select(s=>s.Text).ToArray())){Refresh();return;}string before=session.Raw;session.SelectShadow(index);Refresh(before,true);Editor.Focus(FocusState.Programmatic);};AttachPeek(button,item.Text,item.Language);ShadowRow.Children.Add(button);
   }
  }
  private void UpdateHighlights(){if(session==null)return;for(int i=0;i<CandidateRow.Children.Count;i++)((Button)CandidateRow.Children[i]).Style=i==session.Highlighted?(Style)Application.Current.Resources["AccentButtonStyle"]:null;}

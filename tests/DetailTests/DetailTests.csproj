@@ -1,0 +1,2 @@
+<Project Sdk="Microsoft.NET.Sdk"><PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net8.0</TargetFramework><ImplicitUsings>enable</ImplicitUsings><Nullable>enable</Nullable></PropertyGroup><ItemGroup><Compile Include="../../src/PrototypeHost/DetailState.cs" Link="DetailState.cs"/><Compile Include="../../src/PrototypeHost/Preferences.cs" Link="Preferences.cs"/><Compile Include="../../src/PrototypeHost/PhoneticDataProvider.cs" Link="PhoneticDataProvider.cs"/><Compile Include="../../src/PrototypeHost/DetailCatalog.cs" Link="DetailCatalog.cs"/></ItemGroup></Project>
+

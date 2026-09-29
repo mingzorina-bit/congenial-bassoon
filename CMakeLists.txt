@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.24)
-project(BilingualInput VERSION 0.0.3 LANGUAGES CXX)
+project(BilingualInput VERSION 0.0.4 LANGUAGES CXX)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 if(MSVC)
@@ -39,3 +39,4 @@ if(BI_WITH_RIME)
   endforeach()
   add_test(NAME RimeTests COMMAND RimeTests "${CMAKE_SOURCE_DIR}/data/rime" "${CMAKE_BINARY_DIR}/rime-test-user")
 endif()
+

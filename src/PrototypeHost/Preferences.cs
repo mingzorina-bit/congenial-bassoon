@@ -7,6 +7,17 @@ internal sealed class UserPreferences {
  public string[] Goals {get;set;}=[];
  public int Theme {get;set;}
  public bool OnboardingComplete {get;set;}
+ public bool QuickPeek {get;set;}=true;
+ public int HoverDelayMs {get;set;}=400;
+ public string PronunciationLocale {get;set;}="en-US";
+ public bool NaturalExpression {get;set;}=true;
+ public bool PhraseBreakdown {get;set;}=true;
+ public bool Vocabulary {get;set;}=true;
+ public bool Examples {get;set;}
+ public bool Ipa {get;set;}=true;
+ public bool Pronunciation {get;set;}=true;
+ public bool Meaning {get;set;}=true;
+ public bool PartOfSpeech {get;set;}=true;
 }
 internal sealed class PreferenceStore(string path) {
  private static UserPreferences Normalize(UserPreferences p) {
@@ -14,6 +25,8 @@ internal sealed class PreferenceStore(string path) {
   p.UiLanguage=p.UiLanguage=="EN"?"EN":"ZH";
   p.InputPreference=p.InputPreference=="Pinyin"?"Pinyin":"Smart";
   p.Theme=p.Theme is >=0 and <=2?p.Theme:0;
+  p.PronunciationLocale=p.PronunciationLocale=="en-GB"?"en-GB":"en-US";
+  p.HoverDelayMs=p.HoverDelayMs is >=200 and <=1500?p.HoverDelayMs:400;
   p.Goals=(p.Goals??[]).Where(g=>g is "Expression" or "Learning" or "Input").Distinct().ToArray();
   return p;
  }
