@@ -1,27 +1,11 @@
-# Project Progress
+# Project Progress — v0.0.3
 更新时间：2026-09-29。
-
-## 当前状态
-v0.0.1 已交付首轮试用：CI c05b7a5、包 10635147909；详见 docs/releases/v0.0.1.md。用户本轮明确授权下一版本，开始 v0.0.2 Shadow。未把上一版未执行的第二台干净机器、持续 UX 验收标成 PASS。
-
-## 不变量与范围
-Spec Freeze v0.1 + CR-01～05 为权威。Enter=raw；Space=高亮 Primary；Shift=Shadow action。Core C++20 与 WinUI Host 分离，本地优先，不记录原始输入。
-本轮只做本地词级/短语 Shadow、来源追踪、Shift 选择、五步 onboarding/偏好保存/重新体验。禁止推进 Bilingual Context、Hover、Learning、AI、TSF。
-
-## 执行计划
-- [x] T1：本地 LexicalStore / Shadow + 自动测试与真实引擎回归。
-- [x] T2：Shift 按键、五步真实 onboarding、偏好重启保存与故障降级。
-- [ ] T3：CI、包校验、真实 UI 冒烟、独立复核、试用交付。
-
-Ruling：新分支 codex/shadow-v0.0.2 基于 0558d6b，保留 v0.0.1 原目录/试用包；本地无 MSVC，C++ 由现有 GitHub Windows CI 验证。短路径 staging 用于本机 WinUI 构建。
-Ruling：本轮仅使用项目自有 curated TSV，不新增外部库、第三方词典、服务或费用。来源 OWN/PROTOTYPE_ONLY、逐条 source/entry id；缺失/损坏时保留 Primary。
-Ruling：Shift 选择目标取自当前 Shadow 项的语言，不由 profile 强制；完整语言上下文识别仍在 v0.0.3。英文 profile 可保存，但如实提示智能识别尚未实现。
-
-## 恢复规则
-每次开工读本文件、冻结规格、CODEX_IMPLEMENTATION_PLAN.md；有效工作后更新。后续顺序 v0.0.3 Context → v0.0.4 Hover → v0.0.5 Learning → v0.0.6 AI → v0.1.0-alpha。当前原始聊天快照留在旧本地目录，不上传。仓库私有化上次受工具额度阻断，未确认私有；本轮按公开内容边界部署。
-
-## 本轮验证（进行中）
-2026-09-23：Shadow RED commit 07ef25d，12 个新测试中 7 个如预期失败（旧 Core 通过）；实现后 CI Core/Shadow 已通过。17 个按键测试 Shift+数字先失败再通过；7 个 onboarding/settings 测试先 3 失败后全部通过。本机 WinUI publish 已通过；首次四步窗口已实际观察。完整 native 与最终包仍在 CI 验证。
-
-## 2026-09-29 交付进展
-正式 Windows CI 35821403057 成功，试用包下载和 556 项校验通过，正式应用启动成功。已交付 v0.0.2 试用候选；T3 的完整 UI 验证及独立复核未全部完成，详见 docs/releases/v0.0.2.md。保持 v0.0.3 未开始，等待用户试用反馈。
+用户已试用 v0.0.2 并明确批准下一版。v0.0.2 未完成独立复核与第二机验收继续保留；不冒充 PASS。
+当前：v0.0.3 Bilingual Context 开发中。规格和范围见 docs/plans/v0.0.3-context.md，权威为冻结五份规格与 CR-01～05。
+- Context RED：CI 36579679922，9 tests/7 failures；旧 Core/Shadow PASS。
+- Session RED：CI 36580074086，6 tests/4 failures。
+- ExpressionRange RED 7/4 → GREEN 7/0，本地 .NET 实测。
+- Context 多 gap 测试初版用了不自然的 needs optimize，改为 I use this approach to optimize this part；保留双空格/标点断言。
+- 当前整合 native/WinUI/真实 Rime，等待最终 CI 与包验证。
+只做当前上下文、gap、歧义、typo；不做 Hover/Learning/AI/TSF，不引入新外部依赖。自有词形规则有意有限，未知词保留。当前分析仅在内存，不写输入日志。
+仓库 mingzorina-bit/congenial-bassoon，分支 codex/context-v0.0.3。原始聊天快照不上传。完成后停止等待 v0.0.3 试用反馈。

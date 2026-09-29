@@ -12,6 +12,8 @@ struct Handle {
  std::vector<ShadowCandidate> shadows;
  std::string shadowValue;
  std::string commit;
+ std::string expression,contextInfo;
+ std::vector<ShadowCandidate> expressionShadows;
  bool ready = false;
 };
 std::mutex lifecycle;
@@ -37,6 +39,16 @@ BI void* bi_create(const char* shared, const char* user) noexcept {
 }
 BI void bi_destroy(void* ptr) noexcept { try { std::lock_guard lock(lifecycle); if(ptr) { delete static_cast<Handle*>(ptr); active=false; } } catch(...) {} }
 BI int bi_ready(void* ptr) noexcept { return ptr && static_cast<Handle*>(ptr)->ready ? 1:0; }
+BI void bi_context(void* ptr,const char* surroundings,const char* expression,const char* prior) noexcept {
+ try{if(!ptr)return;auto h=static_cast<Handle*>(ptr);std::string p=prior?prior:"ZH";
+ h->session->setContext(surroundings?surroundings:"",p);h->expression=expression?expression:"";
+ auto c=LanguageContextResolver::analyze(h->expression,p);
+ h->contextInfo=c.dominant+" | "+std::to_string(c.confidence)+" | "+c.reason;
+ h->expressionShadows=h->lexical?LanguageContextResolver::completeGaps(h->expression,c,*h->lexical):std::vector<ShadowCandidate>{};
+ }catch(...){if(ptr)static_cast<Handle*>(ptr)->expressionShadows.clear();}
+}
+BI const char* bi_context_info(void* ptr) noexcept {return ptr?static_cast<Handle*>(ptr)->contextInfo.c_str():"";}
+BI const char* bi_expression_shadow(void* ptr) noexcept {if(!ptr)return "";auto h=static_cast<Handle*>(ptr);return h->expressionShadows.empty()?"":h->expressionShadows[0].text.c_str();}
 BI int bi_type(void* ptr, int ch) noexcept { try { if(!ptr) return 0; static_cast<Handle*>(ptr)->session->type(static_cast<char>(ch)); return 1; } catch(...) { return 0; } }
 BI int bi_key(void* ptr, int key, int shift) noexcept {
  try { if(!ptr || key<0 || key>7) return 0; return static_cast<Handle*>(ptr)->session->press(static_cast<Key>(key),shift!=0)?1:0; } catch(...) { return 0; }

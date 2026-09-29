@@ -25,7 +25,7 @@ class InputSession {
   void highlight(int index);
   void setPrivacy(PrivacyMode mode);
   void setLexical(const LexicalStore* store) { lexical_ = store; }
-  void setContext(const std::string&,const std::string& = "ZH") {}
+  void setContext(const std::string& expression,const std::string& prior = "ZH");
   const LanguageContext& context() const { return context_; }
   std::vector<ShadowCandidate> shadows() const;
   bool selectShadow(int index);
@@ -43,5 +43,7 @@ class InputSession {
   int highlighted_ = 0;
   PrivacyMode mode_ = PrivacyMode::Normal;
   LanguageContext context_;
+  std::string surroundings_,prior_="ZH";
+  bool contextEnabled_=false;
 };
 }

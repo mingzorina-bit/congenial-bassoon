@@ -1,7 +1,7 @@
 # Project-authored prototype mappings. No imported third-party dictionary.
 ---
 name: bilingual
-version: "0.0.2"
+version: "0.0.3"
 sort: by_weight
 use_preset_vocabulary: false
 ...
@@ -104,4 +104,6 @@ use_preset_vocabulary: false
 自然表达	zi ran biao da	1200
 学习语言	xue xi yu yan	1200
 解决问题	jie jue wen ti	1200
-
+还可以	hai ke yi	1200
+餐	can	100
+么	me	100
