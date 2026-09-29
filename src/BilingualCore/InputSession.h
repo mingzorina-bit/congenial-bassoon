@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include "LexicalStore.h"
+#include "LanguageContext.h"
 namespace bilingual {
 enum class PrivacyMode { Normal, Private, Secure };
 struct PrivacyPolicy {
@@ -24,6 +25,8 @@ class InputSession {
   void highlight(int index);
   void setPrivacy(PrivacyMode mode);
   void setLexical(const LexicalStore* store) { lexical_ = store; }
+  void setContext(const std::string&,const std::string& = "ZH") {}
+  const LanguageContext& context() const { return context_; }
   std::vector<ShadowCandidate> shadows() const;
   bool selectShadow(int index);
   const std::string& raw() const { return raw_; }
@@ -39,5 +42,6 @@ class InputSession {
   std::vector<std::string> candidates_;
   int highlighted_ = 0;
   PrivacyMode mode_ = PrivacyMode::Normal;
+  LanguageContext context_;
 };
 }
