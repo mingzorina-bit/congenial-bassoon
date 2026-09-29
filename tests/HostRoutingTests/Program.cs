@@ -6,7 +6,7 @@ var cases = new (string Name,int Code,bool Shift,bool Caps,bool Composing,bool S
  ("EnterIsRaw",13,false,false,true,false,InputAction.CoreKey,0),
  ("SpaceUsesPrimary",32,false,false,true,false,InputAction.CoreKey,1),
  ("NumberSelects",50,false,false,true,false,InputAction.Select,1),
- ("ShadowNumbersReserved",50,true,false,true,false,InputAction.Reserve,0),
+ ("ShadowNumberSelects",50,true,false,true,false,InputAction.SelectShadow,1),
  ("ShortcutPreservesPendingText",86,false,false,true,true,InputAction.FlushRaw,0),
  ("ApostropheIsPinyinDelimiter",222,false,false,true,false,InputAction.Type,39),
  ("CommaFollowsComposition",188,false,false,true,false,InputAction.FlushPrimary,0),
@@ -27,3 +27,4 @@ foreach(var c in cases){
 }
 Console.WriteLine($"{cases.Length} routing tests, {failures} failures");
 return failures==0?0:1;
+

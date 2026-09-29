@@ -26,6 +26,16 @@ int main(int argc,char** argv) {
   for(auto word:{"油画","有话"})
     if(std::find(words.begin(),words.end(),word)==words.end()) return 1;
   InputSession session(engine);
+  auto lexicalPath=std::filesystem::u8path(argv[1]).parent_path()/"lexical"/"own-v0.0.2.tsv";
+  auto lexicalUtf8=lexicalPath.u8string();
+  LexicalStore lexical(std::string(lexicalUtf8.begin(),lexicalUtf8.end()));
+  session.setLexical(&lexical);
+  for(char c:std::string("youhua"))session.type(c);
+  session.press(Key::Enter,true);
+  if(session.takeCommit()!="optimize")return 1;
+  for(char c:std::string("youhuafangan"))session.type(c);
+  session.press(Key::Enter,true);
+  if(session.takeCommit()!="optimization plan")return 1;
   for(char c:std::string("youhua")) session.type(c);
   session.highlight(1);
   auto expected=session.candidates().at(1);

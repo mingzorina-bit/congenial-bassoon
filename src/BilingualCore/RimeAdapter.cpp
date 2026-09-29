@@ -12,7 +12,7 @@ RimeAdapter::RimeAdapter(const std::string& shared, const std::string& user) {
   traits.user_data_dir = user.c_str();
   traits.distribution_name = "BilingualInput";
   traits.distribution_code_name = "bilingual";
-  traits.distribution_version = "0.0.1";
+  traits.distribution_version = "0.0.2";
   traits.app_name = "rime.bilingual";
   traits.min_log_level = 3;
   traits.log_dir = "";
@@ -62,3 +62,4 @@ std::vector<std::string> RimeAdapter::query(const std::string& raw) {
   return result;
 }
 }
+

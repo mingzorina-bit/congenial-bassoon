@@ -8,7 +8,7 @@ void InputSession::type(char ch) {
 }
 bool InputSession::press(Key key, bool shift) {
   if (raw_.empty()) return false;
-  if (shift && key == Key::Enter) return true; // Reserved for Shadow in v0.0.2.
+  if (shift && key == Key::Enter) { selectShadow(0); return true; }
   switch (key) {
     case Key::Enter: commit(raw_); break;
     case Key::Space:
@@ -34,6 +34,14 @@ void InputSession::highlight(int index) {
   if (index >= 0 && index < static_cast<int>(candidates_.size())) highlighted_ = index;
 }
 void InputSession::setPrivacy(PrivacyMode mode) { mode_ = mode; refresh(); }
+std::vector<ShadowCandidate> InputSession::shadows() const {
+ if(!lexical_||mode_==PrivacyMode::Secure||highlighted_<0||highlighted_>=static_cast<int>(candidates_.size()))return {};
+ try{return lexical_->lookup(candidates_[highlighted_]);}catch(...){return {};}
+}
+bool InputSession::selectShadow(int index) {
+ auto items=shadows();if(index<0||index>=static_cast<int>(items.size()))return false;
+ commit(items[index].text);return true;
+}
 std::string InputSession::takeCommit() { auto text = pending_; pending_.clear(); return text; }
 void InputSession::refresh() {
   candidates_.clear(); highlighted_ = 0;
