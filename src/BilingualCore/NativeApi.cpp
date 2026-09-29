@@ -39,8 +39,13 @@ BI void* bi_create(const char* shared, const char* user) noexcept {
 }
 BI void bi_destroy(void* ptr) noexcept { try { std::lock_guard lock(lifecycle); if(ptr) { delete static_cast<Handle*>(ptr); active=false; } } catch(...) {} }
 BI int bi_ready(void* ptr) noexcept { return ptr && static_cast<Handle*>(ptr)->ready ? 1:0; }
+BI void bi_privacy(void* ptr,int mode) noexcept {
+ try {if(!ptr)return;auto h=static_cast<Handle*>(ptr);h->session->setPrivacy(mode==2?PrivacyMode::Secure:mode==1?PrivacyMode::Private:PrivacyMode::Normal);
+  if(mode==2){h->expression.clear();h->contextInfo.clear();h->expressionShadows.clear();h->shadows.clear();}}
+ catch(...){}
+}
 BI void bi_context(void* ptr,const char* surroundings,const char* expression,const char* prior) noexcept {
- try{if(!ptr)return;auto h=static_cast<Handle*>(ptr);std::string p=prior?prior:"ZH";
+ try{if(!ptr)return;auto h=static_cast<Handle*>(ptr);if(h->session->privacy()==PrivacyMode::Secure)return;std::string p=prior?prior:"ZH";
  h->session->setContext(surroundings?surroundings:"",p);h->expression=expression?expression:"";
  auto c=LanguageContextResolver::analyze(h->expression,p);
  h->contextInfo=c.dominant+" | "+std::to_string(c.confidence)+" | "+c.reason;

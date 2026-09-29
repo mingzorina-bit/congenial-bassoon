@@ -24,6 +24,7 @@ class InputSession {
   bool select(int index);
   void highlight(int index);
   void setPrivacy(PrivacyMode mode);
+  PrivacyMode privacy() const { return mode_; }
   void setLexical(const LexicalStore* store) { lexical_ = store; }
   void setContext(const std::string& expression,const std::string& prior = "ZH");
   const LanguageContext& context() const { return context_; }

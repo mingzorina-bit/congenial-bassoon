@@ -49,3 +49,6 @@ source_id、name、type（CODE/DATA/AUDIO/MODEL/SERVICE）、version/snapshot da
 
 ## v0.0.4 sources
 User approved CMUdict proposal on 2026-09-29. See data/pronunciation/SOURCE.md and docs/reviews/V0_0_4_DEPENDENCY_PROPOSAL.md. Package the standalone cmudict-us.tsv and licenses/CMUdict-LICENSE.txt together; no en-GB IPA shipped. WindowsSpeechProvider uses existing Windows SDK APIs and installed voices, no new binary or network service. data/details/own-v004.tsv contains project-authored prototype POS/glosses, kept separate from CMUdict.
+
+## v0.0.5 storage binding
+User approved `Microsoft.Data.Sqlite` 8.0.31 on 2026-09-30 for the local Learning database. NuGet lock records its `Microsoft.Data.Sqlite.Core` 8.0.31 and `SQLitePCLRaw`/`e_sqlite3` 2.1.12 transitives. The Microsoft provider declares MIT; the SQLitePCLRaw native package declares Apache-2.0, and SQLite itself is public domain. Source: official NuGet package metadata and Microsoft documentation. The self-contained Windows prototype redistributes the package runtime assets and includes the resolved dependency manifest. No ORM, cloud or bundled lexical data enters the learning database; only explicitly saved catalog terms and counters are written. Review status: approved for prototype use; commercial release still passes the frozen release gate.

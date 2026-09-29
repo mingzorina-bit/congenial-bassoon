@@ -1,4 +1,5 @@
-# Project Progress — v0.0.4
+# Project Progress — v0.0.5
+2026-09-30: 用户确认按原定顺序继续 Learning，批准 Microsoft.Data.Sqlite 8.0.31 与锁定传递依赖。最近提出的 Tab 关闭、中文 Shadow 拼音、混合未提交文本识别、youh 提前候选和不完整英文双语提示仅列为未来改进，未改变冻结行为。v0.0.5 本地实现进行中：Save/Library、再遇见去重、Private/Secure 与失败降级。Learning 12 项本地测试 PASS，WinUI 本地 publish PASS；尚待完整 CI、实际窗口和 GitHub 试用包校验。此次实现没有 AI/TSF。
 2026-09-29: 用户接受 v0.0.3 有限中英试用，明确要求按计划开发下一版。两处未来改进留到 v0.1.0 后讨论，内容未给出。
 本轮仅 Hover / Deep Dive / Windows 发音 / 音标 / 设置，完成后停止试用。GitHub 沿用 mingzorina-bit/congenial-bassoon，codex/peek-v0.0.4 堆叠 v0.0.3。
 新增 CMUdict 有限美式数据提案及本轮英式音标缺失提示已获用户批准。无新 NuGet；不做 Learning/AI/TSF。

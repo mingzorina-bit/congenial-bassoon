@@ -23,6 +23,7 @@
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="1.8.260804001" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="8.0.31" />
   </ItemGroup>
   <Target Name="PublishWinUiResources" AfterTargets="Publish">
     <Error Condition="!Exists('$(TargetDir)$(AssemblyName).pri')" Text="WinUI resource index was not generated." />
