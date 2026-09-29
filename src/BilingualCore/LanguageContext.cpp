@@ -29,7 +29,7 @@ LanguageContext LanguageContextResolver::analyze(const std::string& expression,c
   else {++i;continue;}
   c.segments.push_back({start,i-start,expression.substr(start,i-start),lang,false});
  }
- if(en>=2&&en>zh){c.dominant="EN";c.confidence=.9;c.reason="English word sequence outweighs Chinese gaps";}
+ if(en>=2&&en>=zh){c.dominant="EN";c.confidence=.9;c.reason="English word sequence supports Chinese gaps";}
  else if(zh>0&&zh>=en){c.dominant="ZH";c.confidence=.85;c.reason="Chinese or explicit pinyin evidence";}
  else if(en>0){c.dominant="EN";c.confidence=.8;c.reason="Recognized English word form";}
  else if(amb>0){c.dominant=prior=="EN"?"EN":"ZH";c.confidence=.35;c.reason="Ambiguous short token; profile used only as weak prior";}
