@@ -12,6 +12,9 @@ public sealed partial class MainWindow {
  private void LibraryClick(object sender,RoutedEventArgs e){
   CloseDetails();SettingsCard.Visibility=Visibility.Collapsed;
   if(LibraryCard.Visibility==Visibility.Visible){LibraryCard.Visibility=Visibility.Collapsed;Editor.Focus(Microsoft.UI.Xaml.FocusState.Programmatic);return;}
+  RenderLibraryBody();LibraryCard.Visibility=Visibility.Visible;
+ }
+ private void RenderLibraryBody(){
   LibraryBody.Children.Clear();
   if(!privacy.LearningAllowed){LibraryBody.Children.Add(Paragraph(T("隐私模式下不读取收藏词库。","Library is unavailable in privacy mode.")));}
   else {
@@ -25,6 +28,5 @@ public sealed partial class MainWindow {
     LibraryBody.Children.Add(label);
    }
   }
-  LibraryCard.Visibility=Visibility.Visible;
  }
 }

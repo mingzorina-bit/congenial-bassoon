@@ -8,13 +8,17 @@
    <Grid><StackPanel Spacing="6"><TextBlock Text="Bilingual Input" FontSize="28" FontWeight="SemiBold"/>
     <TextBlock x:Name="Subtitle" Text="同样的输入，连接另一种表达。" TextWrapping="Wrap"/>
    </StackPanel></Grid>
-   <StackPanel Orientation="Horizontal" Spacing="12">
-    <ComboBox x:Name="ThemeChoice" Header="外观 / Appearance" Width="160" SelectedIndex="0" SelectionChanged="ThemeChanged">
-     <ComboBoxItem Content="System / 跟随系统"/><ComboBoxItem Content="Light / 浅色"/><ComboBoxItem Content="Dark / 深色"/>
-    </ComboBox>
-    <Button Content="详情设置 / Settings" VerticalAlignment="Bottom" Click="SettingsClick"/>
-    <Button x:Name="ReplayButton" Content="重新体验 / Demo" VerticalAlignment="Bottom" Click="ReplayClick"/>
-    <Button x:Name="LibraryButton" Content="收藏词库 / Library" VerticalAlignment="Bottom" Click="LibraryClick"/>
+   <StackPanel Spacing="8">
+    <StackPanel Orientation="Horizontal" Spacing="12">
+     <ComboBox x:Name="ThemeChoice" Header="外观 / Appearance" Width="160" SelectedIndex="0" SelectionChanged="ThemeChanged">
+      <ComboBoxItem Content="System / 跟随系统"/><ComboBoxItem Content="Light / 浅色"/><ComboBoxItem Content="Dark / 深色"/>
+     </ComboBox>
+     <Button Content="详情设置 / Settings" VerticalAlignment="Bottom" Click="SettingsClick"/>
+    </StackPanel>
+    <StackPanel Orientation="Horizontal" Spacing="12">
+     <Button x:Name="ReplayButton" Content="重新体验 / Demo" Click="ReplayClick"/>
+     <Button x:Name="LibraryButton" Content="收藏词库 / Library" Click="LibraryClick"/>
+    </StackPanel>
    </StackPanel>
    <Border x:Name="SettingsCard" Visibility="Collapsed" Padding="16" CornerRadius="8" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"><ScrollViewer MaxHeight="320"><StackPanel x:Name="SettingsBody" Spacing="8"/></ScrollViewer></Border>
    <Border x:Name="LibraryCard" Visibility="Collapsed" Padding="16" CornerRadius="8" Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"><StackPanel Spacing="10"><TextBlock Text="收藏词库 / Library" FontSize="18" FontWeight="SemiBold"/><StackPanel x:Name="LibraryBody" Spacing="8"/></StackPanel></Border>

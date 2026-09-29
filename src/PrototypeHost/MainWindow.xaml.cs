@@ -156,7 +156,7 @@ public sealed partial class MainWindow : Window {
  private void RenderShadows(){
   if(session==null)return;SyncDetailContext();ShadowRow.Children.Clear();var items=session.Shadows;
   if(session.Raw.Length==0)encounters.Reset();
-  else if(privacy.LearningAllowed)foreach(var item in items){var key=LearningKey(item.Text);if(learning.Contains(key)&&encounters.Observe(session.Raw,key,true))learning.Encounter(key);}
+  else if(privacy.LearningAllowed){bool changed=false;foreach(var item in items){var key=LearningKey(item.Text);if(learning.Contains(key)&&encounters.Observe(session.Raw,key,true))changed|=learning.Encounter(key);}if(changed&&LibraryCard.Visibility==Visibility.Visible)RenderLibraryBody();}
   if(session.Raw.Length==0&&expressionShadow.Length>0){
    ShadowLanguage.Text="EN";ShadowHint.Text=T("补全当前表达中的中文缺口 · Shift+Enter 应用","Complete Chinese gaps in this expression · Shift+Enter to apply");
    var button=new Button{Content=new TextBlock{Text=expressionShadow,TextWrapping=TextWrapping.Wrap},FontSize=14,IsTabStop=false,MaxWidth=720};
