@@ -33,7 +33,13 @@ bool InputSession::select(int index) {
 void InputSession::highlight(int index) {
   if (index >= 0 && index < static_cast<int>(candidates_.size())) highlighted_ = index;
 }
-void InputSession::setPrivacy(PrivacyMode mode) { mode_ = mode; refresh(); }
+void InputSession::setPrivacy(PrivacyMode mode) { mode_ = mode;if(mode==PrivacyMode::Secure){context_={};surroundings_.clear();} refresh(); }
+void InputSession::setContext(const std::string& expression,const std::string& prior){
+ if(mode_==PrivacyMode::Secure)return;
+ if(contextEnabled_&&surroundings_==expression&&prior_==prior)return;
+ contextEnabled_=true;surroundings_=expression;prior_=prior;
+ context_=LanguageContextResolver::analyze(expression,prior);refresh();
+}
 std::vector<ShadowCandidate> InputSession::shadows() const {
  if(!lexical_||mode_==PrivacyMode::Secure||highlighted_<0||highlighted_>=static_cast<int>(candidates_.size()))return {};
  try{return lexical_->lookup(candidates_[highlighted_]);}catch(...){return {};}
@@ -46,7 +52,15 @@ std::string InputSession::takeCommit() { auto text = pending_; pending_.clear();
 void InputSession::refresh() {
   candidates_.clear(); highlighted_ = 0;
   if (raw_.empty() || mode_ == PrivacyMode::Secure) return;
-  try { candidates_ = engine_.query(raw_); } catch (...) { candidates_.clear(); }
+  try {
+   if(!contextEnabled_){candidates_=engine_.query(raw_);return;}
+   auto language=LanguageContextResolver::tokenLanguage(raw_,context_,prior_);
+   if(language=="EN"){candidates_={raw_};return;}
+   auto query=LanguageContextResolver::correctedPinyin(raw_,context_);
+   if(language=="Unknown"&&query==raw_){candidates_={raw_};return;}
+   candidates_=engine_.query(query);
+   if(candidates_.empty())candidates_={raw_};
+  } catch (...) { candidates_.clear(); }
 }
 void InputSession::commit(const std::string& text) {
   pending_ += text; // Copy before clearing raw/candidates: text may reference either.

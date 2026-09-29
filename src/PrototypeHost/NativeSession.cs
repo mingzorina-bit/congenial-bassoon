@@ -3,6 +3,12 @@ namespace BilingualInput;
 internal sealed class NativeSession : IDisposable {
  private IntPtr handle;
  private const string Dll = "BilingualNative.dll";
+ [DllImport(Dll, CallingConvention=CallingConvention.Cdecl)] private static extern void bi_context(IntPtr h,[MarshalAs(UnmanagedType.LPUTF8Str)] string surroundings,[MarshalAs(UnmanagedType.LPUTF8Str)] string expression,[MarshalAs(UnmanagedType.LPUTF8Str)] string prior);
+ [DllImport(Dll, CallingConvention=CallingConvention.Cdecl)] private static extern IntPtr bi_context_info(IntPtr h);
+ [DllImport(Dll, CallingConvention=CallingConvention.Cdecl)] private static extern IntPtr bi_expression_shadow(IntPtr h);
+ public void Context(string surroundings,string expression,string prior)=>bi_context(handle,surroundings,expression,prior);
+ public string ContextInfo=>Copy(bi_context_info(handle));
+ public string ExpressionShadow=>Copy(bi_expression_shadow(handle));
  [DllImport(Dll, CallingConvention=CallingConvention.Cdecl)] private static extern IntPtr bi_create([MarshalAs(UnmanagedType.LPUTF8Str)] string shared,[MarshalAs(UnmanagedType.LPUTF8Str)] string user);
  [DllImport(Dll, CallingConvention=CallingConvention.Cdecl)] private static extern void bi_destroy(IntPtr h);
  [DllImport(Dll, CallingConvention=CallingConvention.Cdecl)] private static extern int bi_ready(IntPtr h);
@@ -22,7 +28,7 @@ internal sealed class NativeSession : IDisposable {
  public ShadowItem[] Shadows=>Enumerable.Range(0,bi_shadow_count(handle)).Select(i=>new ShadowItem(Copy(bi_shadow_field(handle,i,0)),Copy(bi_shadow_field(handle,i,1)),Copy(bi_shadow_field(handle,i,2)),Copy(bi_shadow_field(handle,i,3)))).ToArray();
  public bool SelectShadow(int i)=>bi_select_shadow(handle,i)!=0;
  public NativeSession() {
-  var user = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"BilingualInput","rime-v002");
+  var user = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"BilingualInput","rime-v003");
   handle=bi_create(Path.Combine(AppContext.BaseDirectory,"data","rime"),user);
   if(handle==IntPtr.Zero) throw new InvalidOperationException("Input session unavailable.");
  }
@@ -38,4 +44,3 @@ internal sealed class NativeSession : IDisposable {
  public string TakeCommit()=>Copy(bi_take_commit(handle));
  public void Dispose(){if(handle!=IntPtr.Zero){bi_destroy(handle);handle=IntPtr.Zero;}}
 }
-
