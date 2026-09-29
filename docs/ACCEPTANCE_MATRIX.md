@@ -46,3 +46,6 @@ D=Deterministic；S=Semantic；M=Human/manual。下表是测试追踪计划；�
 
 ## v0.0.4 执行证据
 AC-17/18/19/20/26 的本里程碑子集见 [v0.0.4 记录](releases/v0.0.4.md)。不将局部测试等同整项 PASS：英式 IPA 未收录、无本机英式声线听感、第二机部署、后续 Learning/AI 仍保留对应限制。
+
+## v0.0.5 执行证据
+AC-21/22/23/24 及 AC-14/20 学习子集的范围、确定性测试与窗口证据见 [v0.0.5 记录](releases/v0.0.5.md)。真实系统安全字段检测与完整 Phase 0/Alpha 判定仍未完成，不能据此标 AC-30 PASS。
