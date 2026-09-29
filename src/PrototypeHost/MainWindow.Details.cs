@@ -30,19 +30,22 @@ public sealed partial class MainWindow {
  private void AttachPeek(Button target,string text,string language){
   target.PointerEntered+=async(_,_)=>{
    if(!prefs.QuickPeek||closed)return;
-   long ticket=details.Enter(text,Environment.TickCount64);leaveRevision++;
+   HidePeek();StopAudio();long ticket=details.Enter(text,Environment.TickCount64);leaveRevision++;
    await Task.Delay(prefs.HoverDelayMs);
    if(closed||!details.TryShow(ticket,Environment.TickCount64,prefs.QuickPeek,prefs.HoverDelayMs))return;
-   if(peek==null){peek=new Popup{IsLightDismissEnabled=false};Root.Children.Add(peek);}
+   if(peek==null){peek=new Popup{IsLightDismissEnabled=false};Surface.Children.Add(peek);}
    var content=EntryCard(text,language);
-   var border=new Border{Width=360,Padding=new Thickness(16),CornerRadius=new CornerRadius(8),BorderThickness=new Thickness(1),
+   double width=Math.Min(360,Math.Max(120,Surface.ActualWidth-24));
+   var border=new Border{Width=width,RequestedTheme=Root.RequestedTheme,Padding=new Thickness(16),CornerRadius=new CornerRadius(8),BorderThickness=new Thickness(1),
     BorderBrush=(Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["CardStrokeColorDefaultBrush"],
-    Background=(Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["SolidBackgroundFillColorBaseBrush"],Child=content};
+    Background=(Microsoft.UI.Xaml.Media.Brush)Application.Current.Resources["SolidBackgroundFillColorBaseBrush"],Child=new ScrollViewer{Content=content,MaxHeight=Math.Max(60,Math.Min(310,Surface.ActualHeight-60))}};
    border.PointerEntered+=(_,_)=>leaveRevision++;
    border.PointerExited+=(_,_)=>LeavePeekSoon();
    peek.Child=border;peek.XamlRoot=Root.XamlRoot;
-   var position=target.TransformToVisual(Root).TransformPoint(new Windows.Foundation.Point(0,target.ActualHeight));
-   peek.HorizontalOffset=Math.Clamp(position.X,0,Math.Max(0,Root.ActualWidth-360));peek.VerticalOffset=position.Y;
+   border.Measure(new Windows.Foundation.Size(width,double.PositiveInfinity));
+   var position=target.TransformToVisual(Surface).TransformPoint(new Windows.Foundation.Point(0,0));
+   var placement=DetailPlacement.Peek(position.X,position.Y,target.ActualHeight,width,border.DesiredSize.Height,Surface.ActualWidth,Surface.ActualHeight);
+   peek.HorizontalOffset=placement.X;peek.VerticalOffset=placement.Y;
    peek.IsOpen=true;
   };
   target.PointerExited+=(_,_)=>LeavePeekSoon();
@@ -63,9 +66,10 @@ public sealed partial class MainWindow {
   if(prefs.Pronunciation){
    var speak=new Button{Content=T("🔊 播放","🔊 Play"),IsTabStop=false,AllowFocusOnInteraction=false};
    speak.Click+=async(_,_)=>{
-    long ticket=++audioRevision;string locale=DetailState.VoiceLocale(language,prefs.PronunciationLocale);
-    await speech.PlayAsync(text,locale,state=>DispatcherQueue.TryEnqueue(()=>{
-     if(closed||ticket!=audioRevision)return;
+    long ticket=++audioRevision,surfaceTicket=details.AudioTicket;string locale=DetailState.VoiceLocale(language,prefs.PronunciationLocale);
+    bool IsCurrent()=>!closed&&ticket==audioRevision&&details.CanPlay(surfaceTicket);
+    await speech.PlayAsync(text,locale,IsCurrent,state=>DispatcherQueue.TryEnqueue(()=>{
+     if(!IsCurrent())return;
      feedback.Text=state switch{
       "MissingVoice"=>T("未安装对应声线（","Voice not installed (")+locale+T("），可在 Windows 语言设置中添加。", "). Add it in Windows language settings."),
       "Preparing"=>T("准备发音…","Preparing audio…"),
@@ -79,7 +83,7 @@ public sealed partial class MainWindow {
   return panel;
  }
  private void OpenDetails(){
-  SyncDetailContext();if(DetailText().Length==0)return;HidePeek();details.Open();DeepBody.Children.Clear();
+  SyncDetailContext();if(DetailText().Length==0)return;HidePeek();StopAudio();details.Open();DeepBody.Children.Clear();
   string text=DetailText(),mapping=DetailMapping();
   DeepBody.Children.Add(new TextBlock{Text=T("当前表达","Current expression"),FontWeight=Microsoft.UI.Text.FontWeights.SemiBold});DeepBody.Children.Add(Paragraph(text));
   foreach(var module in DetailState.Modules(prefs)){
@@ -99,6 +103,7 @@ public sealed partial class MainWindow {
   }
   if(prefs.Examples)DeepBody.Children.Add(Paragraph(T("Examples：本版未提供例句数据。","Examples: no example data in this version.")));
   DeepCard.Visibility=Visibility.Visible;
+  DispatcherQueue.TryEnqueue(()=>{if(!closed&&details.DeepOpen)DeepCard.StartBringIntoView(new BringIntoViewOptions{AnimationDesired=false,VerticalAlignmentRatio=0});});
  }
  private void DetailsClick(object sender,RoutedEventArgs e){OpenDetails();Editor.Focus(FocusState.Programmatic);}
  private void CloseDetailsClick(object sender,RoutedEventArgs e){CloseDetails();Editor.Focus(FocusState.Programmatic);}

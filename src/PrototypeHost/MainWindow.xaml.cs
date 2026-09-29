@@ -22,6 +22,8 @@ public sealed partial class MainWindow : Window {
   Editor.InputScope=new InputScope{Names={new InputScopeName(InputScopeNameValue.AlphanumericHalfWidth)}};
   Editor.TextChanged+=(_,_)=>{if(!updating)UpdateContext();};
   Editor.SelectionChanged+=(_,_)=>{if(!updating)UpdateContext();};
+  Surface.SizeChanged+=(_,_)=>{if(peek?.IsOpen==true){HidePeek();StopAudio();}};
+  PageScroll.ViewChanged+=(_,_)=>{if(peek?.IsOpen==true){HidePeek();StopAudio();}};
   Closed+=(_,_)=>{closed=true;CloseDetails();speech.Dispose();session?.Dispose();};
   RenderGuide();
   Root.Loaded+=async(_,_)=>{

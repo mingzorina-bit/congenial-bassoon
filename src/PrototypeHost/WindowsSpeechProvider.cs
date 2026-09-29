@@ -15,7 +15,7 @@ internal sealed class WindowsSpeechProvider : IDisposable {
   player?.Dispose();player=null;source?.Dispose();source=null;stream?.Dispose();stream=null;
  }
  // Only the explicit speaker-button handler calls this. Streams never touch disk.
- public async Task PlayAsync(string text,string locale,Action<string> report){
+ public async Task PlayAsync(string text,string locale,Func<bool> isCurrent,Action<string> report){
   if(disposed||string.IsNullOrWhiteSpace(text))return;
   Stop();long ticket=revision;
   try{
@@ -25,7 +25,7 @@ internal sealed class WindowsSpeechProvider : IDisposable {
    report("Preparing");
    using var synth=new SpeechSynthesizer{Voice=voices[index]};
    var generated=await synth.SynthesizeTextToStreamAsync(text);
-   if(disposed||ticket!=revision){generated.Dispose();return;}
+   if(disposed||ticket!=revision||!isCurrent()){generated.Dispose();return;}
    stream=generated;source=MediaSource.CreateFromStream(stream,stream.ContentType);
    player=new MediaPlayer{AutoPlay=false,Source=source};
    player.MediaEnded+=(_,_)=>{if(!disposed&&ticket==revision)report("Ended");};

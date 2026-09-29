@@ -17,5 +17,10 @@ Test("CmuConversionHasStressAndSchwa",()=>{Check(PhoneticDataProvider.ToIpa("R I
 Test("PronunciationProvenanceAndNoLocaleFallback",()=>{var path=Path.GetTempFileName();try{File.WriteAllText(path,"refine\tR IH0 F AY1 N\ninvalid\tNOPE\n");var p=new PhoneticDataProvider(path);var entry=p.Find("refine","en-US");Check(entry!=null&&entry.Word=="refine"&&entry.Locale=="en-US"&&entry.SourceId=="cmudict-7479086"&&entry.Notation=="IPA");Check(p.Find("refine","en-GB")==null);Check(p.Find("unknown","en-US")==null);Check(p.Find("invalid","en-US")==null);}finally{File.Delete(path);}});
 Test("MissingPhoneticsDoNotBlockInput",()=>Check(new PhoneticDataProvider("nonexistent-phonetics.tsv").Find("refine","en-US")==null));
 CatalogChecks.Run(Test,Check);
+Test("ReplacementInvalidatesPendingAudio",()=>{var s=new DetailState();s.Context("youhua");s.Enter("refine",0);long a=s.AudioTicket;s.Enter("improve",1);Check(!s.CanPlay(a));s.Open();long b=s.AudioTicket;s.Open();Check(!s.CanPlay(b));});
+Test("DelayedAudioCannotPlayAfterTab",()=>{var s=new DetailState();s.Context("youhua");s.Enter("refine",0);long ticket=s.AudioTicket;var synth=new TaskCompletionSource<bool>();var continuation=synth.Task.ContinueWith(_=>s.CanPlay(ticket));s.Open();synth.SetResult(true);Check(!continuation.GetAwaiter().GetResult());});
+Test("PeekFitsBottomAndRightEdges",()=>{var p=DetailPlacement.Peek(1000,650,32,360,240,1280,720);Check(p.X+360<=1268&&p.Y+240<=650&&p.X>=12&&p.Y>=12);});
+Test("PeekBelowWhenSpaceAvailable",()=>{var p=DetailPlacement.Peek(20,100,32,360,240,1280,720);Check(p.Y==132);});
 Console.WriteLine($"{count} tests, {failed} failures");return failed==0?0:1;
+
 
