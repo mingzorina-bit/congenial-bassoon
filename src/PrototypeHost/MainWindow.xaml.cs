@@ -35,7 +35,7 @@ public sealed partial class MainWindow : Window {
  private TextBlock Paragraph(string text)=>new(){Text=text,TextWrapping=TextWrapping.Wrap};
  private void RenderGuide(){
   Subtitle.Text=T("同样的输入，连接另一种表达。","The same input, another way to express it.");
-  Hint.Text=T("试试 design、youhua 或 I think this 方案 is better。系统输入法切到英文输入拼音；可粘贴混合句体验补全。","Try youhua, youhuafangan or xuexi. Use the system keyboard in English to enter pinyin here.");
+  Hint.Text=T("试试 design、youhua 或 I think this 方案 is better。系统输入法切到英文输入拼音；可粘贴混合句体验补全。","Try design or youhua. You can paste a mixed sentence to complete its Chinese gaps. Use the system keyboard in English for pinyin.");
   Editor.PlaceholderText=T("在这里连续输入…","Keep typing here…");
   GuideCard.Visibility=showGuide?Visibility.Visible:Visibility.Collapsed;
   InputPanel.Visibility=!showGuide||guide.Step==4?Visibility.Visible:Visibility.Collapsed;
@@ -51,7 +51,7 @@ public sealed partial class MainWindow : Window {
     GuideTitle.Text=T("欢迎使用 Bilingual Input","Welcome to Bilingual Input");
     GuideBody.Children.Add(Paragraph(T("用你熟悉的语言，自然连接另一种表达。","Use your familiar language to connect with another expression.")));
     GuideBody.Children.Add(Paragraph(T("自然输入 · 双语表达 · 在真实使用中学习","Natural input · Bilingual expression · Learn through use")));
-    GuideBody.Children.Add(Paragraph(T("本次试用：本地中英上下文、英文保留与中文缺口补全。发音与学习收藏将在后续版本加入。","This trial adds local word and phrase Shadows. Context intelligence, pronunciation and learning collections come later.")));break;
+    GuideBody.Children.Add(Paragraph(T("本次试用：本地中英上下文、英文保留与中文缺口补全。发音与学习收藏将在后续版本加入。","This trial adds local bilingual context and Chinese gap completion. Pronunciation and learning collections come later.")));break;
    case 1:
     GuideTitle.Text=T("你更熟悉哪种语言？","Which language feels more familiar?");
     var primary=new ComboBox{Header=T("Primary Language（不代表英语水平）","Primary language (not a proficiency rating)"),Width=300};
@@ -63,7 +63,7 @@ public sealed partial class MainWindow : Window {
     GuideTitle.Text=T("输入偏好","Input preference");
     var preference=new ComboBox{Width=320};preference.Items.Add(T("智能识别（推荐）","Smart recognition (recommended)"));preference.Items.Add(T("中文拼音优先","Chinese pinyin first"));preference.SelectedIndex=prefs.InputPreference=="Pinyin"?1:0;
     preference.SelectionChanged+=(_,_)=>prefs.InputPreference=preference.SelectedIndex==1?"Pinyin":"Smart";GuideBody.Children.Add(preference);
-    GuideBody.Children.Add(Paragraph(T("偏好会保存。当前表达优先于语言偏好；本版使用有限本地规则，未知词保留原文。","Your preference is saved. This version tests pinyin and local Shadows; full bilingual recognition is planned for the next milestone.")));break;
+    GuideBody.Children.Add(Paragraph(T("偏好会保存。当前表达优先于语言偏好；本版使用有限本地规则，未知词保留原文。","Current expression takes priority over your saved preference. Local rules are limited; unknown words keep their original form.")));break;
    case 3:
     GuideTitle.Text=T("你希望用它做什么？","What would you like to do?");
     foreach(var item in new[]{("Expression",T("更自然地使用另一种语言表达","Express yourself naturally in another language")),("Learning",T("在输入过程中学习另一种语言","Learn another language while typing")),("Input",T("快速进行中英双语输入","Type in Chinese and English quickly"))}){
@@ -92,9 +92,10 @@ public sealed partial class MainWindow : Window {
   int relative=Math.Clamp(Editor.SelectionStart-expressionRange.Start,0,expressionRange.Length);
   string surroundings=expressionRange.Text;
   string current=surroundings.Insert(relative,session.Raw);
-  session.Context(surroundings,current,prefs.PrimaryLanguage);
+  session.Context(surroundings,current,prefs.InputPreference=="Pinyin"?"ZH":prefs.PrimaryLanguage);
   expressionShadow=session.Raw.Length==0?session.ExpressionShadow:"";
-  ContextLabel.Text=session.ContextInfo;
+  ContextLabel.Text=session.ContextInfo.StartsWith("EN |")?T("当前表达：英文","Current expression: English"):session.ContextInfo.StartsWith("ZH |")?T("当前表达：中文","Current expression: Chinese"):T("当前表达：待判断，保留原文","Current expression: uncertain; original text preserved");
+  RenderCandidates();
   RenderShadows();
  }
  private void CommitExpression(){
@@ -132,13 +133,17 @@ public sealed partial class MainWindow : Window {
    if(showGuide){guide.Observe(raw,commit,shadow);RenderGuide();}
   }
   Composition.Text=session.Raw.Length==0?T("准备输入","Ready to type"):session.Raw;
-  CandidateRow.Children.Clear();var candidates=session.Candidates;
+  UpdateContext();
+ }
+ private void RenderCandidates(){
+  if(session==null)return;CandidateRow.Children.Clear();var candidates=session.Candidates;
   for(int i=0;i<candidates.Length;i++){
    int index=i;var button=new Button{Content=$"{i+1}  {candidates[i]}",FontSize=18,IsTabStop=false};
    if(i==session.Highlighted)button.Style=(Style)Application.Current.Resources["AccentButtonStyle"];
-   button.Click+=(_,_)=>{string before=session.Raw;session.Select(index);Refresh(before);Editor.Focus(FocusState.Programmatic);};
+   var snapshot=new CandidateSnapshot(session.Raw,index,candidates[i]);
+   button.Click+=(_,_)=>{if(!snapshot.Matches(session.Raw,session.Candidates)){Refresh();return;}string before=session.Raw;session.Select(index);Refresh(before);Editor.Focus(FocusState.Programmatic);};
    button.PointerEntered+=(_,_)=>{session.Highlight(index);UpdateHighlights();RenderShadows();};CandidateRow.Children.Add(button);
-  }UpdateContext();RenderShadows();
+  }
  }
  private void RenderShadows(){
   if(session==null)return;ShadowRow.Children.Clear();var items=session.Shadows;
@@ -151,7 +156,8 @@ public sealed partial class MainWindow : Window {
   ShadowHint.Text=items.Length>0?T("Shift+Enter 使用首选表达 · Shift+数字选择","Shift+Enter uses the first expression · Shift+number selects"):session.Raw.Length>0?T("暂无本地辅助表达；Primary 与 Enter 原文仍可用。","No local Shadow available; Primary and raw Enter still work."):"";
   for(int i=0;i<items.Length;i++){
    int index=i;var item=items[i];var button=new Button{Content=item.Text,FontSize=14,IsTabStop=false};
-   button.Click+=(_,_)=>{string before=session.Raw;session.SelectShadow(index);Refresh(before,true);Editor.Focus(FocusState.Programmatic);};ShadowRow.Children.Add(button);
+   var snapshot=new CandidateSnapshot(session.Raw,index,item.Text);
+   button.Click+=(_,_)=>{if(!snapshot.Matches(session.Raw,session.Shadows.Select(s=>s.Text).ToArray())){Refresh();return;}string before=session.Raw;session.SelectShadow(index);Refresh(before,true);Editor.Focus(FocusState.Programmatic);};ShadowRow.Children.Add(button);
   }
  }
  private void UpdateHighlights(){if(session==null)return;for(int i=0;i<CandidateRow.Children.Count;i++)((Button)CandidateRow.Children[i]).Style=i==session.Highlighted?(Style)Application.Current.Resources["AccentButtonStyle"]:null;}

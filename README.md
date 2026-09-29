@@ -1,9 +1,9 @@
-# BilingualInput — Local Shadow v0.0.2
+# BilingualInput — Bilingual Context v0.0.3
 
-Windows 原生输入原型，采用 WinUI 3/C# 与 C++20 Core、真实 librime。当前推进第二个里程碑，等待实际试用反馈；完整 Phase 0 尚未完成。
+Windows 原生输入原型，采用 WinUI 3/C# 与 C++20 Core、真实 librime。当前推进第三个里程碑，等待实际试用反馈；完整 Phase 0 尚未完成。
 
 ## 试用
-按 [体验指南](README-TRY.md) 下载成功 Actions 构建中的 BilingualInput-v0.0.2-win-x64，完整解压后运行 BilingualInput.exe。无需 API Key。有限自有词表用于验证候选交互；已加入本地 Shadow 与首次引导；上下文智能、学习、AI 与系统级输入尚未实现。
+按 [体验指南](README-TRY.md) 下载成功 Actions 构建中的 BilingualInput-v0.0.3-win-x64，完整解压后运行 BilingualInput.exe。无需 API Key。有限自有词表用于验证候选交互；已加入本地上下文判断、英文保留与中文 gap 补全；规则和词表有限，学习、AI 与系统级输入尚未实现。
 
 ## 规格与推进
 1. [冻结登记](docs/SPEC_FREEZE.md)、[CR-01～05](docs/CHANGE_REQUESTS.md)。
@@ -25,7 +25,6 @@ dotnet run --project tests/HostRoutingTests/HostRoutingTests.csproj -c Release
 ./scripts/Package.ps1
 ```
 
-成品位于 artifacts/BilingualInput-v0.0.2-win-x64.zip。GitHub Actions 使用同一流程。包内附来源、许可和文件校验清单。不要只拷贝 exe；原型不安装为系统输入法。
+成品位于 artifacts/BilingualInput-v0.0.3-win-x64.zip。GitHub Actions 使用同一流程。包内附来源、许可和文件校验清单。不要只拷贝 exe；原型不安装为系统输入法。
 
 用户已批准本阶段依赖。下一里程碑须先根据本阶段试用结果验收，新增依赖或冻结行为修改仍按实施计划处理。
-

@@ -1,4 +1,7 @@
 namespace BilingualInput;
+internal readonly record struct CandidateSnapshot(string Raw,int Index,string Text) {
+ public bool Matches(string raw,string[] candidates)=>Raw==raw&&Index>=0&&Index<candidates.Length&&candidates[Index]==Text;
+}
 internal readonly record struct ExpressionRange(int Start,int Length,string Text) {
  public static ExpressionRange At(string text,int caret,int selectionLength){
   caret=Math.Clamp(caret,0,text.Length);selectionLength=Math.Clamp(selectionLength,0,text.Length-caret);

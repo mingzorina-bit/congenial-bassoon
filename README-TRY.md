@@ -1,27 +1,16 @@
-# Bilingual Input v0.0.2 — 本地 Shadow 试用
+# Bilingual Input v0.0.3 — Bilingual Context 试用
+Windows 10 2004+ / Windows 11 x64。完整解压后运行 BilingualInput.exe；无需 API Key。
 
-Windows 10 2004+ / Windows 11 x64；原型只在自己的编辑区工作。
-完整解压文件夹，运行 BilingualInput.exe；无需 API Key、网络或开发工具。建议窗口最大化；小窗口支持滚动。
+## 本次新增
+- 明确英文 design 保留为英文，Shadow 可显示“设计”。英文单词用 Space 提交并留下词间空格。
+- 输入 zhege + Space、一个空格、design + Space、haikeyi + Space，可得到“这个 design 还可以”。
+- 在编辑区粘贴 I think this 方案 is better，保持光标在本句，点击下方英文补全或 Shift+Enter，可得到 I think this approach is better。
+- 粘贴 We probably need to 优化 this part.，补全为 We probably need to optimize this part.。
+- 先输入“这个方案”，再输入 youhha：在明确中文上下文中恢复为“优化”；Shift+Enter 可用 optimize。Enter 仍提交原始 youhha。
+- shi/he/can/an/in/me 结合当前句判断；无明确证据时才使用偏好。判断并非每次正确，Enter 总能保留原文。
 
-## 第一次使用
-Welcome → Primary Language → Input Preference → Goals → First Success。
-选择更熟悉的语言（不代表英语水平），界面语言可独立选择。偏好和目标会保存；完整中英智能识别属于下一里程碑，此版仍用拼音验证本地 Shadow。
-在第五步将系统输入法切到英文：
-1. youhua + Space → 优化。
-2. 再输入 youhua + Shift+Enter → optimize。
-两次真实提交后，“开始使用”解锁。重启不重复引导；可从“重新体验 / Demo”再次进入。
+补全只作用于当前句或明确选区。无 composition 时 Shift+Enter 应用当前句补全；有 composition 时仍提交当前候选的 Shadow。编辑其他句子后旧结果不会继续应用。正常 Ctrl+Z 撤销由编辑器处理。
 
-## 连续试用
-- youhua：Primary 优化/油画/有话；默认 Shadow optimize、improve、refine。
-- 方向键或鼠标高亮油画：Shadow 换成 oil painting，不保留旧义。
-- Space/1–5/鼠标提交 Primary；Enter 始终提交原始拼音。
-- Shift+Enter 提交第一条 Shadow；Shift+1–3 选择相应项；无项时保留 composition。
-- youhuafangan 或 youhua'fangan：优化方案 → optimization plan。
-- jixuyouhua → 继续优化 → further improve；xuexi → 学习 → learn。
-- 词表未覆盖时无 Shadow，仍能用 Primary 与原文输入。不会在线补译。
+原有引导、Primary 高亮与 Shift+1–3 保持；system keyboard 请切英文。词表有限，不认识的中文缺口保留原文，整句自动翻译、AI、Hover、学习和系统级输入法尚未实现。
 
-五步设置存于本地应用数据 BilingualInput/preferences.json，Rime 构建数据使用 rime-v002；不保存编辑器输入内容。设置写入失败会提示，但输入继续可用。
-
-## 本版边界与反馈
-词表有限；完整 Context、Hover、发音、收藏学习、AI、系统 TSF 尚未实现。Shift+数字在不同键盘布局上的便利性仍需试用。
-请连续试用 10–20 分钟，记录高亮切换是否自然、Shift 是否顺手、缺少哪些必要词义。先反馈本里程碑，再决定 v0.0.3。
+请重点体验英文是否误转、切换句子/选区是否准确、拼音与英文交替是否自然；反馈后再推进 v0.0.4。

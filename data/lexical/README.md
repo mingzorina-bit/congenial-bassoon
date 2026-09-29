@@ -10,3 +10,5 @@ Approval: 冻结 D-07 与 v0.0.2 计划的 curated 路线，本轮用户明确�
 
 语义复核：优化 optimize/improve/refine，均为动词改进义；油画 oil painting，为独立名词义；优化方案 optimization plan，完整短语条目；继续优化 further improve，动词短语；学习语言 learn a language，完整动宾结构。缺失词义（如 有话）不强造英文。
 反向 optimize→优化 用于验证 Core 目标语言不被写死成 EN；当前真实拼音 Host 尚未进行英文上下文识别，不能据此宣称 AC-11 已实现。
+
+2026-09-29 v0.0.3：新增自有 design→设计；上下文词形集合在 LanguageContext.cpp，人工编写、无外部词典。gap 只匹配完整词条，不逐字拼接，不承诺语法改写。

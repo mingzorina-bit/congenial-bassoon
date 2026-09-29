@@ -6,7 +6,7 @@ namespace bilingual {
 namespace {
 // Project-authored, deliberately bounded vocabulary; no downloaded language model.
 const std::unordered_set<std::string> english={"i","we","you","they","this","that","the","a","is","are","was","be","think","probably","need","needs","to","better","part","design","works","work","well","hello","world","optimize","improve","refine","plan","approach","input","test","use","my","your","and","of","for","with","it","not","please","good","very","thank","thanks","new","have","want","will","should","do","does","help"};
-const std::unordered_set<std::string> pinyin={"zhege","hai","keyi","haikeyi","youhua","youhuafangan","jixu","jixuyouhua","fangan","wo","women","ni","nihao","xuexi","gongzuo","zhongguo","sheji","gaijin","wancheng","wenti","jihua","juede","shuru","zhongwen","yingwen","yuyan","shijian","jintian","mingtian","xianzai","xuyao","ceshi","tiyan","ziran","biaoda","xuanze","houxuan","baocun","xiexie","pengyou","fangfa","diannao","neirong","kaishi","jieshu","xihuan","bangzhu","zhichi","kaifa","yige","haishi","danshi","yinwei","suoyi","feichang","yijing","shenme","zenme","weishenme"};
+const std::unordered_set<std::string> pinyin={"an","bangzhu","baocun","biaoda","bu","can","ceshi","danshi","de","diannao","fang","fangan","fangfa","feichang","gaijin","ge","gong","gongzuo","guo","hai","haikeyi","haishi","hao","he","hen","houxuan","hua","jiejuewenti","jieshu","jihua","jintian","jixu","jixuyouhua","juede","kaifa","kaishi","ke","keyi","le","me","mingtian","neirong","ni","nihao","nimen","pengyou","sheji","shenme","shi","shijian","shuru","suoyi","ta","tamen","tiyan","wancheng","weishenme","wenti","wo","women","xi","xianzai","xiexie","xihuan","xuanze","xue","xuexi","xuexiyuyan","xuyao","ye","yi","yige","yijing","yingwen","yinwei","you","youhua","youhuafangan","youhuafangfa","yuyan","zai","zenme","zhe","zhege","zhichi","zhong","zhongguo","zhongwen","ziran","ziranbiaoda","zuo"};
 const std::unordered_set<std::string> ambiguous={"shi","he","can","an","in","me"};
 std::string lower(std::string s){for(char& c:s)if(c>='A'&&c<='Z')c+=32;return s;}
 bool latin(unsigned char c){return (c>='A'&&c<='Z')||(c>='a'&&c<='z');}
@@ -38,6 +38,7 @@ LanguageContext LanguageContextResolver::analyze(const std::string& expression,c
 }
 std::string LanguageContextResolver::tokenLanguage(const std::string& raw,const LanguageContext& context,const std::string& prior){
  auto word=lower(raw);
+ word.erase(std::remove(word.begin(),word.end(),'\''),word.end());
  if(ambiguous.contains(word))return context.confidence>=.5?context.dominant:(prior=="EN"?"EN":"ZH");
  if(english.contains(word))return "EN";
  if(pinyin.contains(word))return "ZH";

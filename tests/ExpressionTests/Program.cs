@@ -8,4 +8,7 @@ Test("StaleResultRejected",()=>!new ExpressionRange(0,2,"方案").Matches("优�
 Test("UnchangedAccepted",()=>new ExpressionRange(0,2,"方案").Matches("方案"));
 Test("EndPunctuationIncluded",()=>ExpressionRange.At("I think 方案.",11,0).Text=="I think 方案.");
 Test("EmptySafe",()=>ExpressionRange.At("",0,0).Length==0);
+Test("CandidateRejectsContextChange",()=>!new CandidateSnapshot("he",0,"he").Matches("he",new[]{"和"}));
+Test("CandidateRejectsCompositionChange",()=>!new CandidateSnapshot("he",0,"he").Matches("design",new[]{"he"}));
+Test("CandidateAcceptsCurrent",()=>new CandidateSnapshot("he",0,"和").Matches("he",new[]{"和"}));
 Console.WriteLine($"{count} tests, {failed} failures");return failed==0?0:1;

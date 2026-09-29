@@ -57,6 +57,7 @@ void InputSession::refresh() {
    auto language=LanguageContextResolver::tokenLanguage(raw_,context_,prior_);
    if(language=="EN"){candidates_={raw_};return;}
    auto query=LanguageContextResolver::correctedPinyin(raw_,context_);
+   if(language=="Unknown"&&query==raw_){candidates_={raw_};return;}
    candidates_=engine_.query(query);
    if(candidates_.empty())candidates_={raw_};
   } catch (...) { candidates_.clear(); }
