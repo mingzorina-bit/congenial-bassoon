@@ -3,7 +3,7 @@
 Windows 原生输入原型，采用 WinUI 3/C# 与 C++20 Core、真实 librime。当前推进第四个里程碑，等待实际试用反馈；完整 Phase 0 尚未完成。
 
 ## 试用
-[v0.0.4 构建与试用包](https://github.com/mingzorina-bit/congenial-bassoon/actions?query=branch%3Acodex%2Fpeek-v0.0.4) · [本轮变更](https://github.com/mingzorina-bit/congenial-bassoon/pull/4)。
+[下载 v0.0.4 Windows 试用包](https://github.com/mingzorina-bit/congenial-bassoon/actions/runs/36591040997/artifacts/11043534654) · [本轮变更](https://github.com/mingzorina-bit/congenial-bassoon/pull/4)。
 
 按 [体验指南](README-TRY.md) 下载成功 Actions 构建中的 BilingualInput-v0.0.4-win-x64，完整解压后运行 BilingualInput.exe。无需 API Key。有限自有词表用于验证候选交互；已加入本地上下文、英文保留、中文 gap 补全、Hover/Tab 详情及本地发音；规则和词表有限，学习、AI 与系统级输入尚未实现。
 
@@ -30,4 +30,5 @@ dotnet run --project tests/HostRoutingTests/HostRoutingTests.csproj -c Release
 成品位于 artifacts/BilingualInput-v0.0.4-win-x64.zip。GitHub Actions 使用同一流程。包内附来源、许可和文件校验清单。不要只拷贝 exe；原型不安装为系统输入法。
 
 用户已批准本阶段依赖。下一里程碑须先根据本阶段试用结果验收，新增依赖或冻结行为修改仍按实施计划处理。
+
 

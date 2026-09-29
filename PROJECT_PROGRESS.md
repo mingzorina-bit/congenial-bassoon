@@ -4,3 +4,8 @@
 新增 CMUdict 有限美式数据提案及本轮英式音标缺失提示已获用户批准。无新 NuGet；不做 Learning/AI/TSF。
 本地 Host 17 + Onboarding 7 + Expression 10 + Details 18 = 52 tests PASS。WinUI 本地 publish PASS（包漏洞查询因网络提示未完成，待 CI）。原始聊天不上传。
 当前等待完整 CI、独立 review、实际窗口验证；不标本轮交付完成。
+
+最终实现 62ee4666864b477896d9696f91355b0a75143944 的完整 CI 36591040997 与 36591033413 均成功。独立复核两项 Important 已修复并 RED→GREEN；本地最终 56/56 tests PASS。Hover 实际界面/单词短语播放状态/word-phrase-sentence Tab-Esc/模块开关/UK missing voice 已验证；详细证据见 docs/releases/v0.0.4.md。正式 artifact 11043534654 正在下载校验。
+
+## 交付
+v0.0.4 正式 GitHub 包完成外层/内层 SHA256 和 560 项文件校验，已启动供用户试用。ZIP SHA256 19C75F0FE756B2D3A7C83D7845A2B9E898933861ADCFE716A33EF5CBEC227B2C。当前里程碑达到带已披露覆盖限制的试用状态；完整 Phase 0 尚未完成。停在本版，等待用户试用确认，不推进 v0.0.5。
