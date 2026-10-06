@@ -1,34 +1,20 @@
-# BilingualInput — Hover / Deep Dive v0.0.4
+# Bilingual Input — v0.0.6 AI Expression
 
-Windows 原生输入原型，采用 WinUI 3/C# 与 C++20 Core、真实 librime。当前推进第四个里程碑，等待实际试用反馈；完整 Phase 0 尚未完成。
+Windows WinUI 3/C# 原型与 C++20 Core、真实 librime。当前仅推进到第六个试用里程碑，完整 Phase 0 和系统级 TSF 输入法尚未完成。
 
-## 试用
-[下载 v0.0.4 Windows 试用包](https://github.com/mingzorina-bit/congenial-bassoon/actions/runs/36591040997/artifacts/11043534654) · [本轮变更](https://github.com/mingzorina-bit/congenial-bassoon/pull/4)。
+请按 [试用指南](README-TRY.md) 完整解压 GitHub Actions 的 `BilingualInput-v0.0.6-win-x64`，运行 `BilingualInput.exe`。不配置 API Key 也能使用本地输入。真实句子 AI 需要本机配置 OpenAI API Key，并在设置中明确开启云端辅助；详见 [已批准的供应商及数据条件](docs/reviews/V0_0_6_PROVIDER_APPROVAL.md)。
 
-按 [体验指南](README-TRY.md) 下载成功 Actions 构建中的 BilingualInput-v0.0.4-win-x64，完整解压后运行 BilingualInput.exe。无需 API Key。有限自有词表用于验证候选交互；已加入本地上下文、英文保留、中文 gap 补全、Hover/Tab 详情及本地发音；规则和词表有限，学习、AI 与系统级输入尚未实现。
+冻结依据：[规格登记](docs/SPEC_FREEZE.md)、[CR-01～05](docs/CHANGE_REQUESTS.md)、[实施计划](CODEX_IMPLEMENTATION_PLAN.md)、[验收矩阵](docs/ACCEPTANCE_MATRIX.md)。本轮范围见 [执行简报](docs/plans/v0.0.6-ai-expression.md)。
 
-## 规格与推进
-1. [冻结登记](docs/SPEC_FREEZE.md)、[CR-01～05](docs/CHANGE_REQUESTS.md)。
-2. [Product](docs/01_PRODUCT_SPEC.md)、[Interaction](docs/02_INTERACTION_SPEC.md)、[Architecture](docs/03_ARCHITECTURE.md)、[Data](docs/04_DATA_SOURCE_STRATEGY.md)、[Acceptance](docs/05_PHASE0_ACCEPTANCE.md)。
-3. [实施计划](CODEX_IMPLEMENTATION_PLAN.md)、[验收矩阵](docs/ACCEPTANCE_MATRIX.md)、[依赖来源](THIRD_PARTY_SOURCES.md)。
-4. [本阶段执行证据](PROJECT_PROGRESS.md)。
-
-## 从干净 checkout 构建
-环境：Windows x64，Visual Studio 2022 C++ desktop workload 与 Windows SDK 10.0.19041+，CMake、Git、7-Zip、PowerShell 7、.NET SDK 8.0.425。建议短路径如 C:/src/BilingualInput，避免 XAML 工具的路径长度限制。首次构建需要联网下载已登记依赖；运行原型无需联网。
-
-在仓库根目录的 PowerShell 依次执行：
+从干净 checkout 构建需要 Windows x64、Visual Studio 2022 C++ desktop workload、Windows SDK 10.0.19041+、CMake、Git、7-Zip、PowerShell 7 和 .NET SDK 8.0.425。使用短路径（例如 `C:/src/BilingualInput`）避免 XAML 工具路径过长。首次构建须下载登记依赖。
 
 ```powershell
 ./scripts/Prepare-Rime.ps1
 cmake -S . -B build -A x64 -DBI_WITH_RIME=ON -DRIME_ROOT="$PWD/.vendor/rime"
 cmake --build build --config Release
 ctest --test-dir build -C Release --output-on-failure
-dotnet run --project tests/HostRoutingTests/HostRoutingTests.csproj -c Release
+dotnet run --project tests/ProviderTests/ProviderTests.csproj -c Release
 ./scripts/Package.ps1
 ```
 
-成品位于 artifacts/BilingualInput-v0.0.4-win-x64.zip。GitHub Actions 使用同一流程。包内附来源、许可和文件校验清单。不要只拷贝 exe；原型不安装为系统输入法。
-
-用户已批准本阶段依赖。下一里程碑须先根据本阶段试用结果验收，新增依赖或冻结行为修改仍按实施计划处理。
-
-
+成品位于 `artifacts/BilingualInput-v0.0.6-win-x64.zip`，附来源、许可和逐文件校验清单。不要只拷贝 exe。每个里程碑试用后再推进下一版；新增依赖或冻结行为修改按计划审批。

@@ -12,15 +12,15 @@ public sealed partial class MainWindow {
  private Popup? peek;
  private long leaveRevision,audioRevision;
  private string DetailText()=>session?.Raw.Length>0?session.Candidates.ElementAtOrDefault(session.Highlighted)??session.Raw:expressionRange.Text?.Trim()??"";
- private string DetailMapping()=>session?.Raw.Length>0?session.Shadows.FirstOrDefault()?.Text??"":expressionShadow;
+ private string DetailMapping()=>session?.Raw.Length>0?session.Shadows.FirstOrDefault()?.Text??"":expressionShadow.Length>0?expressionShadow:aiSentenceShadow;
  private void SyncDetailContext(){
   string text=DetailText();
-  string snapshot=text.Length==0?"":string.Join("\n",text,DetailMapping(),session?.Raw,Editor.SelectionStart,Editor.SelectionLength,prefs.PronunciationLocale);
+  string snapshot=text.Length==0?"":string.Join("\n",text,session?.Raw,Editor.SelectionStart,Editor.SelectionLength,prefs.PronunciationLocale);
   if(snapshot==details.Snapshot)return;
   details.Context(snapshot);HidePeek();DeepCard.Visibility=Visibility.Collapsed;StopAudio();
  }
  private void HidePeek(){leaveRevision++;details.Leave();if(peek!=null)peek.IsOpen=false;}
- private void CloseDetails(){details.Close();HidePeek();DeepCard.Visibility=Visibility.Collapsed;StopAudio();}
+ private void CloseDetails(){details.Close();naturalGateway.Invalidate();HidePeek();DeepCard.Visibility=Visibility.Collapsed;StopAudio();}
  private void StopAudio(){audioRevision++;speech.Stop();}
  private void RootKeyDown(object sender,KeyRoutedEventArgs e){
   if(e.Key==VirtualKey.Escape&&(details.DeepOpen||peek?.IsOpen==true)){
@@ -99,8 +99,16 @@ public sealed partial class MainWindow {
   foreach(var module in DetailState.Modules(prefs)){
    DeepBody.Children.Add(new TextBlock{Text=module switch{"Sentence"=>"Natural Expression","Phrase"=>"Phrase Breakdown",_=>"Vocabulary"},FontSize=17,FontWeight=Microsoft.UI.Text.FontWeights.SemiBold});
    if(module=="Sentence"){
-    DeepBody.Children.Add(Paragraph(mapping.Length>0?mapping:T("暂无其他本地表达；保留当前原文。","No alternative local expression; original text preserved.")));
-    var note=Paragraph(T("已有本地辅助结果 · 本版未接入 AI 改写","Existing local result · AI rewriting is not connected in this version"));note.FontSize=11;DeepBody.Children.Add(note);
+    naturalOutput=Paragraph(mapping.Length>0?mapping:T("正在保留当前原文；可按需完善表达。","Keeping the current expression; an optional refinement may follow."));
+    DeepBody.Children.Add(naturalOutput);
+    var note=Paragraph(prefs.CloudAssistance&&privacy.CloudAllowed&&expressionProvider.Available?T("已有表达可继续使用。","The existing expression remains available."):T("云端辅助未启用或暂不可用；本地表达仍可使用。","Cloud assistance is off or unavailable; local expression remains usable."));note.FontSize=11;DeepBody.Children.Add(note);naturalNote=note;
+    naturalSource=aiSentenceShadow.Length>0?aiSentenceShadow:expressionShadow.Length>0?expressionShadow:text;
+    if(prefs.CloudAssistance&&privacy.CloudAllowed&&expressionProvider.Available&&ExpressionGateway.IsSentence(naturalSource)){
+     string naturalLanguage=ExpressionDirection.Source(naturalSource);
+     string naturalTarget=ExpressionDirection.NaturalTarget(naturalSource,aiSentenceShadow.Length>0||expressionShadow.Length>0);
+     naturalGateway.RequestNatural(naturalSource,naturalLanguage,naturalTarget,true);
+     _=ShowNaturalLoading(expressionRevision,note);
+    }
    }else{
     var found=catalog.In(text+"\n"+mapping).Where(e=>e.English.Contains(' ')==(module=="Phrase")).ToArray();
     if(found.Length==0)DeepBody.Children.Add(Paragraph(T("暂无本地条目","No local entries")));
@@ -130,6 +138,8 @@ public sealed partial class MainWindow {
   SettingsBody.Children.Add(Paragraph(T("英式音标尚未收录；未安装对应声线时会提示，不会切成其他口音。","British IPA is not included yet. Missing voices are reported without switching accents.")));
   var installed=WindowsSpeechProvider.InstalledLocales();SettingsBody.Children.Add(Paragraph(T("可用系统声线：","Installed voice locales: ")+(installed.Length>0?string.Join(", ",installed):T("未检测到","none detected"))));
   Toggle("Natural Expression",prefs.NaturalExpression,v=>prefs.NaturalExpression=v);Toggle("Phrase Breakdown",prefs.PhraseBreakdown,v=>prefs.PhraseBreakdown=v);Toggle("Vocabulary",prefs.Vocabulary,v=>prefs.Vocabulary=v);Toggle("Examples",prefs.Examples,v=>prefs.Examples=v);
+  Toggle(T("云端辅助（仅完整句子，默认关闭）","Cloud assistance (complete sentences only; off by default)"),prefs.CloudAssistance,v=>{prefs.CloudAssistance=v;expressionGateway.Invalidate();naturalGateway.Invalidate();expressionContextKey="";UpdateContext();});
+  SettingsBody.Children.Add(Paragraph(expressionProvider.Available?T("本机已检测到 API Key。启用后当前句子会发送至 OpenAI API。","API key detected. When enabled, the current sentence is sent to OpenAI API."):T("尚未检测到 OPENAI_API_KEY；本地输入可继续。设置本机环境变量后重启程序。","OPENAI_API_KEY was not found. Local input remains available; set it on this computer and restart.")));
   Toggle("IPA",prefs.Ipa,v=>prefs.Ipa=v);Toggle(T("发音","Pronunciation"),prefs.Pronunciation,v=>prefs.Pronunciation=v);Toggle(T("释义","Meaning"),prefs.Meaning,v=>prefs.Meaning=v);Toggle(T("词性","Part of speech"),prefs.PartOfSpeech,v=>prefs.PartOfSpeech=v);
   Toggle(T("Private Mode：不记录学习行为","Private Mode: no learning records"),prefs.PrivateMode,v=>{prefs.PrivateMode=v;SetPrivacy(PrivacyGate.Effective(v,secureSimulation));});
   var secure=new CheckBox{Content=T("模拟安全输入区（本次窗口）","Simulate secure field (this window)"),IsChecked=secureSimulation};

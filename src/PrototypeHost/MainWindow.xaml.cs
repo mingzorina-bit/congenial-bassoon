@@ -10,6 +10,15 @@ public sealed partial class MainWindow : Window {
  private bool updating;
  private ExpressionRange expressionRange;
  private string expressionShadow="";
+ private readonly Guid expressionSessionId=Guid.NewGuid();
+ private long expressionRevision;
+ private string expressionContextKey="";
+ private string aiSentenceShadow="";
+ private string naturalExpression="";
+ private readonly HttpClient expressionHttp=new();
+ private readonly ExpressionGateway expressionGateway;
+ private readonly ExpressionGateway naturalGateway;
+ private readonly OpenAiExpressionProvider expressionProvider;
  private readonly PreferenceStore store=new(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"BilingualInput","preferences.json"));
  private UserPreferences prefs=new();
  private readonly OnboardingProgress guide=new();
@@ -19,9 +28,12 @@ public sealed partial class MainWindow : Window {
  private string T(string zh,string en)=>prefs.UiLanguage=="EN"?en:zh;
  public MainWindow(){
   InitializeComponent();prefs=store.Load();showGuide=!prefs.OnboardingComplete;
+  expressionProvider=new(expressionHttp,()=>Environment.GetEnvironmentVariable("OPENAI_API_KEY"));
+  expressionGateway=new(expressionProvider,privacy,OnExpressionResult,diagnostic:code=>System.Diagnostics.Debug.WriteLine(code));
+  naturalGateway=new(expressionProvider,privacy,OnExpressionResult,diagnostic:code=>System.Diagnostics.Debug.WriteLine(code));
   learning=new(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"BilingualInput","learning-v005.db"),privacy);
   privacy.Set(prefs.PrivateMode?LearningPrivacy.Private:LearningPrivacy.Normal);
-  Title="Bilingual Input — v0.0.5 Learning";
+  Title="Bilingual Input — v0.0.6 AI Expression";
   AppWindow.Resize(new Windows.Graphics.SizeInt32(980,900));
   ThemeChoice.SelectedIndex=prefs.Theme;ApplyTheme();initialized=true;
   Editor.InputScope=new InputScope{Names={new InputScopeName(InputScopeNameValue.AlphanumericHalfWidth)}};
@@ -29,7 +41,7 @@ public sealed partial class MainWindow : Window {
   Editor.SelectionChanged+=(_,_)=>{if(!updating)UpdateContext();};
   Surface.SizeChanged+=(_,_)=>{if(peek?.IsOpen==true){HidePeek();StopAudio();}};
   PageScroll.ViewChanged+=(_,_)=>{if(peek?.IsOpen==true){HidePeek();StopAudio();}};
-  Closed+=(_,_)=>{closed=true;CloseDetails();speech.Dispose();session?.Dispose();};
+  Closed+=(_,_)=>{closed=true;expressionGateway.Dispose();naturalGateway.Dispose();expressionHttp.Dispose();CloseDetails();speech.Dispose();session?.Dispose();};
   RenderGuide();
   Root.Loaded+=async(_,_)=>{
    try{var created=await Task.Run(()=>new NativeSession());if(closed){created.Dispose();return;}session=created;created.Privacy(privacy.Mode);
@@ -48,7 +60,7 @@ public sealed partial class MainWindow : Window {
   InputPanel.Visibility=!showGuide||guide.Step==4?Visibility.Visible:Visibility.Collapsed;
   ReplayButton.Visibility=showGuide?Visibility.Collapsed:Visibility.Visible;
   if(!showGuide)return;
-  StepLabel.Text=$"{guide.Step+1} / 5 · v0.0.5";
+  StepLabel.Text=$"{guide.Step+1} / 5 · v0.0.6";
   BackButton.Content=T("上一步","Back");BackButton.Visibility=guide.Step==0?Visibility.Collapsed:Visibility.Visible;
   NextButton.Content=guide.Step==4?T("开始使用","Start using"):T("继续","Continue");
   NextButton.IsEnabled=guide.Step!=4||guide.CanFinish;
@@ -58,7 +70,7 @@ public sealed partial class MainWindow : Window {
     GuideTitle.Text=T("欢迎使用 Bilingual Input","Welcome to Bilingual Input");
     GuideBody.Children.Add(Paragraph(T("用你熟悉的语言，自然连接另一种表达。","Use your familiar language to connect with another expression.")));
     GuideBody.Children.Add(Paragraph(T("自然输入 · 双语表达 · 在真实使用中学习","Natural input · Bilingual expression · Learn through use")));
-    GuideBody.Children.Add(Paragraph(T("本次试用：从详情收藏词条，在词库中查看，再次遇见时记录次数。","This trial adds saving words from details, a Library, and encounter counts.")));break;
+    GuideBody.Children.Add(Paragraph(T("本次试用：可在设置中开启云端辅助，为完整句子取得英文表达；本地输入始终可用。","This trial can add cloud assistance for complete sentences. Local input remains available.")));break;
    case 1:
     GuideTitle.Text=T("你更熟悉哪种语言？","Which language feels more familiar?");
     var primary=new ComboBox{Header=T("Primary Language（不代表英语水平）","Primary language (not a proficiency rating)"),Width=300};
@@ -101,15 +113,17 @@ public sealed partial class MainWindow : Window {
   string current=surroundings.Insert(relative,session.Raw);
   session.Context(surroundings,current,prefs.InputPreference=="Pinyin"?"ZH":prefs.PrimaryLanguage);
   expressionShadow=session.Raw.Length==0?session.ExpressionShadow:"";
+  UpdateExpressionRequest();
   ContextLabel.Text=session.ContextInfo.StartsWith("EN |")?T("当前表达：英文","Current expression: English"):session.ContextInfo.StartsWith("ZH |")?T("当前表达：中文","Current expression: Chinese"):T("当前表达：待判断，保留原文","Current expression: uncertain; original text preserved");
   RenderCandidates();
   RenderShadows();
  }
  private void CommitExpression(){
-  if(session==null||session.Raw.Length!=0||expressionShadow.Length==0||!expressionRange.Matches(Editor.Text))return;
+  string replacement=expressionShadow.Length>0?expressionShadow:aiSentenceShadow;
+  if(session==null||session.Raw.Length!=0||replacement.Length==0||!expressionRange.Matches(Editor.Text))return;
   var current=ExpressionRange.At(Editor.Text,Editor.SelectionStart,Editor.SelectionLength);
   if(current!=expressionRange){UpdateContext();return;}
-  string replacement=expressionShadow;updating=true;
+  updating=true;
   try{Editor.Select(expressionRange.Start,expressionRange.Length);Editor.SelectedText=replacement;Editor.Select(expressionRange.Start+replacement.Length,0);}
   finally{updating=false;}
   UpdateContext();Editor.Focus(FocusState.Programmatic);
@@ -117,7 +131,7 @@ public sealed partial class MainWindow : Window {
  private void EditorKeyDown(object sender,KeyRoutedEventArgs e){
   if(session==null)return;UpdateContext();bool shift=Down(VirtualKey.Shift);string raw=session.Raw;
   if(e.Key==VirtualKey.Tab&&!shift&&!Down(VirtualKey.Control)&&!Down(VirtualKey.Menu)&&DetailText().Length>0){OpenDetails();e.Handled=true;return;}
-  if(raw.Length==0&&shift&&e.Key==VirtualKey.Enter&&expressionShadow.Length>0){CommitExpression();e.Handled=true;return;}
+  if(raw.Length==0&&shift&&e.Key==VirtualKey.Enter&&(expressionShadow.Length>0||aiSentenceShadow.Length>0)){CommitExpression();e.Handled=true;return;}
   bool caps=(Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(VirtualKey.CapitalLock)&CoreVirtualKeyStates.Locked)!=0;
   var d=KeyboardRouter.Decide((int)e.Key,shift,caps,raw.Length>0,Down(VirtualKey.Control)||Down(VirtualKey.Menu));
   bool shadow=d.Action==InputAction.SelectShadow||(d.Action==InputAction.CoreKey&&d.Value==0&&shift);
@@ -157,9 +171,11 @@ public sealed partial class MainWindow : Window {
   if(session==null)return;SyncDetailContext();ShadowRow.Children.Clear();var items=session.Shadows;
   if(session.Raw.Length==0)encounters.Reset();
   else if(privacy.LearningAllowed){bool changed=false;foreach(var item in items){var key=LearningKey(item.Text);if(learning.Contains(key)&&encounters.Observe(session.Raw,key,true))changed|=learning.Encounter(key);}if(changed&&LibraryCard.Visibility==Visibility.Visible)RenderLibraryBody();}
-  if(session.Raw.Length==0&&expressionShadow.Length>0){
-   ShadowLanguage.Text="EN";ShadowHint.Text=T("补全当前表达中的中文缺口 · Shift+Enter 应用","Complete Chinese gaps in this expression · Shift+Enter to apply");
-   var button=new Button{Content=new TextBlock{Text=expressionShadow,TextWrapping=TextWrapping.Wrap},FontSize=14,IsTabStop=false,MaxWidth=720};
+  string wholeExpression=expressionShadow.Length>0?expressionShadow:aiSentenceShadow;
+  if(session.Raw.Length==0&&wholeExpression.Length>0){
+   ShadowLanguage.Text=expressionShadow.Length>0?"EN":ExpressionDirection.ShadowTarget(expressionRange.Text);
+   ShadowHint.Text=expressionShadow.Length>0?T("补全当前表达中的中文缺口 · Shift+Enter 应用","Complete Chinese gaps in this expression · Shift+Enter to apply"):T("完整句子的云端辅助表达 · Shift+Enter 应用","Cloud-assisted sentence · Shift+Enter to apply");
+   var button=new Button{Content=new TextBlock{Text=wholeExpression,TextWrapping=TextWrapping.Wrap},FontSize=14,IsTabStop=false,MaxWidth=720};
    button.Click+=(_,_)=>CommitExpression();ShadowRow.Children.Add(button);return;
   }
   ShadowLanguage.Text=items.Length>0?items[0].Language:"";

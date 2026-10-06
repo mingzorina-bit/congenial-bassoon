@@ -3,15 +3,19 @@ namespace BilingualInput;
 internal enum LearningPrivacy { Normal, Private, Secure }
 internal sealed class PrivacyGate {
  public static LearningPrivacy Effective(bool privateMode,bool secureMode)=>secureMode?LearningPrivacy.Secure:privateMode?LearningPrivacy.Private:LearningPrivacy.Normal;
- public LearningPrivacy Mode {get;private set;}
- public long Revision {get;private set;}
+ private readonly object sync=new();
+ private LearningPrivacy mode;
+ private long revision;
+ public LearningPrivacy Mode {get{lock(sync)return mode;}}
+ public long Revision {get{lock(sync)return revision;}}
  public bool LearningAllowed=>Mode==LearningPrivacy.Normal;
  public bool CloudAllowed=>Mode==LearningPrivacy.Normal;
  public bool ContentLoggingAllowed=>false;
  public bool PersistentTextCacheAllowed=>false;
  public long Ticket()=>Revision;
- public bool Accept(long ticket)=>LearningAllowed&&ticket==Revision;
- public void Set(LearningPrivacy mode){if(Mode!=mode){Mode=mode;Revision++;}}
+ public bool Accept(long ticket){lock(sync)return mode==LearningPrivacy.Normal&&ticket==revision;}
+ public bool AcceptCloud(long ticket){lock(sync)return mode==LearningPrivacy.Normal&&ticket==revision;}
+ public void Set(LearningPrivacy value){lock(sync){if(mode!=value){mode=value;revision++;}}}
 }
 
 internal sealed record LearningItem(string Key,string Lemma,string Language,string Meaning,string MeaningSource,
