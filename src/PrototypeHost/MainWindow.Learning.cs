@@ -5,6 +5,7 @@ public sealed partial class MainWindow {
  private bool secureSimulation;
  private static string LearningKey(string lemma)=>"own-v004:"+lemma.ToLowerInvariant();
  private void SetPrivacy(LearningPrivacy mode){
+  expressionGateway.Invalidate();naturalGateway.Invalidate();expressionContextKey="";aiSentenceShadow="";naturalExpression="";
   privacy.Set(mode);encounters.Reset();session?.Privacy(mode);CloseDetails();LibraryCard.Visibility=Visibility.Collapsed;
   if(mode==LearningPrivacy.Secure){expressionShadow="";ShadowRow.Children.Clear();}
   UpdateContext();Refresh();
