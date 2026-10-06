@@ -2,6 +2,8 @@
 
 Windows 10 2004+ / Windows 11 x64。完整解压后运行 `BilingualInput.exe`。没有 API Key 时，本地候选、Shadow、详情、发音和收藏仍可试用。
 
+[下载 GitHub 正式试用包](https://github.com/mingzorina-bit/congenial-bassoon/actions/runs/37484316733/artifacts/11423735176)。
+
 ## 完整句子的云端辅助
 
 1. 若要体验真实 AI，请在本机配置 OpenAI API 密钥为当前用户的 `OPENAI_API_KEY` 环境变量，然后重新启动程序。不要把密钥发到聊天、提交到 GitHub 或写进程序目录。API 独立计费。

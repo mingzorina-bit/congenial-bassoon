@@ -1,6 +1,8 @@
 # Project Progress — v0.0.6 AI Expression
 
-2026-10-06: 用户要求继续下一里程碑，明确批准 OpenAI API `gpt-5.4-mini`、.NET 自带 HTTP、当期费用及所述隐私/缓存条件；用户将在本机自行配置 API Key，本机目前未检测到。按照冻结计划仅推进 AI Expression：默认关闭的 Cloud assistance、完整句子的异步 Shadow、Tab 按需 Natural Expression、Mock/真实 provider、最小上下文、过期结果拦截与降级。无新增 NuGet 或原始聊天上传。17 项 Provider 测试通过；既有 Host 69 项本地回归通过。独立复核指出无标点完整句子、EN→ZH 语言标记、详情误取消 Shadow 与并发门控问题，均已修正并加入对应回归；随后补测隐私切换后已排队的 UI 回调。WinUI 本地发布和无 Key 窗口启动、设置提示、本地中文编辑已验证。正式 GitHub CI、artifact 校验、真实 API 语义与真人试用尚待完成；不能提前将 AC-13 语义标为 PASS。
+2026-10-06: 用户要求继续下一里程碑，明确批准 OpenAI API `gpt-5.4-mini`、.NET 自带 HTTP、当期费用及所述隐私/缓存条件；用户将在本机自行配置 API Key，本机目前未检测到。按照冻结计划仅推进 AI Expression：默认关闭的 Cloud assistance、完整句子的异步 Shadow、Tab 按需 Natural Expression、Mock/真实 provider、最小上下文、过期结果拦截与降级。无新增 NuGet 或原始聊天上传。17 项 Provider 测试通过；既有 Host 69 项本地回归通过。独立复核指出无标点完整句子、EN→ZH 语言标记、详情误取消 Shadow 与并发门控问题，均已修正并加入对应回归；随后补测隐私切换后已排队的 UI 回调。WinUI 本地发布和无 Key 窗口启动、设置提示、本地中文编辑已验证。真实 API 语义与真人试用尚待完成；不能提前将 AC-13 语义标为 PASS。
+
+正式交付：最新 GitHub Actions run 37484316733 成功；artifact 11423735176 外层 SHA-256 `01216B9B810249F02562388756AF030B365961FCE65AD8690FF188E9C0A2919E` 与 GitHub 一致，内部 ZIP SHA-256 `3DFCDE78C42D671C6EC91A34D7C4A9AEBF231FDF67C931FE6FA991326FCA8C84`，567 个文件逐项校验且无额外文件。详见 docs/releases/v0.0.6.md。真实 API 语义仍需用户本机设置 Key 后验证；本轮停在 v0.0.6 试用边界。
 
 ## Earlier progress
 
