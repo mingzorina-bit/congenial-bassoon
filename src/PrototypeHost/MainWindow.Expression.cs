@@ -25,6 +25,7 @@ public sealed partial class MainWindow {
   DispatcherQueue.TryEnqueue(()=>{
    if(closed||result.SessionId!=expressionSessionId||result.Revision!=expressionRevision||
       !prefs.CloudAssistance||!privacy.CloudAllowed||!expressionRange.Matches(Editor.Text))return;
+   if(!(result.Operation==ExpressionOperation.Shadow?expressionGateway:naturalGateway).AcceptResult(result))return;
    if(result.Operation==ExpressionOperation.Shadow){
     if(session?.Raw.Length>0||expressionShadow.Length>0)return;
     aiSentenceShadow=result.Text;RenderShadows();

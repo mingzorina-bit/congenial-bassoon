@@ -43,6 +43,17 @@ await Check("PrivacySwitchBlocksBothDirections",async()=>{
  gateway.Change(Guid.NewGuid(),3,"这是另一个完整的测试句子。","ZH","EN",true);await Task.Delay(20);
  return output.Count==0&&provider.Count==1;
 });
+await Check("QueuedCallbackRejectedAfterPrivacyFlipOrDetailClose",async()=>{
+ var provider=new PendingProvider();var privacy=new PrivacyGate();ExpressionResult? result=null;
+ using var gateway=new ExpressionGateway(provider,privacy,r=>result=r,TimeSpan.Zero);
+ gateway.Change(Guid.NewGuid(),1,"这是一个完整的测试句子。","ZH","EN",true);await provider.WaitFor(1);
+ provider.Complete(0,"This is a complete test sentence.");
+ for(int i=0;i<50&&result==null;i++)await Task.Delay(5);
+ if(result==null||!gateway.AcceptResult(result))return false;
+ privacy.Set(LearningPrivacy.Private);privacy.Set(LearningPrivacy.Normal);
+ bool rejectedPrivacy=!gateway.AcceptResult(result);
+ gateway.Invalidate();return rejectedPrivacy&&!gateway.AcceptResult(result);
+});
 await Check("WordAndDisabledNeverCallProvider",async()=>{
  var provider=new PendingProvider();using var gateway=new ExpressionGateway(provider,new PrivacyGate(),_=>{},TimeSpan.Zero);
  gateway.Change(Guid.NewGuid(),1,"优化","ZH","EN",true);gateway.Change(Guid.NewGuid(),2,"这是一个完整的测试句子。","ZH","EN",false);

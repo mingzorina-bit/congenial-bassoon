@@ -1,6 +1,6 @@
 # Project Progress — v0.0.6 AI Expression
 
-2026-10-06: 用户要求继续下一里程碑，明确批准 OpenAI API `gpt-5.4-mini`、.NET 自带 HTTP、当期费用及所述隐私/缓存条件；用户将在本机自行配置 API Key，本机目前未检测到。按照冻结计划仅推进 AI Expression：默认关闭的 Cloud assistance、完整句子的异步 Shadow、Tab 按需 Natural Expression、Mock/真实 provider、最小上下文、过期结果拦截与降级。无新增 NuGet 或原始聊天上传。16 项 Provider 测试通过；既有 Host 69 项本地回归通过。独立复核指出无标点完整句子、EN→ZH 语言标记、详情误取消 Shadow 与并发门控问题，均已修正并加入对应回归。WinUI 本地发布和无 Key 窗口启动、设置提示、本地中文编辑已验证。正式 GitHub CI、artifact 校验、真实 API 语义与真人试用尚待完成；不能提前将 AC-13 语义标为 PASS。
+2026-10-06: 用户要求继续下一里程碑，明确批准 OpenAI API `gpt-5.4-mini`、.NET 自带 HTTP、当期费用及所述隐私/缓存条件；用户将在本机自行配置 API Key，本机目前未检测到。按照冻结计划仅推进 AI Expression：默认关闭的 Cloud assistance、完整句子的异步 Shadow、Tab 按需 Natural Expression、Mock/真实 provider、最小上下文、过期结果拦截与降级。无新增 NuGet 或原始聊天上传。17 项 Provider 测试通过；既有 Host 69 项本地回归通过。独立复核指出无标点完整句子、EN→ZH 语言标记、详情误取消 Shadow 与并发门控问题，均已修正并加入对应回归；随后补测隐私切换后已排队的 UI 回调。WinUI 本地发布和无 Key 窗口启动、设置提示、本地中文编辑已验证。正式 GitHub CI、artifact 校验、真实 API 语义与真人试用尚待完成；不能提前将 AC-13 语义标为 PASS。
 
 ## Earlier progress
 

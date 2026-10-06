@@ -2,7 +2,7 @@ namespace BilingualInput;
 
 internal enum ExpressionOperation { Shadow, Natural }
 internal sealed record ExpressionRequest(Guid SessionId,long Revision,long RequestId,string Source,string SourceLanguage,string TargetLanguage,ExpressionOperation Operation);
-internal sealed record ExpressionResult(Guid SessionId,long Revision,long RequestId,ExpressionOperation Operation,string Text);
+internal sealed record ExpressionResult(Guid SessionId,long Revision,long RequestId,long PrivacyRevision,ExpressionOperation Operation,string Text);
 internal interface IExpressionProvider {
  Task<string?> GenerateAsync(ExpressionRequest request,CancellationToken cancellation);
 }
@@ -69,7 +69,7 @@ internal sealed class ExpressionGateway : IDisposable {
    },timeout.Token);
    if(!Current(request,privacyRevision,lifetime)||timeout.IsCancellationRequested)return;
    if(string.IsNullOrWhiteSpace(text)||text.Length>500){diagnostic?.Invoke("provider_invalid_response");return;}
-   publish(new ExpressionResult(request.SessionId,request.Revision,request.RequestId,request.Operation,text.Trim()));
+   publish(new ExpressionResult(request.SessionId,request.Revision,request.RequestId,privacyRevision,request.Operation,text.Trim()));
   }catch(OperationCanceledException){if(!lifetime.IsCancellationRequested)diagnostic?.Invoke("provider_timeout");}
    catch(TimeoutException){diagnostic?.Invoke("provider_timeout");}
    catch(HttpRequestException){diagnostic?.Invoke("provider_http_failure");}
@@ -82,6 +82,12 @@ internal sealed class ExpressionGateway : IDisposable {
       revision!=request.Revision||requestId!=request.RequestId)return false;
   }
   return privacy.AcceptCloud(privacyRevision);
+ }
+ public bool AcceptResult(ExpressionResult result){
+  lock(sync){
+   if(disposed||sessionId!=result.SessionId||revision!=result.Revision||requestId!=result.RequestId)return false;
+  }
+  return privacy.AcceptCloud(result.PrivacyRevision);
  }
  public void Invalidate(){CancellationTokenSource? old;lock(sync){requestId++;old=pending;pending=null;}try{old?.Cancel();}catch(ObjectDisposedException){}}
  public void Dispose(){lock(sync){if(disposed)return;disposed=true;}Invalidate();}
