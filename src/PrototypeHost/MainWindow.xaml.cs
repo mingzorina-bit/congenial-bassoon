@@ -18,7 +18,7 @@ public sealed partial class MainWindow : Window {
  private readonly HttpClient expressionHttp=new();
  private readonly ExpressionGateway expressionGateway;
  private readonly ExpressionGateway naturalGateway;
- private readonly OpenAiExpressionProvider expressionProvider;
+ private readonly SelectableExpressionProvider expressionProvider;
  private readonly PreferenceStore store=new(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"BilingualInput","preferences.json"));
  private UserPreferences prefs=new();
  private readonly OnboardingProgress guide=new();
@@ -28,7 +28,8 @@ public sealed partial class MainWindow : Window {
  private string T(string zh,string en)=>prefs.UiLanguage=="EN"?en:zh;
  public MainWindow(){
   InitializeComponent();prefs=store.Load();showGuide=!prefs.OnboardingComplete;
-  expressionProvider=new(expressionHttp,()=>Environment.GetEnvironmentVariable("OPENAI_API_KEY"));
+  var liveExpressionProvider=new OpenAiExpressionProvider(expressionHttp,()=>Environment.GetEnvironmentVariable("OPENAI_API_KEY"));
+  expressionProvider=new(liveExpressionProvider,new MockExpressionProvider(),()=>prefs.DemoAi,()=>liveExpressionProvider.Available);
   expressionGateway=new(expressionProvider,privacy,OnExpressionResult,diagnostic:code=>System.Diagnostics.Debug.WriteLine(code));
   naturalGateway=new(expressionProvider,privacy,OnExpressionResult,diagnostic:code=>System.Diagnostics.Debug.WriteLine(code));
   learning=new(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"BilingualInput","learning-v005.db"),privacy);
@@ -174,7 +175,7 @@ public sealed partial class MainWindow : Window {
   string wholeExpression=expressionShadow.Length>0?expressionShadow:aiSentenceShadow;
   if(session.Raw.Length==0&&wholeExpression.Length>0){
    ShadowLanguage.Text=expressionShadow.Length>0?"EN":ExpressionDirection.ShadowTarget(expressionRange.Text);
-   ShadowHint.Text=expressionShadow.Length>0?T("补全当前表达中的中文缺口 · Shift+Enter 应用","Complete Chinese gaps in this expression · Shift+Enter to apply"):T("完整句子的云端辅助表达 · Shift+Enter 应用","Cloud-assisted sentence · Shift+Enter to apply");
+   ShadowHint.Text=expressionShadow.Length>0?T("补全当前表达中的中文缺口 · Shift+Enter 应用","Complete Chinese gaps in this expression · Shift+Enter to apply"):prefs.DemoAi?T("AI 演示结果（Mock，不联网） · Shift+Enter 应用","AI demo result (Mock, offline) · Shift+Enter to apply"):T("完整句子的云端辅助表达 · Shift+Enter 应用","Cloud-assisted sentence · Shift+Enter to apply");
    var button=new Button{Content=new TextBlock{Text=wholeExpression,TextWrapping=TextWrapping.Wrap},FontSize=14,IsTabStop=false,MaxWidth=720};
    button.Click+=(_,_)=>CommitExpression();ShadowRow.Children.Add(button);return;
   }

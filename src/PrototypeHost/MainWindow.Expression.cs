@@ -10,12 +10,12 @@ public sealed partial class MainWindow {
   if(session==null)return;
   string source=expressionRange.Text.Trim();
   string key=string.Join("\u001f",expressionRange.Start,source,Editor.SelectionLength,session.Raw,expressionShadow,
-   privacy.Ticket(),prefs.CloudAssistance,prefs.PrimaryLanguage);
+   privacy.Ticket(),prefs.CloudAssistance,prefs.DemoAi,prefs.PrimaryLanguage);
   if(key==expressionContextKey)return;
   expressionContextKey=key;expressionRevision++;aiSentenceShadow="";naturalExpression="";
   naturalOutput=null;naturalNote=null;
   bool eligible=!closed&&session.Raw.Length==0&&Editor.SelectionLength==0&&expressionShadow.Length==0&&
-   prefs.CloudAssistance&&expressionProvider.Available&&privacy.CloudAllowed;
+   ExpressionMode.Enabled(prefs.CloudAssistance,prefs.DemoAi)&&expressionProvider.Available&&privacy.CloudAllowed;
   string from=ExpressionDirection.Source(source),to=ExpressionDirection.ShadowTarget(source);
   expressionGateway.Change(expressionSessionId,expressionRevision,source,from,to,eligible);
   naturalGateway.Change(expressionSessionId,expressionRevision,source,from,to,false);
@@ -24,7 +24,7 @@ public sealed partial class MainWindow {
  private void OnExpressionResult(ExpressionResult result){
   DispatcherQueue.TryEnqueue(()=>{
    if(closed||result.SessionId!=expressionSessionId||result.Revision!=expressionRevision||
-      !prefs.CloudAssistance||!privacy.CloudAllowed||!expressionRange.Matches(Editor.Text))return;
+      !ExpressionMode.Enabled(prefs.CloudAssistance,prefs.DemoAi)||!privacy.CloudAllowed||!expressionRange.Matches(Editor.Text))return;
    if(!(result.Operation==ExpressionOperation.Shadow?expressionGateway:naturalGateway).AcceptResult(result))return;
    if(result.Operation==ExpressionOperation.Shadow){
     if(session?.Raw.Length>0||expressionShadow.Length>0)return;
@@ -39,7 +39,7 @@ public sealed partial class MainWindow {
  }
  private async Task ShowShadowLoading(long revision){
   await Task.Delay(850);
-  if(!closed&&revision==expressionRevision&&aiSentenceShadow.Length==0&&prefs.CloudAssistance&&privacy.CloudAllowed&&
+  if(!closed&&revision==expressionRevision&&aiSentenceShadow.Length==0&&ExpressionMode.Enabled(prefs.CloudAssistance,prefs.DemoAi)&&privacy.CloudAllowed&&
      session?.Raw.Length==0&&expressionShadow.Length==0&&ExpressionGateway.IsSentence(expressionRange.Text))
    ShadowHint.Text=T("正在完善表达…本地输入可继续。","Refining expression… local typing remains available.");
   await Task.Delay(7900);

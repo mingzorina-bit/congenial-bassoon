@@ -101,9 +101,9 @@ public sealed partial class MainWindow {
    if(module=="Sentence"){
     naturalOutput=Paragraph(mapping.Length>0?mapping:T("正在保留当前原文；可按需完善表达。","Keeping the current expression; an optional refinement may follow."));
     DeepBody.Children.Add(naturalOutput);
-    var note=Paragraph(prefs.CloudAssistance&&privacy.CloudAllowed&&expressionProvider.Available?T("已有表达可继续使用。","The existing expression remains available."):T("云端辅助未启用或暂不可用；本地表达仍可使用。","Cloud assistance is off or unavailable; local expression remains usable."));note.FontSize=11;DeepBody.Children.Add(note);naturalNote=note;
+    var note=Paragraph(prefs.DemoAi?T("AI 演示模式：结果来自固定 Mock，不联网。","AI demo mode: fixed Mock result, no network."):prefs.CloudAssistance&&privacy.CloudAllowed&&expressionProvider.Available?T("已有表达可继续使用。","The existing expression remains available."):T("云端辅助未启用或暂不可用；本地表达仍可使用。","Cloud assistance is off or unavailable; local expression remains usable."));note.FontSize=11;DeepBody.Children.Add(note);naturalNote=note;
     naturalSource=aiSentenceShadow.Length>0?aiSentenceShadow:expressionShadow.Length>0?expressionShadow:text;
-    if(prefs.CloudAssistance&&privacy.CloudAllowed&&expressionProvider.Available&&ExpressionGateway.IsSentence(naturalSource)){
+    if(ExpressionMode.Enabled(prefs.CloudAssistance,prefs.DemoAi)&&privacy.CloudAllowed&&expressionProvider.Available&&ExpressionGateway.IsSentence(naturalSource)){
      string naturalLanguage=ExpressionDirection.Source(naturalSource);
      string naturalTarget=ExpressionDirection.NaturalTarget(naturalSource,aiSentenceShadow.Length>0||expressionShadow.Length>0);
      naturalGateway.RequestNatural(naturalSource,naturalLanguage,naturalTarget,true);
@@ -138,8 +138,9 @@ public sealed partial class MainWindow {
   SettingsBody.Children.Add(Paragraph(T("英式音标尚未收录；未安装对应声线时会提示，不会切成其他口音。","British IPA is not included yet. Missing voices are reported without switching accents.")));
   var installed=WindowsSpeechProvider.InstalledLocales();SettingsBody.Children.Add(Paragraph(T("可用系统声线：","Installed voice locales: ")+(installed.Length>0?string.Join(", ",installed):T("未检测到","none detected"))));
   Toggle("Natural Expression",prefs.NaturalExpression,v=>prefs.NaturalExpression=v);Toggle("Phrase Breakdown",prefs.PhraseBreakdown,v=>prefs.PhraseBreakdown=v);Toggle("Vocabulary",prefs.Vocabulary,v=>prefs.Vocabulary=v);Toggle("Examples",prefs.Examples,v=>prefs.Examples=v);
+  Toggle(T("AI 演示模式（Mock，不联网、不收费）","AI demo mode (Mock, offline, no charge)"),prefs.DemoAi,v=>{prefs.DemoAi=v;expressionGateway.Invalidate();naturalGateway.Invalidate();expressionContextKey="";UpdateContext();});
   Toggle(T("云端辅助（仅完整句子，默认关闭）","Cloud assistance (complete sentences only; off by default)"),prefs.CloudAssistance,v=>{prefs.CloudAssistance=v;expressionGateway.Invalidate();naturalGateway.Invalidate();expressionContextKey="";UpdateContext();});
-  SettingsBody.Children.Add(Paragraph(expressionProvider.Available?T("本机已检测到 API Key。启用后当前句子会发送至 OpenAI API。","API key detected. When enabled, the current sentence is sent to OpenAI API."):T("尚未检测到 OPENAI_API_KEY；本地输入可继续。设置本机环境变量后重启程序。","OPENAI_API_KEY was not found. Local input remains available; set it on this computer and restart.")));
+  SettingsBody.Children.Add(Paragraph(prefs.DemoAi?T("AI 演示模式已开启：使用有限固定结果，不发送句子、不产生 API 费用。","AI demo mode is on: limited fixed results, no sentence transmission or API charge."):expressionProvider.Available?T("本机已检测到 API Key。启用后当前句子会发送至 OpenAI API。","API key detected. When enabled, the current sentence is sent to OpenAI API."):T("尚未检测到 OPENAI_API_KEY；本地输入可继续。请填写项目根目录 .env 或设置本机环境变量，然后重启程序。","OPENAI_API_KEY was not found. Local input remains available; fill in the project-root .env or set the local environment variable, then restart.")));
   Toggle("IPA",prefs.Ipa,v=>prefs.Ipa=v);Toggle(T("发音","Pronunciation"),prefs.Pronunciation,v=>prefs.Pronunciation=v);Toggle(T("释义","Meaning"),prefs.Meaning,v=>prefs.Meaning=v);Toggle(T("词性","Part of speech"),prefs.PartOfSpeech,v=>prefs.PartOfSpeech=v);
   Toggle(T("Private Mode：不记录学习行为","Private Mode: no learning records"),prefs.PrivateMode,v=>{prefs.PrivateMode=v;SetPrivacy(PrivacyGate.Effective(v,secureSimulation));});
   var secure=new CheckBox{Content=T("模拟安全输入区（本次窗口）","Simulate secure field (this window)"),IsChecked=secureSimulation};

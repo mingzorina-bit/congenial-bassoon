@@ -98,12 +98,57 @@ await Check("ProviderSendsOnlyCurrentSentenceWithNoStorage",async()=>{
 await Check("ProviderUnavailableWithoutKey",async()=>{
  var handler=new CaptureHandler();using var client=new HttpClient(handler);var provider=new OpenAiExpressionProvider(client,()=>null);
  try{await provider.GenerateAsync(new ExpressionRequest(Guid.NewGuid(),1,2,"这是一个完整的测试句子。","ZH","EN",ExpressionOperation.Shadow),CancellationToken.None);return false;}
- catch(InvalidOperationException){return handler.Calls==0;}
+ catch(InvalidOperationException e){return handler.Calls==0&&e.Message=="OPENAI_API_KEY is not configured.";}
+});
+await Check("ProjectEnvLoadsKeyWithoutOverridingProcessValue",async()=>{
+ await Task.CompletedTask;
+ string dir=Path.Combine(Path.GetTempPath(),"bilingual-env-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(dir);
+ try{
+  string path=Path.Combine(dir,".env");
+  await File.WriteAllTextAsync(path,"# local only\nOPENAI_API_KEY=project-key\n");
+  var loaded=new Dictionary<string,string>(StringComparer.OrdinalIgnoreCase);
+  var first=ProjectEnvironment.LoadFile(path,name=>loaded.GetValueOrDefault(name),(name,value)=>loaded[name]=value!);
+  if(first!=ProjectEnvironmentStatus.Loaded||loaded.GetValueOrDefault("OPENAI_API_KEY")!="project-key")return false;
+  loaded["OPENAI_API_KEY"]="process-key";
+  await File.WriteAllTextAsync(path,"OPENAI_API_KEY=file-key\n");
+  var second=ProjectEnvironment.LoadFile(path,name=>loaded.GetValueOrDefault(name),(name,value)=>loaded[name]=value!);
+  return second==ProjectEnvironmentStatus.AlreadyConfigured&&loaded["OPENAI_API_KEY"]=="process-key";
+ } finally { Directory.Delete(dir,true); }
+});
+await Check("ProjectEnvRejectsMissingOrEmptyKeyWithoutLeakingValue",async()=>{
+ await Task.CompletedTask;
+ string dir=Path.Combine(Path.GetTempPath(),"bilingual-env-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(dir);
+ try{
+  string path=Path.Combine(dir,".env");var loaded=new Dictionary<string,string>();
+  var missing=ProjectEnvironment.LoadFile(path,name=>loaded.GetValueOrDefault(name),(name,value)=>loaded[name]=value!);
+  await File.WriteAllTextAsync(path,"OPENAI_API_KEY=   \n");
+  var empty=ProjectEnvironment.LoadFile(path,name=>loaded.GetValueOrDefault(name),(name,value)=>loaded[name]=value!);
+  return missing==ProjectEnvironmentStatus.FileMissing&&empty==ProjectEnvironmentStatus.KeyMissing&&loaded.Count==0;
+ } finally { Directory.Delete(dir,true); }
 });
 await Check("MockIsClearlyFiniteAndDeterministic",async()=>{
  var mock=new MockExpressionProvider();var request=new ExpressionRequest(Guid.NewGuid(),1,1,"我觉得这个方案还可以继续优化。","ZH","EN",ExpressionOperation.Shadow);
  return await mock.GenerateAsync(request,CancellationToken.None)=="I think this approach could be further improved."&&
-  await mock.GenerateAsync(request with{Source="另一句话。"},CancellationToken.None)==null&&mock.CallCount==2;
+  await mock.GenerateAsync(request with{Operation=ExpressionOperation.Natural,Source="I think this approach could be further improved.",SourceLanguage="EN",TargetLanguage="EN"},CancellationToken.None)=="I believe this approach could be refined further."&&
+  await mock.GenerateAsync(request with{Source="另一句话。"},CancellationToken.None)==null&&mock.CallCount==3;
+});
+await Check("DemoModeUsesMockWithoutCallingLiveProvider",async()=>{
+ var live=new RecordingProvider("LIVE");var demo=new RecordingProvider("DEMO");bool enabled=true;
+ var selected=new SelectableExpressionProvider(live,demo,()=>enabled,()=>false);
+ var request=new ExpressionRequest(Guid.NewGuid(),1,1,"我觉得这个方案还可以继续优化。","ZH","EN",ExpressionOperation.Shadow);
+ string? result=await selected.GenerateAsync(request,CancellationToken.None);
+ return selected.Available&&selected.DemoEnabled&&result=="DEMO"&&live.CallCount==0&&demo.CallCount==1;
+});
+await Check("LiveModeStillUsesLiveProvider",async()=>{
+ var live=new RecordingProvider("LIVE");var demo=new RecordingProvider("DEMO");bool enabled=false;
+ var selected=new SelectableExpressionProvider(live,demo,()=>enabled,()=>true);
+ var request=new ExpressionRequest(Guid.NewGuid(),1,1,"我觉得这个方案还可以继续优化。","ZH","EN",ExpressionOperation.Shadow);
+ string? result=await selected.GenerateAsync(request,CancellationToken.None);
+ return selected.Available&&!selected.DemoEnabled&&result=="LIVE"&&live.CallCount==1&&demo.CallCount==0;
+});
+await Check("DemoModeDoesNotRequireCloudToggle",async()=>{
+ await Task.CompletedTask;
+ return ExpressionMode.Enabled(false,true)&&ExpressionMode.Enabled(true,false)&&!ExpressionMode.Enabled(false,false);
 });
 await Check("ProviderDoesNotRunOnCallerThread",async()=>{
  int caller=Environment.CurrentManagedThreadId;var observed=new TaskCompletionSource<int>(TaskCreationOptions.RunContinuationsAsynchronously);
@@ -139,4 +184,8 @@ sealed class CaptureHandler:HttpMessageHandler {
 }
 sealed class ThreadCaptureProvider(TaskCompletionSource<int> observed):IExpressionProvider {
  public Task<string?> GenerateAsync(ExpressionRequest request,CancellationToken token){observed.TrySetResult(Environment.CurrentManagedThreadId);return Task.FromResult<string?>(null);}
+}
+sealed class RecordingProvider(string? result):IExpressionProvider {
+ public int CallCount {get;private set;}
+ public Task<string?> GenerateAsync(ExpressionRequest request,CancellationToken token){CallCount++;return Task.FromResult(result);}
 }

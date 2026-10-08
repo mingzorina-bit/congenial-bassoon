@@ -8,7 +8,7 @@ internal sealed class OpenAiExpressionProvider(HttpClient client,Func<string?> a
  private static readonly Uri Endpoint=new("https://api.openai.com/v1/responses");
  public bool Available=>!string.IsNullOrWhiteSpace(apiKey());
  public async Task<string?> GenerateAsync(ExpressionRequest request,CancellationToken cancellation){
-  string? key=apiKey();if(string.IsNullOrWhiteSpace(key))throw new InvalidOperationException("Provider unavailable");
+  string? key=apiKey();if(string.IsNullOrWhiteSpace(key))throw new InvalidOperationException("OPENAI_API_KEY is not configured.");
   string instruction=request.Operation==ExpressionOperation.Shadow
    ?"Translate this complete sentence to the target language. Return one natural sentence only. Preserve meaning; add no facts, entities, intentions or explanations."
    :"Offer one more natural way to express the source sentence in the target language. Preserve meaning; add no facts, entities, intentions or explanations. If it is already natural, return the same sentence.";

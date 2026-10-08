@@ -20,6 +20,7 @@ internal sealed class UserPreferences {
  public bool PartOfSpeech {get;set;}=true;
  public bool PrivateMode {get;set;}
  public bool CloudAssistance {get;set;}
+ public bool DemoAi {get;set;}
 }
 internal sealed class PreferenceStore(string path) {
  private static UserPreferences Normalize(UserPreferences p) {

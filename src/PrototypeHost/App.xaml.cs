@@ -15,7 +15,7 @@ public partial class App : Application {
   } catch { }
  }
  protected override void OnLaunched(LaunchActivatedEventArgs args) {
-  try { window = new MainWindow(); window.Activate(); }
+  try { ProjectEnvironment.Load(); window = new MainWindow(); window.Activate(); }
   catch(Exception error) { WriteStartupFault(error); throw; }
  }
 }
