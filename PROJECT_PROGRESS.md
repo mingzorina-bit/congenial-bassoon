@@ -1,5 +1,7 @@
 # Project Progress — v0.0.6 AI Expression
 
+2026-10-08: 用户明确批准向当前 public GitHub 仓库写入已核查的源码、测试和文档。alpha 分支 `codex/integrated-alpha-v0.1.0` 与草稿 PR #7 已建立；Windows CI 37768056066 全部成功。正式 artifact 11546477105 已下载，外层 SHA-256 `DCE0F939BE7CDBABAA53A5BD4BC9C227507C943AEAD55EE8715B5E85D076A558` 与 GitHub digest 相同；内部 ZIP SHA-256 `4C3F413DB73AC8E40D127899DF66AA8660F40FA10CC21305F902EA15CF638DD7`，567 项文件全部通过 inventory/source audit。真实 API 语义及 P50/P95、第二台干净机器、10–20 分钟真人 UX/Product Gates 仍待执行。进程在本机工具会话中存活 12 秒，但互动窗口未暴露，不能算 UI 验收。当前停在可试用 alpha 候选，不宣称 Phase 0 完成。
+
 2026-10-07: 用户要求继续 v0.1.0-alpha，账户 API 无余额。开始 alpha-T1：打包版本改为 v0.1.0-alpha，新增 package 文件哈希、清单与已审核 data 路径复核脚本，CI 在上传前运行；新增完整 AC 人工验收记录与三 Gate 待决文档。未加入新词典、未改冻结输入行为。PowerShell 脚本语法解析通过；以九文件 fixture 验证清单 PASS、额外数据被拒，修正了 Windows 路径分隔符问题。当前环境缺少 dotnet/cmake，C# 与 native 回归以及 WinUI package 尚不能在本机重跑。25 个待提交文件已做密钥样式扫描，三个命中均为文档占位符或测试用虚构值，`.env` 未跟踪；仓库当前为 public。GitHub 写入被自动审批拦下，Windows CI 未运行；真实 API 语义、性能和干净机器验收待测。本条只记录 alpha 候选工作进度，不宣布里程碑通过。
 
 2026-10-07: 按用户要求补齐项目级 `OPENAI_API_KEY` 配置。仓库根目录新增空的 `.env.example` 与本机 `.env` 模板，`.gitignore` 忽略 `.env*` 但保留示例；WinUI Host 启动时读取项目根目录 `.env`，已有进程环境变量优先。缺失或空 Key 保持本地输入并显示不含敏感信息的提示。Provider 测试新增项目文件加载、优先级、缺失/空值及无 Key 错误检查；Host 17、Onboarding 7、Details 22、Learning 13、Expression 10、Provider 19，共 88 项本地 C# 回归通过，短路径下 WinUI Release 构建 0 警告/0 错误。真实 Key 未写入源码、日志或提交；真实 API 语义仍待用户本机填写 Key 后验证。

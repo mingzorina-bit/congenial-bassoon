@@ -2,7 +2,7 @@
 
 Windows 10 2004+ / Windows 11 x64。完整解压后运行 `BilingualInput.exe`。没有 API Key 时，本地候选、Shadow、详情、发音和收藏仍可试用。
 
-alpha 的 GitHub 试用包将在 Windows CI 通过后提供。当前 [v0.0.6 试用包](https://github.com/mingzorina-bit/congenial-bassoon/actions/runs/37484316733/artifacts/11423735176) 不包含随后增加的项目级 `.env` 和 AI 演示模式。
+[下载 v0.1.0-alpha 试用包](https://github.com/mingzorina-bit/congenial-bassoon/actions/runs/37768056066/artifacts/11546477105)。GitHub 下载的是外层 ZIP；解压后再解压其中的 `BilingualInput-v0.1.0-alpha-win-x64.zip`，运行 `BilingualInput.exe`。本版包含项目级 `.env` 配置和明确标注的 AI 演示模式；正式包运行时请用系统 `OPENAI_API_KEY` 环境变量配置真实 API。
 
 ## 完整句子的云端辅助
 
