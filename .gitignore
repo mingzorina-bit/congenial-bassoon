@@ -8,3 +8,5 @@ artifacts/
 *.zip
 docs/source/
 .superpowers/
+.env*
+!.env.example
