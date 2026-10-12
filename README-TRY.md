@@ -2,7 +2,7 @@
 
 Windows 10 2004+ / Windows 11 x64。完整解压后运行 `BilingualInput.exe`。没有 API Key 时，本地候选、Shadow、详情、发音和收藏仍可试用。
 
-[在 Windows 构建页面取得最新 v0.2.0-lexicon-trial 试用包](https://github.com/mingzorina-bit/congenial-bassoon/actions/workflows/windows.yml)。GitHub 下载的是外层 ZIP；解压后再解压其中的 `BilingualInput-v0.2.0-lexicon-trial-win-x64.zip`，运行 `BilingualInput.exe`。本版保留项目级 `.env` 配置和明确标注的 AI 演示模式；正式包运行时请用系统 `OPENAI_API_KEY` 环境变量配置真实 API。
+[下载已验证的 v0.2.0 离线词库试用包](https://github.com/mingzorina-bit/congenial-bassoon/actions/runs/38191903076/artifacts/11721523668)。GitHub 下载的是外层 ZIP；解压后再解压其中的 `BilingualInput-v0.2.0-lexicon-trial-win-x64.zip`，运行 `BilingualInput.exe`。本版保留项目级 `.env` 配置和明确标注的 AI 演示模式；正式包运行时请用系统 `OPENAI_API_KEY` 环境变量配置真实 API。
 
 在编辑区按 Tab 展开 Details，再按一次 Tab 可关闭；Esc 也可关闭。关闭后继续输入，原文和候选不应改变。
 
