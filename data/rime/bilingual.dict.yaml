@@ -7,105 +7,105 @@ use_preset_vocabulary: true
 import_tables:
   - luna_pinyin
 ...
-优化	you hua	1000
-油画	you hua	900
-有话	you hua	800
-学习	xue xi	1000
-工作	gong zuo	1000
-中国	zhong guo	1000
-你好	ni hao	1000
-我们	wo men	1000
-你们	ni men	1000
-他们	ta men	1000
-方案	fang an	1000
-设计	she ji	1000
-改进	gai jin	1000
-完成	wan cheng	1000
-问题	wen ti	1000
-计划	ji hua	1000
-这个	zhe ge	1000
-可以	ke yi	1000
-继续	ji xu	1000
-觉得	jue de	1000
-输入	shu ru	1000
-中文	zhong wen	1000
-英文	ying wen	1000
-语言	yu yan	1000
-时间	shi jian	1000
-今天	jin tian	1000
-明天	ming tian	1000
-现在	xian zai	1000
-需要	xu yao	1000
-测试	ce shi	1000
-体验	ti yan	1000
-自然	zi ran	1000
-表达	biao da	1000
-选择	xuan ze	1000
-候选	hou xuan	1000
-保存	bao cun	1000
-谢谢	xie xie	1000
-朋友	peng you	1000
-方法	fang fa	1000
-电脑	dian nao	1000
-内容	nei rong	1000
-开始	kai shi	1000
-结束	jie shu	1000
-喜欢	xi huan	1000
-帮助	bang zhu	1000
-支持	zhi chi	1000
-开发	kai fa	1000
-一个	yi ge	1000
-还是	hai shi	1000
-但是	dan shi	1000
-因为	yin wei	1000
-所以	suo yi	1000
-非常	fei chang	1000
-已经	yi jing	1000
-什么	shen me	1000
-怎么	zen me	1000
-为什么	wei shen me	1000
-我	wo	100
-你	ni	100
-他	ta	100
-她	ta	90
-是	shi	100
-时	shi	90
-事	shi	80
-十	shi	70
-有	you	100
-油	you	90
-优	you	80
-话	hua	100
-画	hua	90
-化	hua	80
-好	hao	100
-的	de	100
-了	le	100
-在	zai	100
-不	bu	100
-也	ye	100
-还	hai	100
-很	hen	100
-和	he	100
-可	ke	100
-以	yi	100
-一	yi	90
-中	zhong	100
-国	guo	100
-学	xue	100
-习	xi	100
-工	gong	100
-作	zuo	100
-这	zhe	100
-个	ge	100
-方	fang	100
-案	an	100
-优化方案	you hua fang an	1200
-优化方法	you hua fang fa	1200
-继续优化	ji xu you hua	1200
-自然表达	zi ran biao da	1200
-学习语言	xue xi yu yan	1200
-解决问题	jie jue wen ti	1200
-还可以	hai ke yi	1200
-餐	can	100
-么	me	100
+优化	you hua	100000000
+油画	you hua	90000000
+有话	you hua	80000000
+学习	xue xi	100000000
+工作	gong zuo	100000000
+中国	zhong guo	100000000
+你好	ni hao	100000000
+我们	wo men	100000000
+你们	ni men	100000000
+他们	ta men	100000000
+方案	fang an	100000000
+设计	she ji	100000000
+改进	gai jin	100000000
+完成	wan cheng	100000000
+问题	wen ti	100000000
+计划	ji hua	100000000
+这个	zhe ge	100000000
+可以	ke yi	100000000
+继续	ji xu	100000000
+觉得	jue de	100000000
+输入	shu ru	100000000
+中文	zhong wen	100000000
+英文	ying wen	100000000
+语言	yu yan	100000000
+时间	shi jian	100000000
+今天	jin tian	100000000
+明天	ming tian	100000000
+现在	xian zai	100000000
+需要	xu yao	100000000
+测试	ce shi	100000000
+体验	ti yan	100000000
+自然	zi ran	100000000
+表达	biao da	100000000
+选择	xuan ze	100000000
+候选	hou xuan	100000000
+保存	bao cun	100000000
+谢谢	xie xie	100000000
+朋友	peng you	100000000
+方法	fang fa	100000000
+电脑	dian nao	100000000
+内容	nei rong	100000000
+开始	kai shi	100000000
+结束	jie shu	100000000
+喜欢	xi huan	100000000
+帮助	bang zhu	100000000
+支持	zhi chi	100000000
+开发	kai fa	100000000
+一个	yi ge	100000000
+还是	hai shi	100000000
+但是	dan shi	100000000
+因为	yin wei	100000000
+所以	suo yi	100000000
+非常	fei chang	100000000
+已经	yi jing	100000000
+什么	shen me	100000000
+怎么	zen me	100000000
+为什么	wei shen me	100000000
+我	wo	10000000
+你	ni	10000000
+他	ta	10000000
+她	ta	9000000
+是	shi	10000000
+时	shi	9000000
+事	shi	8000000
+十	shi	7000000
+有	you	10000000
+油	you	9000000
+优	you	8000000
+话	hua	10000000
+画	hua	9000000
+化	hua	8000000
+好	hao	10000000
+的	de	10000000
+了	le	10000000
+在	zai	10000000
+不	bu	10000000
+也	ye	10000000
+还	hai	10000000
+很	hen	10000000
+和	he	10000000
+可	ke	10000000
+以	yi	10000000
+一	yi	9000000
+中	zhong	10000000
+国	guo	10000000
+学	xue	10000000
+习	xi	10000000
+工	gong	10000000
+作	zuo	10000000
+这	zhe	10000000
+个	ge	10000000
+方	fang	10000000
+案	an	10000000
+优化方案	you hua fang an	120000000
+优化方法	you hua fang fa	120000000
+继续优化	ji xu you hua	120000000
+自然表达	zi ran biao da	120000000
+学习语言	xue xi yu yan	120000000
+解决问题	jie jue wen ti	120000000
+还可以	hai ke yi	120000000
+餐	can	10000000
+么	me	10000000
