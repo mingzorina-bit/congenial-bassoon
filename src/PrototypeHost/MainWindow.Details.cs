@@ -6,7 +6,7 @@ using Windows.System;
 namespace BilingualInput;
 public sealed partial class MainWindow {
  private readonly DetailState details=new();
- private readonly DetailCatalog catalog=new(Path.Combine(AppContext.BaseDirectory,"data","details","own-v004.tsv"));
+ private readonly DetailCatalog catalog=new(Path.Combine(AppContext.BaseDirectory,"data","details","own-v004.tsv"),Path.Combine(AppContext.BaseDirectory,"data","details","own-v021.tsv"));
  private readonly PhoneticDataProvider phonetics=new(Path.Combine(AppContext.BaseDirectory,"data","pronunciation","cmudict-us.tsv"));
  private readonly WindowsSpeechProvider speech=new();
  private Popup? peek;

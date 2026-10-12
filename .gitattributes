@@ -1,0 +1,4 @@
+# Preserve upstream notice bytes on Windows; Prepare-Lexicon checks the pinned license SHA-256.
+licenses/rime-luna-pinyin-LGPL-3.0.txt -text
+licenses/rime-luna-pinyin-AUTHORS.txt -text
+licenses/rime-essay-AUTHORS.txt -text

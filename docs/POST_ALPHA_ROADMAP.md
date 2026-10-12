@@ -2,14 +2,14 @@
 
 The user's 2026-10-12 trial feedback authorizes CR-06 (Tab closes an open Details card) and requests broader vocabulary plus input in other applications. These are separate milestones. The v0.1.0-alpha Engineering/UX/Product gates remain pending where recorded; this roadmap does not retroactively pass them or change the frozen Phase 0 scope.
 
-## v0.1.1 — Tab interaction trial (current)
+## v0.1.1 — Tab interaction trial (user-tested)
 
 - Allowed: CR-06 keyboard handling, on-screen hint, regression instructions, versioned trial package.
 - Excluded: new dictionaries, TSF registration, global keyboard hooks, additional AI behavior.
 - Acceptance: with active composition, Tab opens and the next plain Tab closes; Esc closes; focus returns to editor; composition/highlight/editor text/Shadow unchanged. Details-button focus also permits plain Tab close. Shift/Ctrl/Alt+Tab keep their existing meaning. Existing Core, Host, real Rime and packaging CI pass.
 - Done when CI passes and a downloadable, audited Windows package is available for the user's trial. The user decides whether CR-06 feels right before further keyboard changes.
 
-## v0.2.0 — reviewed vocabulary expansion (next data milestone)
+## v0.2.0 — reviewed vocabulary expansion (current data milestone)
 
 - Goal: replace the current roughly 50-entry authored pinyin fixture with a useful broad offline pinyin vocabulary and expand bilingual lookups without mixing source boundaries.
 - First gate: approve a **concrete** source/version/file set and redistribution terms under A-18. The existing librime approval does not approve a Rime dictionary. CC-CEDICT is CC BY-SA 4.0 with attribution and ShareAlike obligations; its verified release is recommended by its editor. ECDICT's repository publishes MIT terms, but field-level provenance still needs review. Rime Luna Pinyin publishes LGPL-3.0 terms and requires a separate packaging review. Do not import any of these by default.

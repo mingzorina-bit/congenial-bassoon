@@ -23,15 +23,23 @@ foreach ($file in $actual) {
 $required = @(
   'THIRD_PARTY_SOURCES.md', 'README-TRY.md', 'dependency-assets.json',
   'licenses/librime-BSD.txt', 'licenses/CMUdict-LICENSE.txt',
+  'licenses/rime-luna-pinyin-LGPL-3.0.txt',
+  'licenses/rime-luna-pinyin-AUTHORS.txt', 'licenses/rime-essay-AUTHORS.txt',
   'data/rime/bilingual.dict.yaml', 'data/lexical/own-v0.0.2.tsv',
+  'data/lexical/own-v021.tsv', 'data/details/own-v021.tsv',
+  'data/rime/luna_pinyin.dict.yaml', 'data/rime/essay.txt', 'data/rime/SOURCE.md',
   'data/details/own-v004.tsv', 'data/pronunciation/cmudict-us.tsv'
 )
 foreach ($path in $required) { if (-not $listed.Contains($path)) { throw "Required source or notice missing: $path" } }
+if ((Get-FileHash -LiteralPath (Join-Path $root 'data/rime/luna_pinyin.dict.yaml') -Algorithm SHA256).Hash -ne '75BCF6EB3FF62B129882ED89CC22B2D80A5347AA72BCFA2CCC839BAC298E7314') { throw 'Luna Pinyin source hash mismatch' }
+if ((Get-FileHash -LiteralPath (Join-Path $root 'data/rime/essay.txt') -Algorithm SHA256).Hash -ne '3E8512EBAA6657E35961B1F5762060717C647E3BF471D5E3B86E783B4E934FFB') { throw 'Rime Essay source hash mismatch' }
 $knownData = @(
-  'data/details/own-v004.tsv', 'data/lexical/own-v0.0.2.tsv',
+  'data/details/own-v004.tsv', 'data/details/own-v021.tsv',
+  'data/lexical/own-v0.0.2.tsv', 'data/lexical/own-v021.tsv',
   'data/lexical/README.md', 'data/pronunciation/cmudict-us.tsv',
   'data/pronunciation/SOURCE.md', 'data/rime/bilingual.dict.yaml',
-  'data/rime/bilingual.schema.yaml', 'data/rime/default.yaml'
+  'data/rime/bilingual.schema.yaml', 'data/rime/default.yaml',
+  'data/rime/luna_pinyin.dict.yaml', 'data/rime/essay.txt', 'data/rime/SOURCE.md'
 )
 foreach ($path in $listed) {
   $normalized = $path.Replace('\','/')

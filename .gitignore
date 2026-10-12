@@ -1,6 +1,8 @@
 build/
 artifacts/
 .vendor/
+data/rime/luna_pinyin.dict.yaml
+data/rime/essay.txt
 **/bin/
 **/obj/
 .vs/

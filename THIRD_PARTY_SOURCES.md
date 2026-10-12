@@ -52,3 +52,7 @@ User approved CMUdict proposal on 2026-09-29. See data/pronunciation/SOURCE.md a
 
 ## v0.0.5 storage binding
 User approved `Microsoft.Data.Sqlite` 8.0.31 on 2026-09-30 for the local Learning database. NuGet lock records its `Microsoft.Data.Sqlite.Core` 8.0.31 and `SQLitePCLRaw`/`e_sqlite3` 2.1.12 transitives. The Microsoft provider declares MIT; the SQLitePCLRaw native package declares Apache-2.0, and SQLite itself is public domain. Source: official NuGet package metadata and Microsoft documentation. The self-contained Windows prototype redistributes the package runtime assets and includes the resolved dependency manifest. No ORM, cloud or bundled lexical data enters the learning database; only explicitly saved catalog terms and counters are written. Review status: approved for prototype use; commercial release still passes the frozen release gate.
+
+## v0.2.0 trial-only offline pinyin corpus
+
+The user approved the unmodified `rime/rime-luna-pinyin` dictionary at `56b934b099dfbeab842320f13aa8b461a6ab3e42` and `rime/rime-essay` vocabulary at `054920de4f54c9e5994276a96a4fc2a35cb51aa3` on 2026-10-12 for trial use only. Both sources publish LGPL-3.0. `scripts/Prepare-Lexicon.ps1` downloads only `luna_pinyin.dict.yaml` and `essay.txt` from those commits and checks fixed SHA-256 values. The original `AUTHORS` records and LGPL text are packaged. `data/rime/SOURCE.md` records source IDs, exact hashes, upstream references, credits and use restrictions. Commercial release remains gated; no bilingual definition/IPA/audio corpus is inferred from these files.

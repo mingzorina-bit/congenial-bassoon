@@ -29,9 +29,10 @@ BI void* bi_create(const char* shared, const char* user) noexcept {
   catch(...) { h->engine=std::make_unique<EmptyEngine>(); }
   h->session=std::make_unique<InputSession>(*h->engine);
   try {
-   auto path=std::filesystem::u8path(shared?shared:"").parent_path()/"lexical"/"own-v0.0.2.tsv";
-   auto utf8=path.u8string();
-   h->lexical=std::make_unique<LexicalStore>(std::string(utf8.begin(),utf8.end()));
+   auto folder=std::filesystem::u8path(shared?shared:"").parent_path()/"lexical";
+   auto path=(folder/"own-v0.0.2.tsv").u8string();
+   auto extension=(folder/"own-v021.tsv").u8string();
+   h->lexical=std::make_unique<LexicalStore>(std::string(path.begin(),path.end()),std::string(extension.begin(),extension.end()));
    h->session->setLexical(h->lexical.get());
   }catch(...){} // A lexical failure must never prevent Primary input.
   active=true; return h.release();

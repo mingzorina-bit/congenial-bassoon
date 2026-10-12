@@ -1,6 +1,27 @@
 #include "RimeAdapter.h"
+#include <algorithm>
 #include <filesystem>
 #include <stdexcept>
+#include <string>
+#include <windows.h>
+
+namespace {
+std::string simplifyChinese(const std::string& utf8) {
+  int wideCount=MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,utf8.c_str(),static_cast<int>(utf8.size()),nullptr,0);
+  if(wideCount<=0) return utf8;
+  std::wstring wide(wideCount,L'\0');
+  if(!MultiByteToWideChar(CP_UTF8,MB_ERR_INVALID_CHARS,utf8.c_str(),static_cast<int>(utf8.size()),wide.data(),wideCount)) return utf8;
+  int mappedCount=LCMapStringEx(L"zh-CN",LCMAP_SIMPLIFIED_CHINESE,wide.data(),wideCount,nullptr,0,nullptr,nullptr,0);
+  if(mappedCount<=0) return utf8;
+  std::wstring mapped(mappedCount,L'\0');
+  if(!LCMapStringEx(L"zh-CN",LCMAP_SIMPLIFIED_CHINESE,wide.data(),wideCount,mapped.data(),mappedCount,nullptr,nullptr,0)) return utf8;
+  int byteCount=WideCharToMultiByte(CP_UTF8,0,mapped.data(),mappedCount,nullptr,0,nullptr,nullptr);
+  if(byteCount<=0) return utf8;
+  std::string result(byteCount,'\0');
+  if(!WideCharToMultiByte(CP_UTF8,0,mapped.data(),mappedCount,result.data(),byteCount,nullptr,nullptr)) return utf8;
+  return result;
+}
+}
 namespace bilingual {
 RimeAdapter::RimeAdapter(const std::string& shared, const std::string& user) {
   if (!std::filesystem::exists(std::filesystem::u8path(shared) / "bilingual.schema.yaml"))
@@ -52,7 +73,10 @@ std::vector<std::string> RimeAdapter::query(const std::string& raw) {
     bool complete=!remaining || !*remaining;
     RIME_STRUCT(RimeCommit, selected);
     if(api_->get_commit(session_,&selected)) {
-      if(complete && selected.text && *selected.text) result.emplace_back(selected.text);
+      if(complete && selected.text && *selected.text) {
+        auto text=simplifyChinese(selected.text);
+        if(std::find(result.begin(),result.end(),text)==result.end()) result.push_back(std::move(text));
+      }
       api_->free_commit(&selected);
     }
   }
