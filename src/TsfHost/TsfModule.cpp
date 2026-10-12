@@ -60,7 +60,7 @@ extern "C" BOOL WINAPI DllMain(HMODULE module,DWORD reason,LPVOID) {
   }
   return TRUE;
 }
-extern "C" __declspec(dllexport) HRESULT STDAPICALLTYPE DllGetClassObject(
+STDAPI DllGetClassObject(
     REFCLSID clsid,REFIID iid,void** value) {
   if(!value) return E_POINTER;
   *value=nullptr;
@@ -71,6 +71,6 @@ extern "C" __declspec(dllexport) HRESULT STDAPICALLTYPE DllGetClassObject(
   factory->Release();
   return hr;
 }
-extern "C" __declspec(dllexport) HRESULT STDAPICALLTYPE DllCanUnloadNow() {
+STDAPI DllCanUnloadNow() {
   return bilingual::tsf::CanUnload()?S_OK:S_FALSE;
 }

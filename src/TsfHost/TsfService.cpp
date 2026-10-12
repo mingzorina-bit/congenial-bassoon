@@ -72,8 +72,9 @@ TsfService::~TsfService() { Deactivate(); ModuleObjectDestroyed(); }
 HRESULT STDMETHODCALLTYPE TsfService::QueryInterface(REFIID iid,void** value) {
   if(!value) return E_POINTER;
   *value=nullptr;
-  if(IsEqualIID(iid,IID_IUnknown) || IsEqualIID(iid,IID_ITfTextInputProcessor) ||
-     IsEqualIID(iid,IID_ITfTextInputProcessorEx))
+  if(IsEqualIID(iid,IID_IUnknown) || IsEqualIID(iid,IID_ITfTextInputProcessor))
+    *value=static_cast<ITfTextInputProcessor*>(this);
+  else if(IsEqualIID(iid,IID_ITfTextInputProcessorEx))
     *value=static_cast<ITfTextInputProcessorEx*>(this);
   else if(IsEqualIID(iid,IID_ITfKeyEventSink))
     *value=static_cast<ITfKeyEventSink*>(this);
