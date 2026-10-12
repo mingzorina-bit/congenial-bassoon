@@ -2,17 +2,17 @@
 
 The user wants vocabulary beyond the current authored ~50-entry pinyin fixture. The next useful step is broad offline Primary coverage while preserving the product's current candidate, Shadow and raw-Enter rules. “Full dictionary” is not a measurable finite set; the initial target is a substantially broader, source-audited pinyin corpus with a measured common-word/phrase fixture, followed by separately reviewed bilingual data.
 
-## Proposed first import: Rime Luna Pinyin
+## Approved first import: Rime Luna Pinyin and Rime Essay
 
 | Field | Proposal |
 |---|---|
 | Source | `rime/rime-luna-pinyin` at commit `56b934b099dfbeab842320f13aa8b461a6ab3e42` (checked 2026-10-12) |
-| Files | `luna_pinyin.dict.yaml` plus only the schema/configuration files required to use it; exact file inventory and hashes recorded before import |
+| Files | Unmodified `luna_pinyin.dict.yaml` and separately approved `rime-essay/essay.txt`; own `bilingual` dictionary imports Luna; exact hashes in `data/rime/SOURCE.md` |
 | Purpose | Expanded offline Chinese pinyin candidates in librime |
 | Terms | Repository `LICENSE` is LGPL-3.0; include its license, attribution and unmodified source files with the prototype package. Audit any imported related data separately. |
 | Distribution | Internal/public prototype proposal only. Commercial deployment requires the frozen Data & Dependency Release Review. |
-| Fallback | Existing authored schema/lexicon remains selectable until the new corpus passes real-engine tests. |
-| Approval state | **APPROVED FOR A FUTURE TRIAL PACKAGE** by the user on 2026-10-12 for this fixed commit/purpose only; no source file has yet been added to build, package or repository. Commercial release remains unapproved. |
+| Fallback | Previous v0.1.1 package remains available if the new corpus fails real-engine tests; v0.2.0 must not ship without both pinned files. |
+| Approval state | **APPROVED FOR v0.2.0 TRIAL** by the user on 2026-10-12 for these fixed files/purpose only. Commercial release remains unapproved. |
 
 Acceptance before shipping: `youhua` retains candidate/highlight/raw behavior; common Chinese word/phrase fixture gives broad coverage; candidate ranking and pinyin composition measured; no online request or user-text logging; source ID and license packaged; no unknown file or nested dependency. Review simplified/traditional output before choosing the schema and do not silently change the frozen input preference.
 
