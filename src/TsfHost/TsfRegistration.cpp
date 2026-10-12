@@ -124,14 +124,13 @@ int wmain(int argc,wchar_t** argv) {
       if(created) RegDeleteTreeW(HKEY_CURRENT_USER,kComKey);
       status=4;
     } else if(!addTsf()) {
-      removeTsf();removeComServer();status=4;
+      if(removeTsf()) removeComServer();
+      status=4;
     }
   } else {
     if(!ownsComServer()) status=5;
     else {
-      const bool tsfRemoved=removeTsf();
-      const bool comRemoved=removeComServer();
-      if(!tsfRemoved || !comRemoved) status=5;
+      if(!removeTsf() || !removeComServer()) status=5;
     }
   }
   CoUninitialize();
