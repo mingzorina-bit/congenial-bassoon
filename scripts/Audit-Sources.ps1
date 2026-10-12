@@ -1,4 +1,4 @@
-param([Parameter(Mandatory)][string]$PackagePath)
+param([Parameter(Mandatory)][string]$PackagePath,[switch]$TsfTrial)
 $ErrorActionPreference = 'Stop'
 $root = (Resolve-Path -LiteralPath $PackagePath).Path
 $inventoryPath = Join-Path $root 'FILES.sha256.json'
@@ -20,7 +20,17 @@ foreach ($file in $actual) {
   if (-not $listed.Contains($relative)) { throw "Unlisted package file: $relative" }
   if ($relative -match '(^|[\\/])\.env($|[\\/])|OPENAI_API_KEY|project\.assets\.json$') { throw "Sensitive or build-only path: $relative" }
 }
-$required = @(
+$required = if ($TsfTrial) { @(
+  'BilingualTsf.dll', 'TsfTrialRegistration.exe', 'rime.dll',
+  'THIRD_PARTY_SOURCES.md', 'README-TSF-TRIAL.md',
+  'scripts/Register-TsfTrial.ps1', 'scripts/Unregister-TsfTrial.ps1',
+  'scripts/Audit-Sources.ps1',
+  'licenses/librime-BSD.txt', 'licenses/rime-luna-pinyin-LGPL-3.0.txt',
+  'licenses/rime-luna-pinyin-AUTHORS.txt', 'licenses/rime-essay-AUTHORS.txt',
+  'data/rime/bilingual.dict.yaml', 'data/rime/bilingual.schema.yaml',
+  'data/rime/default.yaml', 'data/rime/luna_pinyin.dict.yaml',
+  'data/rime/essay.txt', 'data/rime/SOURCE.md'
+) } else { @(
   'THIRD_PARTY_SOURCES.md', 'README-TRY.md', 'dependency-assets.json',
   'licenses/librime-BSD.txt', 'licenses/CMUdict-LICENSE.txt',
   'licenses/rime-luna-pinyin-LGPL-3.0.txt',
@@ -29,18 +39,22 @@ $required = @(
   'data/lexical/own-v021.tsv', 'data/details/own-v021.tsv',
   'data/rime/luna_pinyin.dict.yaml', 'data/rime/essay.txt', 'data/rime/SOURCE.md',
   'data/details/own-v004.tsv', 'data/pronunciation/cmudict-us.tsv'
-)
+) }
 foreach ($path in $required) { if (-not $listed.Contains($path)) { throw "Required source or notice missing: $path" } }
 if ((Get-FileHash -LiteralPath (Join-Path $root 'data/rime/luna_pinyin.dict.yaml') -Algorithm SHA256).Hash -ne '75BCF6EB3FF62B129882ED89CC22B2D80A5347AA72BCFA2CCC839BAC298E7314') { throw 'Luna Pinyin source hash mismatch' }
 if ((Get-FileHash -LiteralPath (Join-Path $root 'data/rime/essay.txt') -Algorithm SHA256).Hash -ne '3E8512EBAA6657E35961B1F5762060717C647E3BF471D5E3B86E783B4E934FFB') { throw 'Rime Essay source hash mismatch' }
-$knownData = @(
+$knownData = if ($TsfTrial) { @(
+  'data/rime/bilingual.dict.yaml', 'data/rime/bilingual.schema.yaml',
+  'data/rime/default.yaml', 'data/rime/luna_pinyin.dict.yaml',
+  'data/rime/essay.txt', 'data/rime/SOURCE.md'
+) } else { @(
   'data/details/own-v004.tsv', 'data/details/own-v021.tsv',
   'data/lexical/own-v0.0.2.tsv', 'data/lexical/own-v021.tsv',
   'data/lexical/README.md', 'data/pronunciation/cmudict-us.tsv',
   'data/pronunciation/SOURCE.md', 'data/rime/bilingual.dict.yaml',
   'data/rime/bilingual.schema.yaml', 'data/rime/default.yaml',
   'data/rime/luna_pinyin.dict.yaml', 'data/rime/essay.txt', 'data/rime/SOURCE.md'
-)
+) }
 foreach ($path in $listed) {
   $normalized = $path.Replace('\','/')
   if ($normalized.StartsWith('data/') -and $normalized -notin $knownData) { throw "Unreviewed data file: $path" }

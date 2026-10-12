@@ -16,6 +16,9 @@ jobs:
         run: cmake --build build --config Release
       - name: Test core
         run: ctest --test-dir build -C Release --output-on-failure
+      - name: Verify TSF registration preview is read-only
+        shell: pwsh
+        run: ./tests/TsfHostTests/TsfRegistration.Tests.ps1
       - uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d
         with:
           dotnet-version: '8.0.425'
@@ -60,6 +63,18 @@ jobs:
         with:
           name: BilingualInput-v0.2.1-lexicon-trial-win-x64
           path: artifacts/BilingualInput-v0.2.1-lexicon-trial-win-x64.zip
+          if-no-files-found: error
+          retention-days: 30
+      - name: Package separate TSF trial without registering it
+        shell: pwsh
+        run: ./scripts/Package-TsfSpike.ps1
+      - name: Audit separate TSF trial
+        shell: pwsh
+        run: ./scripts/Audit-Sources.ps1 -PackagePath artifacts/BilingualInput-v0.2.2-tsf-phase1a-win-x64 -TsfTrial
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: BilingualInput-v0.2.2-tsf-phase1a-win-x64
+          path: artifacts/BilingualInput-v0.2.2-tsf-phase1a-win-x64.zip
           if-no-files-found: error
           retention-days: 30
 
