@@ -11,8 +11,7 @@ class ServiceEngine final : public PrimaryEngine {
   std::vector<std::string> query(const std::string& raw) override;
 };
 
-class TsfService final : public ITfTextInputProcessor,
-                         public ITfTextInputProcessorEx,
+class TsfService final : public ITfTextInputProcessorEx,
                          public ITfKeyEventSink,
                          public ITfThreadMgrEventSink {
  public:
@@ -57,3 +56,4 @@ class TsfService final : public ITfTextInputProcessor,
   TsfComposition composition_;
 };
 }
+
