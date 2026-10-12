@@ -42,6 +42,9 @@ if(BI_WITH_RIME)
       "${RIME_ROOT}/lib/rime.dll" "$<TARGET_FILE_DIR:${target}>/rime.dll")
   endforeach()
   add_test(NAME RimeTests COMMAND RimeTests "${CMAKE_SOURCE_DIR}/data/rime" "${CMAKE_BINARY_DIR}/rime-test-user")
+  add_executable(TsfModuleTests tests/TsfHostTests/TsfModuleTests.cpp)
+  target_link_libraries(TsfModuleTests PRIVATE msctf ole32)
+  add_test(NAME TsfModuleTests COMMAND TsfModuleTests "$<TARGET_FILE_DIR:TsfModuleTests>/BilingualTsf.dll")
 endif()
 
 
