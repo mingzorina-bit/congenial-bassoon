@@ -282,6 +282,10 @@ HRESULT STDMETHODCALLTYPE TsfService::OnKeyDown(ITfContext* context,WPARAM key,L
   const HRESULT requestHr=context->RequestEditSession(clientId_,edit,
     TF_ES_SYNC|TF_ES_READWRITE,&sessionHr);
   edit->Release();
+  if(FAILED(requestHr) || FAILED(sessionHr) || recoveryPending_) {
+    clearFocus();
+    return S_OK;
+  }
   if(SUCCEEDED(requestHr) && SUCCEEDED(sessionHr) && result.handled) *eaten=TRUE;
   return S_OK;
 }

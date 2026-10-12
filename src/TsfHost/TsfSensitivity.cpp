@@ -1,3 +1,4 @@
+#include <initguid.h>
 #include "TsfSensitivity.h"
 
 namespace bilingual::tsf {
