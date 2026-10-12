@@ -1,4 +1,5 @@
 #include "TsfKeyRouter.h"
+#include "TsfEditGate.h"
 #include <functional>
 #include <iostream>
 #include <stdexcept>
@@ -29,6 +30,8 @@ int main() {
   test("TabAndModifiedKeysPassThrough",[]{Engine engine;InputSession session(engine);session.setContext("","ZH");TsfKeyRouter router(session);check(!router.route({0x09,0,false,false,false},false).handled);check(!router.route({'A','a',false,true,false},false).handled);check(!router.route({0x0D,0,true,false,false},false).handled);});
   test("SensitiveContextNeverQueriesOrRetains",[]{Engine engine;InputSession session(engine);session.setContext("","ZH");TsfKeyRouter router(session);type(router,"nihao");auto result=router.route(letter('a'),true);check(!result.handled&&result.raw.empty()&&result.candidates.empty());});
   test("FocusResetCancelsComposition",[]{Engine engine;InputSession session(engine);session.setContext("","ZH");TsfKeyRouter router(session);type(router,"nihao");router.reset();auto result=router.snapshot();check(result.raw.empty()&&result.candidates.empty()&&result.commit.empty());});
+  test("DeniedEditDoesNotConsumeOrMutate",[]{Engine engine;InputSession session(engine);session.setContext("","ZH");TsfKeyRouter router(session);TsfEditGate gate(router);auto result=gate.dispatch(letter('n'),false,[](const std::function<void()>&){return false;});check(!result.handled&&router.snapshot().raw.empty());});
+  test("GrantedEditRoutesInsideCallback",[]{Engine engine;InputSession session(engine);session.setContext("","ZH");TsfKeyRouter router(session);TsfEditGate gate(router);bool inside=false;auto result=gate.dispatch(letter('n'),false,[&](const std::function<void()>& apply){inside=true;apply();inside=false;return true;});check(result.handled&&result.raw=="n"&&!inside);});
   std::cout<<total<<" tests, "<<failures<<" failures\n";
   return failures?1:0;
 }
