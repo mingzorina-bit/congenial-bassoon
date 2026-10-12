@@ -1,4 +1,14 @@
-# Project Progress — v0.0.6 AI Expression
+# BilingualInput project progress
+
+2026-10-13: 免费本机签名准备复用 PR #10。核对 CI 38268798738 的 `aecad960...` 与已审阅包 38267091679/11755622047 的 `f146af64...`，只有两份文档差异，源码一致且旧包包含全部修复。与本地 FREE_LOCAL_TEST_SIGNING_PLAN 比对后沿用 30 天，使用现有 Microsoft 签署的 SDK SignTool；新增默认预览五模式脚本、账户/本机/精确指纹约束、原包保护、信任事务及专用私钥 DeleteKey/CNG 核验。补封包失败清单恢复、过期证书撤销、只读 TSF status 和包内提交记录。12 个边界测试、真实内存证书测试、封包回滚及既有注册测试在本机通过；实际 SDK SignTool 对未签名包验证返回 1，五模式真实预览均只读。独立复核指出封包重新生成清单可能接纳验证后被改动的文件，已让 Seal/Register 再验精确 payload/指纹/SignTool，补文件篡改及 foreign signer 负测。未创建个人证书、导入信任或注册/激活。待最新 Windows CI 与构建包审计；真人编辑器 Gate 保留。
+
+2026-10-12: TSF Phase 1-A 修复提交 `f146af645b3cffefe822745cf9c1761068d32e30` 的 Windows CI 38267091679 全部成功；TSF artifact 11755622047 已独立下载，外层 SHA-256 `8C9B9CF6608C34D9A32A2F47BCF0167B044E1750D4C57F3750B824CB2605F1A5` 与 GitHub digest 一致，内层 ZIP `97FF09A0C0428256C311AAA7233C5F6C9C6EA343E5913642407AFDE56B2448C2`，38 项清单/来源审计 PASS。三个核心二进制文件都未签名；注册/卸载只执行 dry-run。独立代码复核在修订后未发现新的 Critical 或 use-after-free，但宿主拒绝全部清理编辑会话时旧文本可能无法移除，外部编辑器试用必须判为未验收。签名信任导入、注册、激活均未执行，需用户另行确认。
+
+2026-10-12: 用户批准 PR #10 Phase 1-A 安全/一致性修复、Windows CI、独立复核与构建包审计，并要求准备免费单机开发签名方案，证书信任导入、系统设置及 TSF 注册/激活须另行确认。修复候选已补密码/Private/PIN 范围及密码窗口识别、焦点切换或编辑失败后的组合输入清理、英文空格与五候选一致性；新增相应原生回归。独立复核提出 PIN 枚举、异步清理提前放行、销毁期间回调和卸载部分失败重试问题，已修正为命名的敏感范围、保留组合直到清理回调成功、销毁期间不再排队、逐项验证 TSF 条目确实消失后才删自有 COM 标记。若宿主在 Deactivate 时同步和异步编辑都拒绝，仍无法保证移除旧文本，这必须留待真人焦点/失败试用 Gate。`docs/tsf/LOCAL_TEST_SIGNING.md` 为尚未执行的方案。首轮 Windows CI 链接输入范围 GUID 失败，已修正；最终 CI、签名、外部编辑器实测与最终审计仍待完成；不得将现有 CI 视作外部体验 PASS。
+
+2026-10-12: 用户批准 Phase 1-A TSF 分步实现。独立外部编辑器试用分支已实现本地拼音输入路由、TSF COM/编辑会话、五候选桌面弹窗，以及默认只预览的注册/卸载脚本和独立来源审计包。Windows CI 38222256758 构建、Core/Host 回归、TSF 原生测试、真实 Rime 测试和打包审计全部成功；TSF artifact 11735770561 为未签名审阅包，不能据此宣称外部编辑器已可试用。微软要求第三方 IME 有有效数字签名，注册脚本在三项核心二进制文件未受信任签名时阻止 Apply。本机 CurrentUser/My 未发现可用签名证书；签名、安装/回滚审查、Notepad/第二编辑器及密码框真人负测仍待完成。详见 `docs/releases/v0.2.2-tsf-phase1a.md`。冻结的 WinUI v0.2.1 行为未改。
+
+2026-10-12: 用户提供八张 v0.2.1 实际试用截图，确认 `beijing`、`shanghai`、`diannao`、`beijingdiqu` 已可输入，前缀 `beij`、`beijingdiq` 也能预测；英文 Shadow 和有限详情可见。将 v0.2.0/1 词库交互回归按此用户旅程记录为已复测。用户提出省写拼音、候选翻页和更广详情覆盖，按 `docs/USER_FEEDBACK_V021.md` 列为后续独立迭代，现有五候选和有限详情符合本次冻结/审批准则。用户指示进入下一阶段；开始 Phase 1-A TSF 可行性设计，见 `docs/tsf/PHASE1A_DESIGN.md`。尚未注册系统输入法或宣称外部应用可用。
 
 2026-10-12: 用户实际试用 v0.2.0 并附图：`beijing`、`shanghai`、`diannao`、`beijingdiqu` 在编辑区仍显示原文，没有对应英文 Shadow/详情。根因是 InputSession 旧有限拼音意图表在查询 Rime 前拒绝未知拼音；先前 CI 仅直接测引擎覆盖，漏掉真实会话路由。v0.2.1 修复了中文上下文/中文偏好查询宽词库，明确英文上下文仍保留原文，未知查询无结果保留原文；四个用户试用词新增独立自写 Shadow/详情和会话级验收。Windows CI 38196778580 全部通过，artifact 11723553954 已下载；外层 SHA-256 `38F2395BB262D8252D282D38A6DBAE29682EAE21D00EDFDF7BA6808F914C6CEA`、内层 `AE428C0567B7AC0F8C75F786CF628FFB05B65BFDF0F73783FD049ED677F4995F`，575 项文件/来源审计 PASS。v0.2.0 对这些用户旅程不标 PASS；v0.2.1 真人复测待用户完成。
 

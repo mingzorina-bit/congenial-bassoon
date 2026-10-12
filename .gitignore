@@ -12,3 +12,8 @@ docs/source/
 .superpowers/
 .env*
 !.env.example
+signing-local/
+*.pfx
+*.p12
+*.cer
+*.key
