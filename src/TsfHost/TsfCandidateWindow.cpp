@@ -51,7 +51,7 @@ void TsfCandidateWindow::update(const TsfKeyResult& result,const RECT& caret,
     monitorRect=monitor.rcWork;
   else { monitorRect.left=0;monitorRect.top=0;monitorRect.right=GetSystemMetrics(SM_CXSCREEN);monitorRect.bottom=GetSystemMetrics(SM_CYSCREEN); }
   const int x=std::clamp(caret.left,monitorRect.left,std::max(monitorRect.left,monitorRect.right-width));
-  int y=caret.bottom+2;
+  LONG y=caret.bottom+2;
   if(y+height>monitorRect.bottom) y=caret.top-height-2;
   y=std::clamp(y,monitorRect.top,std::max(monitorRect.top,monitorRect.bottom-height));
   SetWindowPos(window_,HWND_TOPMOST,x,y,width,height,
@@ -97,3 +97,4 @@ LRESULT CALLBACK TsfCandidateWindow::WindowProc(HWND window,UINT message,
   return DefWindowProcW(window,message,wparam,lparam);
 }
 }
+
