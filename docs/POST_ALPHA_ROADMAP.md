@@ -9,12 +9,14 @@ The user's 2026-10-12 trial feedback authorizes CR-06 (Tab closes an open Detail
 - Acceptance: with active composition, Tab opens and the next plain Tab closes; Esc closes; focus returns to editor; composition/highlight/editor text/Shadow unchanged. Details-button focus also permits plain Tab close. Shift/Ctrl/Alt+Tab keep their existing meaning. Existing Core, Host, real Rime and packaging CI pass.
 - Done when CI passes and a downloadable, audited Windows package is available for the user's trial. The user decides whether CR-06 feels right before further keyboard changes.
 
-## v0.2.0 — reviewed vocabulary expansion (current data milestone)
+## v0.2.0 / v0.2.1 — reviewed vocabulary expansion (user-tested trial milestone)
 
 - Goal: replace the current roughly 50-entry authored pinyin fixture with a useful broad offline pinyin vocabulary and expand bilingual lookups without mixing source boundaries.
 - First gate: approve a **concrete** source/version/file set and redistribution terms under A-18. The existing librime approval does not approve a Rime dictionary. CC-CEDICT is CC BY-SA 4.0 with attribution and ShareAlike obligations; its verified release is recommended by its editor. ECDICT's repository publishes MIT terms, but field-level provenance still needs review. Rime Luna Pinyin publishes LGPL-3.0 terms and requires a separate packaging review. Do not import any of these by default.
 - Implementation after approval: reproducible download/pin/hash, source-preserving import and normalization, separate datasets with source IDs, attribution in package, no unreviewed IPA/audio/definitions, graceful fallback when a source is absent. Measure candidate coverage, ordering and lookup latency using a fixed common-word/phrase fixture; retain Enter raw, local-first and existing Shadow behavior.
 - Excluded: a promise of Microsoft-Pinyin-equivalent ranking or unrestricted commercial redistribution. A commercially distributed lexicon requires the frozen release review.
+
+Trial update, 2026-10-12: v0.2.0's interactive pinyin routing regression was repaired in v0.2.1. The user confirmed the four reported words in the actual window. New requests for abbreviated pinyin, candidate paging and broader Details are recorded in `USER_FEEDBACK_V021.md`; they are not retroactive acceptance requirements for this trial. Phase 1-A design is in `tsf/PHASE1A_DESIGN.md`.
 
 ## Phase 1-A — TSF feasibility spike (after a trial-ready lexicon)
 
@@ -29,3 +31,4 @@ The user's 2026-10-12 trial feedback authorizes CR-06 (Tab closes an open Detail
 - [Rime Luna Pinyin repository and license](https://github.com/rime/rime-luna-pinyin)
 - [Microsoft TSF architecture](https://learn.microsoft.com/en-us/windows/win32/tsf/architecture)
 - [Microsoft custom IME requirements](https://learn.microsoft.com/en-us/windows/apps/design/input/input-method-editor-requirements)
+
