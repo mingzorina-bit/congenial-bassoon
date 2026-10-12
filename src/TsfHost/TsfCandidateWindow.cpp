@@ -24,7 +24,7 @@ bool TsfCandidateWindow::create(HWND host) {
   type.cbSize=sizeof(type);
   type.lpfnWndProc=WindowProc;
   type.hInstance=ModuleHandle();
-  type.hCursor=LoadCursorW(nullptr,IDC_ARROW);
+  type.hCursor=LoadCursorW(nullptr,MAKEINTRESOURCEW(32512));
   type.lpszClassName=kWindowClass;
   if(!RegisterClassExW(&type) && GetLastError()!=ERROR_CLASS_ALREADY_EXISTS) return false;
   window_=CreateWindowExW(WS_EX_NOACTIVATE|WS_EX_TOOLWINDOW|WS_EX_TOPMOST,
