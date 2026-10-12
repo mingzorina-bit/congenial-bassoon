@@ -2,7 +2,7 @@
 
 Windows 10 2004+ / Windows 11 x64。完整解压后运行 `BilingualInput.exe`。没有 API Key 时，本地候选、Shadow、详情、发音和收藏仍可试用。
 
-[在 Windows 构建页面下载 v0.2.1 试用包](https://github.com/mingzorina-bit/congenial-bassoon/actions/workflows/windows.yml)。GitHub 下载的是外层 ZIP；解压后再解压其中的 `BilingualInput-v0.2.1-lexicon-trial-win-x64.zip`，运行 `BilingualInput.exe`。本版保留项目级 `.env` 配置和明确标注的 AI 演示模式；正式包运行时请用系统 `OPENAI_API_KEY` 环境变量配置真实 API。
+[下载 v0.2.1 Windows 试用包](https://github.com/mingzorina-bit/congenial-bassoon/actions/runs/38196778580/artifacts/11723553954)（需登录 GitHub）。GitHub 下载的是外层 ZIP；解压后再解压其中的 `BilingualInput-v0.2.1-lexicon-trial-win-x64.zip`，运行 `BilingualInput.exe`。本版保留项目级 `.env` 配置和明确标注的 AI 演示模式；正式包运行时请用系统 `OPENAI_API_KEY` 环境变量配置真实 API。
 
 在编辑区按 Tab 展开 Details，再按一次 Tab 可关闭；Esc 也可关闭。关闭后继续输入，原文和候选不应改变。
 
@@ -22,3 +22,4 @@ Windows 10 2004+ / Windows 11 x64。完整解压后运行 `BilingualInput.exe`�
 在“详情设置 / Settings”开启“AI 演示模式（Mock，不联网、不收费）”。演示模式不需要开启“云端辅助”，不会发送句子或使用 API Key；Private Mode 仍会阻断这条链路，以便继续验证隐私行为。当前仅支持有限固定句子：`我觉得这个方案还可以继续优化。`、`这个设计让双语输入更加自然。`、`我们需要进一步优化这个功能。`。结果区域会明确标注“AI 演示结果（Mock，不联网）”，不能把它当成真实模型语义验收。
 
 本试用仍是 WinUI 原型编辑区，不是全系统输入法。英文 Shadow、详情释义和音标仍只覆盖已审核的有限数据，宽拼音词库不等于完整双语词典；系统声线依安装情况提供，美式 CMUdict 有限，英式音标未覆盖。中文 Shadow 拼音、未提交混输识别、`youh` 提前预测及不完整英文提示仍留待后续迭代；应用外输入需经过独立 TSF 阶段，见仓库 `docs/POST_ALPHA_ROADMAP.md`。本版词典仅获试用批准，商业发布另审。
+
