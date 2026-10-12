@@ -19,6 +19,12 @@ jobs:
       - name: Verify TSF registration preview is read-only
         shell: pwsh
         run: ./tests/TsfHostTests/TsfRegistration.Tests.ps1
+      - name: Test local signing previews, failure and rollback boundaries
+        shell: pwsh
+        run: |
+          ./tests/TsfHostTests/TsfSigning.Tests.ps1
+          ./tests/TsfHostTests/TsfCertificate.Tests.ps1
+          ./tests/TsfHostTests/TsfSeal.Tests.ps1
       - uses: actions/setup-dotnet@d4c94342e560b34958eacfc5d055d21461ed1c5d
         with:
           dotnet-version: '8.0.425'

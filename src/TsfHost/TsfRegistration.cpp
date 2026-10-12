@@ -124,6 +124,22 @@ bool addTsf() {
   category->Release();
   return SUCCEEDED(hr);
 }
+int registrationStatus() {
+  ITfCategoryMgr* category=nullptr;
+  ITfInputProcessorProfiles* profile=nullptr;
+  bool categoryFound=true,profileFound=true;
+  const bool categoryKnown=SUCCEEDED(categories(&category)) && category &&
+    categoryPresent(category,categoryFound);
+  const bool profileKnown=SUCCEEDED(profiles(&profile)) && profile &&
+    profilePresent(profile,profileFound);
+  if(category) category->Release();
+  if(profile) profile->Release();
+  HKEY key=nullptr;
+  const LONG opened=RegOpenKeyExW(HKEY_CURRENT_USER,kComKey,0,KEY_READ,&key);
+  if(key) RegCloseKey(key);
+  if(!categoryKnown || !profileKnown || (opened!=ERROR_SUCCESS && opened!=ERROR_FILE_NOT_FOUND)) return 3;
+  return categoryFound || profileFound || opened==ERROR_SUCCESS ? 6 : 0;
+}
 }
 
 int wmain(int argc,wchar_t** argv) {
@@ -135,6 +151,14 @@ int wmain(int argc,wchar_t** argv) {
     return 0;
   }
   if(argc<2) return 2;
+  if(argc==2 && std::wstring(argv[1])==L"status") {
+    const HRESULT initialized=CoInitializeEx(nullptr,COINIT_APARTMENTTHREADED);
+    if(FAILED(initialized)) return 3;
+    const int status=registrationStatus();
+    CoUninitialize();
+    std::wcout<<(status==0?L"Trial COM/profile/category absent\n":L"Trial present or status unavailable\n");
+    return status;
+  }
   const bool adding=std::wstring(argv[1])==L"register";
   const bool removing=std::wstring(argv[1])==L"unregister";
   if((adding && argc!=3) || (removing && argc!=2) || (!adding && !removing)) return 2;

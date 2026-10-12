@@ -18,9 +18,19 @@ Copy-Item (Join-Path $repo 'licenses') $out -Recurse
 Copy-Item (Join-Path $out 'licenses/rime-luna-pinyin-LGPL-3.0.txt') (Join-Path $out 'licenses/rime-essay-LGPL-3.0.txt')
 Copy-Item (Join-Path $repo 'THIRD_PARTY_SOURCES.md') $out
 Copy-Item (Join-Path $repo 'docs/tsf/PHASE1A_TRIAL.md') (Join-Path $out 'README-TSF-TRIAL.md')
+Copy-Item (Join-Path $repo 'docs/tsf/LOCAL_TEST_SIGNING.md') (Join-Path $out 'LOCAL_TEST_SIGNING.md')
+$checkout = (& git -C $repo rev-parse HEAD).Trim()
+if($LASTEXITCODE -ne 0){throw 'Cannot record checkout commit'}
+$sourceCommit=$checkout
+if($env:GITHUB_EVENT_PATH -and (Test-Path -LiteralPath $env:GITHUB_EVENT_PATH)){
+  $event=Get-Content -LiteralPath $env:GITHUB_EVENT_PATH -Raw|ConvertFrom-Json
+  if($event.pull_request.head.sha){$sourceCommit=$event.pull_request.head.sha}
+}
+@{sourceCommit=$sourceCommit;checkoutCommit=$checkout;runId=$env:GITHUB_RUN_ID;architecture='x64';signed=$false}|
+  ConvertTo-Json|Set-Content (Join-Path $out 'BUILD-PROVENANCE.json') -Encoding utf8
 New-Item -ItemType Directory -Path (Join-Path $out 'scripts') | Out-Null
 foreach ($name in @('Register-TsfTrial.ps1','Unregister-TsfTrial.ps1',
-    'Seal-SignedTsfTrial.ps1','Audit-Sources.ps1')) {
+    'Seal-SignedTsfTrial.ps1','Audit-Sources.ps1','Local-TsfSigning.ps1','TsfSigning.Common.ps1')) {
   Copy-Item (Join-Path $repo "scripts/$name") (Join-Path $out "scripts/$name")
 }
 # App-local VC runtime: external editors should not require Visual Studio.

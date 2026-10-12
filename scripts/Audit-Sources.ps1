@@ -13,9 +13,10 @@ foreach ($item in $inventory) {
   if (-not (Test-Path -LiteralPath $file -PathType Leaf)) { throw "Missing package file: $relative" }
   if ((Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash -ne $item.sha256) { throw "Hash mismatch: $relative" }
 }
-$actual = @(Get-ChildItem -LiteralPath $root -Recurse -File | Where-Object FullName -ne $inventoryPath)
+$actual = @(Get-ChildItem -LiteralPath $root -Recurse -File -Force | Where-Object FullName -ne $inventoryPath)
 if ($actual.Count -ne $inventory.Count) { throw "Inventory count mismatch: listed $($inventory.Count), actual $($actual.Count)" }
 $tsfApproved = @(
+  'BUILD-PROVENANCE.json','LOCAL_TEST_SIGNING.md','scripts/Local-TsfSigning.ps1','scripts/TsfSigning.Common.ps1',
   'BilingualTsf.dll', 'TsfTrialRegistration.exe', 'rime.dll',
   'THIRD_PARTY_SOURCES.md', 'README-TSF-TRIAL.md',
   'scripts/Register-TsfTrial.ps1', 'scripts/Unregister-TsfTrial.ps1',
@@ -42,6 +43,7 @@ foreach ($file in $actual) {
   }
 }
 $required = if ($TsfTrial) { @(
+  'BUILD-PROVENANCE.json','LOCAL_TEST_SIGNING.md','scripts/Local-TsfSigning.ps1','scripts/TsfSigning.Common.ps1',
   'BilingualTsf.dll', 'TsfTrialRegistration.exe', 'rime.dll',
   'THIRD_PARTY_SOURCES.md', 'README-TSF-TRIAL.md',
   'scripts/Register-TsfTrial.ps1', 'scripts/Unregister-TsfTrial.ps1',

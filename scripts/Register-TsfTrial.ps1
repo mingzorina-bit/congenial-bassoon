@@ -1,5 +1,7 @@
 param(
   [string]$PackageRoot = (Split-Path $PSScriptRoot -Parent),
+  [string]$StatePath,
+  [string]$SignToolPath,
   [switch]$Apply
 )
 $ErrorActionPreference = 'Stop'
@@ -28,6 +30,11 @@ $rimeSignature = Get-AuthenticodeSignature -LiteralPath $rime
 if ($dllSignature.Status -ne 'Valid' -or $helperSignature.Status -ne 'Valid' -or $rimeSignature.Status -ne 'Valid') {
   throw 'Registration is blocked until the TSF DLL, Rime engine and helper have valid trusted code signatures.'
 }
+if(-not $StatePath -or -not $SignToolPath){throw 'Local StatePath and official SignToolPath required before registration'}
+. (Join-Path $PSScriptRoot 'TsfSigning.Common.ps1')
+$expectedRoot=Join-Path (Split-Path ([IO.Path]::GetFullPath($StatePath)) -Parent) 'signed-package'
+if($root -ne $expectedRoot){throw 'Registration package must match recorded signed output'}
+Invoke-TsfSigningOperation -Mode Verify -StatePath $StatePath -SignToolPath $SignToolPath -Apply|Out-Null
 & (Join-Path $PSScriptRoot 'Audit-Sources.ps1') -PackagePath $root -TsfTrial
 & $helper register $dll
 if ($LASTEXITCODE -ne 0) { throw "TSF registration failed: exit $LASTEXITCODE. Run Unregister-TsfTrial.ps1 -Apply to clean partial state." }

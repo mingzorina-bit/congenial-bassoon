@@ -1,72 +1,77 @@
-# Phase 1-A: one-machine development signing proposal
+# Phase 1-A free local development signing
 
-Status: prepared for review only. Do not run the trust, registration, or activation steps until the user approves them. This is a free, local development path, not a commercial distribution signature. The target is this user's x64 Windows 11 25H2 (build 26200) machine; actual TSF loading is still an experiment.
+Status: preparation scripts and failure tests. No personal certificate, trusted certificate, TSF registration or activation was created by this task. An actual thumbprint does not exist yet. Target: the designated user's x64 Windows 11 25H2 (build 26200) test machine, subject to its actual security policy. Signature/CI success never establishes external-editor acceptance.
 
-Microsoft requires third-party IMEs to be digitally signed. PowerShell can create a code-signing test certificate and sign files, but a self-signed certificate is untrusted by default. Importing it into `CurrentUser\Root` and `CurrentUser\TrustedPublisher` is a meaningful trust change. Authenticode `Valid` is necessary for our registration guard; it does **not** prove Windows will load this TSF DLL in every editor or bypass every Windows policy.
+## Reconciliation and package identity
 
-## Before any system change
+The supplied local `signing-preparation/FREE_LOCAL_TEST_SIGNING_PLAN.md` and earlier repository proposal describe the same phased operation. Retain the repository's **30-day** lifetime (local plan suggested 90), use the existing Microsoft-signed Windows SDK **SignTool** for signing/verification, and use certificate-provider `DeleteKey` plus exact dedicated CNG-key existence checks for cleanup. No SDK download or paid certificate is needed on the current development machine.
 
-1. Download the Windows CI TSF ZIP for the exact PR commit. Compare the ZIP SHA-256 with GitHub's artifact digest, extract to a new local-only directory, run `scripts/Audit-Sources.ps1 -PackagePath <dir> -TsfTrial`, and keep the original ZIP.
-2. Run `scripts/Register-TsfTrial.ps1 -PackageRoot <dir>` and `scripts/Unregister-TsfTrial.ps1 -PackageRoot <dir>` **without** `-Apply` to inspect fixed CLSID, profile and registry scope. Record the exact extracted directory. Do not alter or sign the original CI ZIP.
-3. Check the three file signatures first: `BilingualTsf.dll`, `rime.dll`, and `TsfTrialRegistration.exe`. If any already have a trusted valid signature, preserve it. Make a separate working copy for signing.
+CI **38268798738** built `aecad960cbe1afc6abf2d5da060eaddaf10f2a2b`; artifact **11755622047** from run **38267091679** built `f146af645b3cffefe822745cf9c1761068d32e30`. GitHub compare shows only progress and release documents changed. TSF source/tests/packaging were identical, so the older review package contains all repairs. This milestone adds signing scripts, package provenance and read-only status; use its new CI package for the new workflow. `BUILD-PROVENANCE.json` records PR source head, actual checkout/merge commit, run ID and x64 architecture.
 
-## Proposed steps after explicit approval
+## Operation boundaries
 
-In Windows PowerShell as the target user, set `$trialRoot` to the absolute path of the copied package. No administrator privilege, private-key export, `bcdedit`, Test Mode, Defender exemption, machine-wide certificate store or commercial certificate is proposed.
+`scripts/Local-TsfSigning.ps1` is the entry point. Every mode defaults to a **read-only preview**; `-Apply` acts only on that mode. Trust additionally requires `-ApproveTrust -Thumbprint <exact uppercase fingerprint>`; Revoke requires `-ApproveRevoke -Thumbprint <exact fingerprint>`. Switches do not replace the human confirmation required by this task.
 
-```powershell
-$cert = New-SelfSignedCertificate -Type CodeSigningCert `
-  -Subject 'CN=BilingualInput Phase1A Local Trial' `
-  -CertStoreLocation 'Cert:\CurrentUser\My' `
-  -KeyExportPolicy NonExportable -HashAlgorithm SHA256 `
-  -NotAfter (Get-Date).AddDays(30)
-$thumbprint = $cert.Thumbprint
-$certificateFile = "$trialRoot-LocalTest.cer" # outside the sealed package
-Export-Certificate -Cert $cert -FilePath $certificateFile
+Reuse Audit, Seal, Register and Unregister scripts. Seal now defaults to preview and requires `-Apply`. Helper `status` reads registration: exit 0 means fixed COM/profile/category absent; 6 means residue present; 3 means status unknown. Unknown status blocks certificate removal. Register retains its three-`Valid` signature guard. No signing mode registers or activates an IME.
 
-foreach ($name in @('BilingualTsf.dll','rime.dll','TsfTrialRegistration.exe')) {
-  $path = Join-Path $trialRoot $name
-  $existing = Get-AuthenticodeSignature -LiteralPath $path
-  if ($existing.Status -ne 'Valid') {
-    $signed = Set-AuthenticodeSignature -LiteralPath $path -Certificate $cert -HashAlgorithm SHA256
-    if ($signed.Status -eq 'HashMismatch' -or $signed.Status -eq 'NotSigned') { throw "Signing failed: $name" }
-  }
-}
-```
+Run PowerShell **7**, **unelevated**, as the designated user. No LocalMachine store, automatic elevation, TESTSIGNING, security-feature changes or policy bypass is offered. If user-scoped trust is insufficient, stop and record the policy error; widening scope needs another proposal and confirmation.
 
-The public `.cer` and thumbprint stay local; **never** upload the private key or a PFX. The command is intentionally separate from trusting the certificate. Before import, inspect the exported certificate's subject, thumbprint, validity and `Code Signing` EKU. Import *only this exact certificate* for this user:
+## Certificate and private key
+
+Dedicated subject: `CN=BilingualInput Phase1A Local Trial`; RSA 2048; SHA-256; Code Signing EKU `1.3.6.1.5.5.7.3.3`; DigitalSignature; 30-day validity. The non-exportable user key belongs to **Microsoft Software Key Storage Provider**, **CurrentUser/My**. Local `state.json` records exact thumbprint, UTC validity, dedicated key name/provider, user/machine, source commit and signed hashes. The private key stays in Windows user key storage: no PFX or password. Export only `public.cer`.
+
+Keep state/CER and outputs local, outside the unsigned extraction. `.gitignore` excludes signing-local/PFX/P12/CER/key files. Upload only named source/test/docs; never local state, signed test outputs or key material. State binding prevents accidental cross-machine/account use; a public CER cannot mathematically prevent independent import elsewhere.
+
+## Preview now; approved execution later
+
+`$packageRoot` is the fresh audited extraction, `$sourceCommit` its verified source head, and `$tool` a trusted official x64 SignTool. The current discovered tool is SDK `10.0.26100.0` from pinned Microsoft.Windows.SDK.BuildTools and has a valid Microsoft signature.
 
 ```powershell
-Import-Certificate -FilePath $certificateFile `
-  -CertStoreLocation 'Cert:\CurrentUser\Root'
-Import-Certificate -FilePath $certificateFile `
-  -CertStoreLocation 'Cert:\CurrentUser\TrustedPublisher'
-foreach ($name in @('BilingualTsf.dll','rime.dll','TsfTrialRegistration.exe')) {
-  $signature = Get-AuthenticodeSignature -LiteralPath (Join-Path $trialRoot $name)
-  if ($signature.Status -ne 'Valid') { throw "Untrusted binary: $name ($($signature.Status))" }
-}
+$localState = Join-Path $PWD 'signing-local/state.json' # outside $packageRoot
+$packageRoot = '<absolute audited package directory>'
+$sourceCommit = '<verified 40-character source commit>'
+$tool = '<absolute Microsoft-signed SDK x64 signtool.exe>'
+./scripts/Local-TsfSigning.ps1 -Mode NewCertificate -StatePath $localState
+./scripts/Local-TsfSigning.ps1 -Mode Sign -StatePath $localState -PackageRoot $packageRoot -SourceCommit $sourceCommit -SignToolPath $tool
+./scripts/Local-TsfSigning.ps1 -Mode Verify -StatePath $localState -SignToolPath $tool
+./scripts/Local-TsfSigning.ps1 -Mode Trust -StatePath $localState
+./scripts/Local-TsfSigning.ps1 -Mode Revoke -StatePath $localState -PackageRoot $packageRoot
 ```
 
-Compare each signature's signer thumbprint with `$thumbprint` for files newly signed by this certificate; pre-existing trusted signatures must match their original signers. Re-run package audit, then `scripts/Seal-SignedTsfTrial.ps1 -PackageRoot $trialRoot`. **Do not** run `Register-TsfTrial.ps1 -Apply` or activate the profile until the separate registration/activation confirmation. `Seal-SignedTsfTrial.ps1` adds a hash inventory and makes a new ZIP; the `.cer` remains outside the package so the allowlist stays strict.
+After confirmation for personal-certificate creation/signing, append `-Apply` to NewCertificate, then Sign. Creation failure rolls back the new certificate/key; signing failure removes partial output, leaving the audited original unchanged. SignTool uses `/sha1 <thumbprint> /s My /fd SHA256` (SHA1 identifies the certificate; file digest is SHA256). Only the three core binaries in a fresh `signed-package` are signed; trusted different signers and existing output directories are protected. Microsoft runtime DLLs remain unchanged.
 
-## Complete local rollback, after any actual trial
+State records original payload and three signed hashes. Before trust, `NotTrusted`/`UnknownError` are pending diagnostics, never PASS; UnknownError is not assumed to mean only chain distrust. Verify, Seal and Register cannot pass until signatures are **Valid**, signers match the selected thumbprint, and `SignTool verify /pa /v` returns zero for all three files.
 
-Switch to a different IME, close editors that loaded the trial DLL, then run `scripts/Unregister-TsfTrial.ps1 -PackageRoot $trialRoot -Apply`. Confirm its exit is successful, the fixed HKCU COM owner marker is gone, and the trial language profile/category are absent. If removal fails, **retain** the binaries and certificates, retry removal or investigate; the helper deliberately preserves its marker on TSF removal failure. Only after successful unregister, remove the exact certificate thumbprint from `Cert:\CurrentUser\TrustedPublisher`, `Cert:\CurrentUser\Root`, then `Cert:\CurrentUser\My`:
+## Separate trust and installation confirmations
+
+After creation/signing, show actual thumbprint, UTC validity, public CER path/hash, three signed hashes, local machine/account, exact Root/TrustedPublisher changes and inverse preview. Only after those operations are approved:
 
 ```powershell
-foreach ($store in @('TrustedPublisher','Root','My')) {
-  $path = "Cert:\CurrentUser\$store\$thumbprint"
-  $item = Get-Item -LiteralPath $path -ErrorAction SilentlyContinue
-  if ($item) {
-    if ($item.Subject -ne 'CN=BilingualInput Phase1A Local Trial') { throw "Unexpected certificate: $path" }
-    Remove-Item -LiteralPath $path
-  }
-  if (Test-Path -LiteralPath $path) { throw "Certificate still trusted: $path" }
-}
+$fingerprint = '<actual uppercase fingerprint from reviewed local state>'
+./scripts/Local-TsfSigning.ps1 -Mode Trust -StatePath $localState -Thumbprint $fingerprint -ApproveTrust -Apply
+./scripts/Local-TsfSigning.ps1 -Mode Verify -StatePath $localState -SignToolPath $tool -Apply # read-only
+./scripts/Seal-SignedTsfTrial.ps1 -PackageRoot '<signed-package path>' -StatePath $localState -SignToolPath $tool # preview
+./scripts/Seal-SignedTsfTrial.ps1 -PackageRoot '<signed-package path>' -StatePath $localState -SignToolPath $tool -Apply
 ```
 
-Delete the extracted working copy and local `.cer` last. If `rime.dll` carried a pre-existing trusted signature, do not remove that publisher's certificate.
+Trust affects only **CurrentUser/Root** and **CurrentUser/TrustedPublisher**. Journal each intention before import; preserve pre-existing copies. A second-import failure rolls back only this attempt's new copies; rollback failure retains the journal. Seal and Register require `-StatePath $localState -SignToolPath $tool` and repeat payload, signer and SignTool verification immediately before use. Failed Seal restores the old inventory and preserves any existing ZIP. Record sealed hash/source commit, show registration/removal previews, then obtain **separate registration/activation approval**.
 
-The current PR has no evidence of actual Notepad, second-editor, password-field, focus-switch, or uninstall behavior. Run those manual checks only after signature, trust, registration and activation are separately approved.
+## Full revocation
 
-Sources: [Microsoft IME requirements](https://learn.microsoft.com/en-us/windows/apps/develop/input/input-method-editors), [New-SelfSignedCertificate](https://learn.microsoft.com/en-us/powershell/module/pki/new-selfsignedcertificate), [Set-AuthenticodeSignature](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/set-authenticodesignature), [Import-Certificate](https://learn.microsoft.com/en-us/powershell/module/pki/import-certificate).
+Switch back to the prior IME and close editors that loaded the DLL. Use a matching audited package; the unsigned original is acceptable for read-only status, while an installed package should already be sealed.
+
+```powershell
+./scripts/Local-TsfSigning.ps1 -Mode Revoke -StatePath $localState -PackageRoot $packageRoot
+# After revocation confirmation; -Unregister is needed only if TSF was installed:
+./scripts/Local-TsfSigning.ps1 -Mode Revoke -StatePath $localState -PackageRoot $packageRoot -Thumbprint $fingerprint -ApproveRevoke -Unregister -Apply
+```
+
+Verify matching provenance and registration status, reuse Unregister if explicitly requested, and establish COM/profile/category absence **before removing trust**. Failure retains trust/key/state/binaries. Remove only journaled new trust by exact fingerprint, delete owned My certificate with `Remove-Item -DeleteKey`, check the recorded user-scoped CNG key and, if necessary, delete that exact remaining dedicated key through CNG. Never delete arbitrary key files or match certificates by name. Expired owned certificates remain revocable. Keep the local journal; repeated completed revoke is safe.
+
+`-DeleteOutputs` also removes only the validated `signed-package` child, public CER and sealed ZIP whose recorded hash still matches. Unknown/changed ZIPs are preserved for review. Original ZIPs, other certificates/data and `%LOCALAPPDATA%/BilingualInput/tsf-rime` remain; optional cache deletion needs a separate reviewed scope. Retain removal binaries/journal until restoration is verified.
+
+## Manual acceptance conditions
+
+Notepad plus a second named editor: pinyin, visible highlight/actual commit, fifth option, Space/Enter/Esc, English separator. Native/browser password, PIN and private fields: no candidates/retained composition. Mid-composition focus switches and editor closure; if a host rejects sync and deferred cleanup and stale text survives, record FAIL. Unregister/reopen: original keyboard works, trial COM/profile/category absent, owned trust/private key absent. CI/signing replaces none of these checks.
+
+Sources: [IME requirements](https://learn.microsoft.com/en-us/windows/apps/develop/input/input-method-editors), [self-signed testing](https://learn.microsoft.com/en-us/windows/apps/package-and-deploy/code-signing-options#self-signed-certificates--dev-and-testing-only), [New-SelfSignedCertificate](https://learn.microsoft.com/en-us/powershell/module/pki/new-selfsignedcertificate), [SignTool](https://learn.microsoft.com/en-us/windows/win32/seccrypto/signtool), [certificate provider/DeleteKey](https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.security/about/about_certificate_provider), [Import-Certificate](https://learn.microsoft.com/en-us/powershell/module/pki/import-certificate).
