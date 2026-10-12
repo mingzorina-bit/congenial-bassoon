@@ -1,4 +1,4 @@
-param([string]$ReleaseVersion = 'v0.1.0-alpha')
+param([string]$ReleaseVersion = 'v0.1.1-tab-trial')
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot -Parent
 $out = Join-Path $repo "artifacts/BilingualInput-$ReleaseVersion-win-x64"

@@ -3,6 +3,7 @@
 
 ## 权威与冲突
 本次用户明确要求采用已确认的五份规格和 CR-01～CR-05。五份规格正文保留既有范围，CR 的澄清优先；实施计划只能安排实现顺序，不能覆盖产品行为。历史原文中的“建议”“请确认”属于当时的讨论状态，不构成重新审批要求。未决技术事项不能自行宣布已通过。
+2026-10-12 的用户试用反馈批准了后续 CR-06，仅扩展 Details 的关闭按键：再按 Tab 可关闭，Esc 保留。其记录见 `CHANGE_REQUESTS.md`；原 v0.1 冻结基线与 alpha 验收证据保持原貌。
 发现无法由 CR 解决的行为矛盾：记录具体条款、复现案例、影响和建议 CR，暂停受影响的实现，继续无关工作。
 
 | 文档 | 状态 | 应用变更 |
@@ -22,5 +23,5 @@ Phase 0 是 WinUI 交互原型；不是全系统 IME。Phase 1 前另做 TSF spi
 商业 Release 前执行 Data & Dependency Release Review。内部 Alpha 可使用有明确分发权限的 PROTOTYPE_ONLY 数据，但不得把该标签当成分发许可；UNKNOWN 权限阻断打包。
 
 ## 原始依据
-[S1 Product](SOURCE_PROVENANCE.md)、[S2 Interaction/CR-01](SOURCE_PROVENANCE.md)、[S3 Architecture](SOURCE_PROVENANCE.md)、[S4 Data](SOURCE_PROVENANCE.md)、[S5 Acceptance/复核](SOURCE_PROVENANCE.md)、[S6 Final Review/CR-02～05](SOURCE_PROVENANCE.md)。
+[S1 Product](source/S1.md)、[S2 Interaction/CR-01](source/S2.md)、[S3 Architecture](source/S3.md)、[S4 Data](source/S4.md)、[S5 Acceptance/复核](source/S5.md)、[S6 Final Review/CR-02～05](source/S6.md)。
 原对话 ID：6aaf87f9-6cd0-83ee-b38f-d1f55d1670a0。最终用户“好的，那进行下一步吧，开始整理移交给codex”，并由本次请求明确要求采用全部 CR；本包不冒充独立技术 PoC、法律审核或 UX 验收。

@@ -23,6 +23,9 @@ public sealed partial class MainWindow {
  private void CloseDetails(){details.Close();naturalGateway.Invalidate();HidePeek();DeepCard.Visibility=Visibility.Collapsed;StopAudio();}
  private void StopAudio(){audioRevision++;speech.Stop();}
  private void RootKeyDown(object sender,KeyRoutedEventArgs e){
+  if(e.Key==VirtualKey.Tab&&details.DeepOpen&&!Down(VirtualKey.Shift)&&!Down(VirtualKey.Control)&&!Down(VirtualKey.Menu)){
+   CloseDetails();e.Handled=true;Editor.Focus(FocusState.Programmatic);return;
+  }
   if(e.Key==VirtualKey.Escape&&(details.DeepOpen||peek?.IsOpen==true)){
    CloseDetails();e.Handled=true;Editor.Focus(FocusState.Programmatic);
   }
