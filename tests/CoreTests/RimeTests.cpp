@@ -4,6 +4,7 @@
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include <tuple>
 using namespace bilingual;
 int main(int argc,char** argv) {
  if(argc!=3) return 2;
@@ -50,8 +51,26 @@ int main(int argc,char** argv) {
   InputSession session(engine);
   auto lexicalPath=std::filesystem::u8path(argv[1]).parent_path()/"lexical"/"own-v0.0.2.tsv";
   auto lexicalUtf8=lexicalPath.u8string();
-  LexicalStore lexical(std::string(lexicalUtf8.begin(),lexicalUtf8.end()));
+  auto extensionPath=std::filesystem::u8path(argv[1]).parent_path()/"lexical"/"own-v021.tsv";
+  auto extensionUtf8=extensionPath.u8string();
+  LexicalStore lexical(std::string(lexicalUtf8.begin(),lexicalUtf8.end()),std::string(extensionUtf8.begin(),extensionUtf8.end()));
   session.setLexical(&lexical);
+  for(const auto& item:std::vector<std::tuple<std::string,std::string,std::string>>{
+      {"beijing","北京","Beijing"},{"shanghai","上海","Shanghai"},
+      {"diannao","电脑","computer"},{"beijingdiqu","北京地区","Beijing area"}}) {
+    InputSession covered(engine);
+    covered.setLexical(&lexical);
+    covered.setContext("电脑你好 ","ZH");
+    for(char c:std::get<0>(item))covered.type(c);
+    auto candidates=covered.candidates();
+    auto found=std::find(candidates.begin(),candidates.end(),std::get<1>(item));
+    if(found==candidates.end()){std::cerr<<"FAIL host-context pinyin: "<<std::get<0>(item)<<"\n";return 1;}
+    covered.highlight(static_cast<int>(found-candidates.begin()));
+    auto shadow=covered.shadows();
+    if(shadow.empty()||shadow.front().text!=std::get<2>(item)){std::cerr<<"FAIL host-context Shadow: "<<std::get<0>(item)<<"\n";return 1;}
+    covered.press(Key::Space);
+    if(covered.takeCommit()!=std::get<1>(item)){std::cerr<<"FAIL host-context commit: "<<std::get<0>(item)<<"\n";return 1;}
+  }
   for(char c:std::string("youhua"))session.type(c);
   session.press(Key::Enter,true);
   if(session.takeCommit()!="optimize") { std::cerr<<"FAIL Shadow commit\n"; return 1; }

@@ -1,5 +1,7 @@
 # Project Progress — v0.0.6 AI Expression
 
+2026-10-12: 用户实际试用 v0.2.0 并附图：`beijing`、`shanghai`、`diannao`、`beijingdiqu` 在编辑区仍显示原文，没有对应英文 Shadow/详情。根因是 InputSession 旧有限拼音意图表在查询 Rime 前拒绝未知拼音；先前 CI 仅直接测引擎覆盖，漏掉真实会话路由。开始 v0.2.1 修复：中文上下文/中文偏好查询宽词库，明确英文上下文仍保留原文，未知查询无结果保留原文；四个用户试用词新增独立自写 Shadow/详情和会话级验收。v0.2.0 对这些用户旅程不再标 PASS，待新 CI/用户重测。
+
 2026-10-12: v0.2.0 最终代码提交 `d81f5c5340607b67c356115885ce7277b9d4c8da` 的 Windows CI 38191903076 全部成功：真实 Rime 常用词 6/6、简体显示、自有候选排序、Shadow/Enter 原文、Host/WinUI 与来源审计均通过。artifact 11721523668 已下载；外层 SHA-256 `0F5125A26FB73C3DA6B86A21C86F02C997E69DBF921AAE897A753389B9F3ADF0`，内层 `401EB26B3536073E5BFAC0F84EA43360831DDE1FEF85DA47986BE07F3C4CAC7B`；573 项文件清单/来源审计通过。Shell 启动在 8 秒内以 code 0 退出，未证实可见窗口，真人试用仍待用户。当前停在 v0.2.0 试用包，不推进 TSF 或商业词典发布。
 
 2026-10-12: 用户确认 v0.1.1 Tab 手感，授权进入 v0.2.0 离线词库试用。文件级审计发现 Luna 致谢多个来源且常用词依赖独立 Rime Essay；用户分别批准保留 Luna 原始致谢与 LGPL 试用，以及 `rime/rime-essay` 固定提交 `054920de4f54c9e5994276a96a4fc2a35cb51aa3` 仅供试用。实现中：固定 SHA-256 下载/校验、独立来源与作者记录、Luna import + Essay 词频、Windows 简体输出、常用词/原文/优先级真实引擎测试、试用包版本与来源审计。源码尚待 Windows CI，商业发布与 TSF 仍独立待审。

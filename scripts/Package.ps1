@@ -1,4 +1,4 @@
-param([string]$ReleaseVersion = 'v0.2.0-lexicon-trial')
+param([string]$ReleaseVersion = 'v0.2.1-lexicon-trial')
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot -Parent
 & "$PSScriptRoot/Prepare-Lexicon.ps1"

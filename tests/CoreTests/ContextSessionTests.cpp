@@ -3,7 +3,7 @@
 #include <iostream>
 #include <stdexcept>
 using namespace bilingual;
-struct Engine:PrimaryEngine {std::string queried;std::vector<std::string> query(const std::string& s)override{queried=s;if(s=="youhua")return {"优化","油画"};if(s=="he")return {"和"};if(s=="computer")return {"错误拼音候选"};return {};}};
+struct Engine:PrimaryEngine {std::string queried;std::vector<std::string> query(const std::string& s)override{queried=s;if(s=="youhua")return {"优化","油画"};if(s=="he")return {"和"};if(s=="beijing")return {"北京"};if(s=="diannao")return {"电脑"};if(s=="beijingdiqu")return {"北京地区"};if(s=="computer")return {"错误拼音候选"};return {};}};
 void check(bool b){if(!b)throw std::runtime_error("assertion");}
 void type(InputSession& s,std::string text){for(char c:text)s.type(c);}
 int main(int argc,char**argv){if(argc!=2)return 2;LexicalStore lex(argv[1]);int count=0,failed=0;auto test=[&](const char* n,std::function<void()> f){++count;try{f();std::cout<<"PASS "<<n<<"\n";}catch(...){++failed;std::cout<<"FAIL "<<n<<"\n";}};
@@ -13,5 +13,8 @@ test("ChineseContextBeatsEnglishPrior",[]{Engine e;InputSession s(e);s.setContex
 test("CorrectionFeedsPrimaryThenShadow",[&]{Engine e;InputSession s(e);s.setLexical(&lex);s.setContext("这个方案");type(s,"youhha");check(e.queried=="youhua"&&s.candidates().front()=="优化"&&s.shadows().front().text=="optimize");s.press(Key::Enter);check(s.takeCommit()=="youhha");});
 test("UnknownLatinRetained",[]{Engine e;InputSession s(e);s.setContext("I think ");type(s,"quux");check(s.candidates()==std::vector<std::string>{"quux"});});
 test("UnknownLatinNeverSentToPinyin",[]{Engine e;InputSession s(e);s.setContext("这个");type(s,"computer");check(s.candidates()==std::vector<std::string>{"computer"}&&e.queried!="computer");});
+test("BroadPinyinQueriesInChineseContext",[]{Engine e;InputSession s(e);s.setContext("电脑你好 ","ZH");type(s,"beijing");check(e.queried=="beijing"&&s.candidates().front()=="北京");s.press(Key::Space);check(s.takeCommit()=="北京");});
+test("BroadPinyinQueriesFromChinesePreference",[]{Engine e;InputSession s(e);s.setContext("","ZH");type(s,"beijingdiqu");check(e.queried=="beijingdiqu"&&s.candidates().front()=="北京地区");});
+test("UnknownProperNounStaysEnglishInEnglishContext",[]{Engine e;InputSession s(e);s.setContext("I think this ","ZH");type(s,"beijing");check(s.candidates()==std::vector<std::string>{"beijing"}&&e.queried!="beijing");});
 test("SecureNoContext",[]{Engine e;InputSession s(e);s.setPrivacy(PrivacyMode::Secure);s.setContext("I think 方案");type(s,"design");check(s.context().segments.empty()&&s.candidates().empty());});
 std::cout<<count<<" tests, "<<failed<<" failures\n";return failed?1:0;}

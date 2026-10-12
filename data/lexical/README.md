@@ -12,3 +12,5 @@ Approval: 冻结 D-07 与 v0.0.2 计划的 curated 路线，本轮用户明确�
 反向 optimize→优化 用于验证 Core 目标语言不被写死成 EN；当前真实拼音 Host 尚未进行英文上下文识别，不能据此宣称 AC-11 已实现。
 
 2026-09-29 v0.0.3：新增自有 design→设计；上下文词形集合在 LanguageContext.cpp，人工编写、无外部词典。gap 只匹配完整词条，不逐字拼接，不承诺语法改写。
+
+2026-10-12 v0.2.1：独立 `own-v021.tsv` / `own-curated-v021` 增补北京、上海、电脑、北京地区四个试用词的项目自写英文 Shadow；详情内容另存 `data/details/own-v021.tsv`。两份扩展文件均为 OWN / PROTOTYPE_ONLY，不从 Luna/Essay 推导翻译、音标或释义；缺少扩展文件时旧词表仍可读取。宽拼音词库中的其他词不因此获得英文 Shadow。

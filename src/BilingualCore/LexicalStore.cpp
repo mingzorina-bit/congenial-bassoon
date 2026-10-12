@@ -4,19 +4,24 @@
 #include <sstream>
 #include <algorithm>
 namespace bilingual {
-LexicalStore::LexicalStore(const std::string& path) {
- std::ifstream input(std::filesystem::u8path(path));
- std::string line;
- while(std::getline(input,line)) {
-  if(!line.empty()&&line.back()=='\r')line.pop_back();
-  if(line.empty()||line[0]=='#')continue;
-  std::istringstream row(line);std::vector<std::string> fields;std::string value;
-  while(std::getline(row,value,'\t'))fields.push_back(value);
-  if(fields.size()!=5||fields[0].empty()||fields[2].empty()||fields[4].empty())continue;
-  // Only this audited source can enter this store. Future licensed sources need separate boundaries.
-  if(fields[3]!="own-curated-v002"||(fields[1]!="EN"&&fields[1]!="ZH"))continue;
-  entries_.push_back({fields[0],{fields[2],fields[1],fields[3],fields[4]}});
- }
+LexicalStore::LexicalStore(const std::string& path,const std::string& trialExtensionPath) {
+ auto load=[this](const std::string& file,const std::string& sourceId) {
+  if(file.empty())return;
+  std::ifstream input(std::filesystem::u8path(file));
+  std::string line;
+  while(std::getline(input,line)) {
+   if(!line.empty()&&line.back()=='\r')line.pop_back();
+   if(line.empty()||line[0]=='#')continue;
+   std::istringstream row(line);std::vector<std::string> fields;std::string value;
+   while(std::getline(row,value,'\t'))fields.push_back(value);
+   if(fields.size()!=5||fields[0].empty()||fields[2].empty()||fields[4].empty())continue;
+   // Preserve the audited source boundary for each project-authored file.
+   if(fields[3]!=sourceId||(fields[1]!="EN"&&fields[1]!="ZH"))continue;
+   entries_.push_back({fields[0],{fields[2],fields[1],fields[3],fields[4]}});
+  }
+ };
+ load(path,"own-curated-v002");
+ load(trialExtensionPath,"own-curated-v021");
 }
 std::vector<ShadowCandidate> LexicalStore::lookup(const std::string& expression) const {
  std::vector<ShadowCandidate> result;

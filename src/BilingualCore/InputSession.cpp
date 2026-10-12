@@ -57,7 +57,12 @@ void InputSession::refresh() {
    auto language=LanguageContextResolver::tokenLanguage(raw_,context_,prior_);
    if(language=="EN"){candidates_={raw_};return;}
    auto query=LanguageContextResolver::correctedPinyin(raw_,context_);
-   if(language=="Unknown"&&query==raw_){candidates_={raw_};return;}
+   // A broad Rime corpus cannot be enumerated in the bounded context word list.
+   // Query unknown Latin input when Chinese expression evidence (or a Chinese
+   // profile without stronger English evidence) supports pinyin. Keep English
+   // expressions as raw text; an empty engine result also falls back to raw.
+   bool chineseContext=context_.dominant=="ZH"||(context_.dominant=="Unknown"&&prior_=="ZH");
+   if(language=="Unknown"&&query==raw_&&!chineseContext){candidates_={raw_};return;}
    candidates_=engine_.query(query);
    if(candidates_.empty())candidates_={raw_};
   } catch (...) { candidates_.clear(); }
