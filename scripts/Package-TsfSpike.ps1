@@ -15,10 +15,12 @@ foreach ($name in $rimeFiles) {
   Copy-Item (Join-Path $repo "data/rime/$name") (Join-Path $out "data/rime/$name")
 }
 Copy-Item (Join-Path $repo 'licenses') $out -Recurse
+Copy-Item (Join-Path $out 'licenses/rime-luna-pinyin-LGPL-3.0.txt') (Join-Path $out 'licenses/rime-essay-LGPL-3.0.txt')
 Copy-Item (Join-Path $repo 'THIRD_PARTY_SOURCES.md') $out
 Copy-Item (Join-Path $repo 'docs/tsf/PHASE1A_TRIAL.md') (Join-Path $out 'README-TSF-TRIAL.md')
 New-Item -ItemType Directory -Path (Join-Path $out 'scripts') | Out-Null
-foreach ($name in @('Register-TsfTrial.ps1','Unregister-TsfTrial.ps1','Audit-Sources.ps1')) {
+foreach ($name in @('Register-TsfTrial.ps1','Unregister-TsfTrial.ps1',
+    'Seal-SignedTsfTrial.ps1','Audit-Sources.ps1')) {
   Copy-Item (Join-Path $repo "scripts/$name") (Join-Path $out "scripts/$name")
 }
 # App-local VC runtime: external editors should not require Visual Studio.

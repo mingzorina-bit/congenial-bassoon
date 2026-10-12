@@ -6,9 +6,9 @@ This ZIP is an isolated Windows x64 text-service trial for desktop editors. It d
 
 Keep this entire folder together. In PowerShell, run `./scripts/Register-TsfTrial.ps1` without `-Apply` to inspect the plan. It prints the fixed CLSID, profile GUID, local DLL path, per-user COM registry scope, and Windows-managed TSF profile scope without making changes. `./scripts/Unregister-TsfTrial.ps1` similarly previews removal.
 
-Do not use `-Apply` until the separate registration/signing and rollback review is complete. The package is unsigned. Microsoft recommends signing text-service binaries; this trial is not a commercial release or a compatibility claim for secure, UI-less, or app-container hosts.
+Do not use `-Apply` until the separate registration/signing and rollback review is complete. This CI package is unsigned, and the registration script rejects it. Microsoft requires third-party IMEs to be digitally signed; this ZIP is therefore a reviewable build, not yet an installable external-editor trial. The trial does not claim compatibility with secure, UI-less, or app-container hosts.
 
-After approval, registration requires an explicit `-Apply` switch and may need elevation depending on Windows TSF policy. Registration enables a zh-CN language profile but does not select it automatically. Keep the ZIP so the matching removal helper remains available. The inverse command is `./scripts/Unregister-TsfTrial.ps1 -Apply`; it targets only the trial CLSID/profile and the marked trial COM registry key.
+After the TSF DLL, Rime engine and registration helper are signed with a trusted code-signing certificate, run `./scripts/Seal-SignedTsfTrial.ps1 -PackageRoot .` from the extracted folder to rebuild and audit the hash inventory, then complete the installation review. Registration requires an explicit `-Apply` switch and may need elevation depending on Windows TSF policy. Registration enables a zh-CN language profile but does not select it automatically. Keep the signed ZIP so the matching removal helper remains available. The inverse command is `./scripts/Unregister-TsfTrial.ps1 -Apply`; it targets only the trial CLSID/profile and the marked trial COM registry key.
 
 ## Manual host trial after registration
 

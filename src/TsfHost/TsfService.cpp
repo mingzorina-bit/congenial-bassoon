@@ -223,7 +223,7 @@ HRESULT STDMETHODCALLTYPE TsfService::OnSetFocus(BOOL foreground) {
 HRESULT STDMETHODCALLTYPE TsfService::OnTestKeyDown(ITfContext* context,WPARAM key,LPARAM,BOOL* eaten) {
   if(!eaten) return E_POINTER;
   *eaten=FALSE;
-  if(sensitive(context)) return S_OK;
+  if(sensitive(context)) { clearFocus(); return S_OK; }
   *eaten=gate_.interested(event(key),false)?TRUE:FALSE;
   return S_OK;
 }

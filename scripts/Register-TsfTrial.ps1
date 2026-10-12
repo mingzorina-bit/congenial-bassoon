@@ -6,6 +6,7 @@ $ErrorActionPreference = 'Stop'
 $root = [IO.Path]::GetFullPath($PackageRoot)
 $dll = Join-Path $root 'BilingualTsf.dll'
 $helper = Join-Path $root 'TsfTrialRegistration.exe'
+$rime = Join-Path $root 'rime.dll'
 $plan = [pscustomobject]@{
   Action = 'register'
   DryRun = -not $Apply.IsPresent
@@ -20,6 +21,13 @@ $plan = [pscustomobject]@{
 if (-not $Apply) { return $plan }
 if (-not (Test-Path -LiteralPath $dll -PathType Leaf)) { throw 'Trial DLL missing' }
 if (-not (Test-Path -LiteralPath $helper -PathType Leaf)) { throw 'Registration helper missing' }
+if (-not (Test-Path -LiteralPath $rime -PathType Leaf)) { throw 'Local Rime engine missing' }
+$dllSignature = Get-AuthenticodeSignature -LiteralPath $dll
+$helperSignature = Get-AuthenticodeSignature -LiteralPath $helper
+$rimeSignature = Get-AuthenticodeSignature -LiteralPath $rime
+if ($dllSignature.Status -ne 'Valid' -or $helperSignature.Status -ne 'Valid' -or $rimeSignature.Status -ne 'Valid') {
+  throw 'Registration is blocked until the TSF DLL, Rime engine and helper have valid trusted code signatures.'
+}
 & (Join-Path $PSScriptRoot 'Audit-Sources.ps1') -PackagePath $root -TsfTrial
 & $helper register $dll
 if ($LASTEXITCODE -ne 0) { throw "TSF registration failed: exit $LASTEXITCODE. Run Unregister-TsfTrial.ps1 -Apply to clean partial state." }

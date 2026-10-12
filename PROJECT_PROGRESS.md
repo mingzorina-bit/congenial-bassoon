@@ -1,5 +1,7 @@
 # BilingualInput project progress
 
+2026-10-12: 用户批准 Phase 1-A TSF 分步实现。独立外部编辑器试用分支已实现本地拼音输入路由、TSF COM/编辑会话、五候选桌面弹窗，以及默认只预览的注册/卸载脚本和独立来源审计包。Windows CI 38222256758 构建、Core/Host 回归、TSF 原生测试、真实 Rime 测试和打包审计全部成功；TSF artifact 11735770561 为未签名审阅包，不能据此宣称外部编辑器已可试用。微软要求第三方 IME 有有效数字签名，注册脚本在三项核心二进制文件未受信任签名时阻止 Apply。本机 CurrentUser/My 未发现可用签名证书；签名、安装/回滚审查、Notepad/第二编辑器及密码框真人负测仍待完成。详见 `docs/releases/v0.2.2-tsf-phase1a.md`。冻结的 WinUI v0.2.1 行为未改。
+
 2026-10-12: 用户提供八张 v0.2.1 实际试用截图，确认 `beijing`、`shanghai`、`diannao`、`beijingdiqu` 已可输入，前缀 `beij`、`beijingdiq` 也能预测；英文 Shadow 和有限详情可见。将 v0.2.0/1 词库交互回归按此用户旅程记录为已复测。用户提出省写拼音、候选翻页和更广详情覆盖，按 `docs/USER_FEEDBACK_V021.md` 列为后续独立迭代，现有五候选和有限详情符合本次冻结/审批准则。用户指示进入下一阶段；开始 Phase 1-A TSF 可行性设计，见 `docs/tsf/PHASE1A_DESIGN.md`。尚未注册系统输入法或宣称外部应用可用。
 
 2026-10-12: 用户实际试用 v0.2.0 并附图：`beijing`、`shanghai`、`diannao`、`beijingdiqu` 在编辑区仍显示原文，没有对应英文 Shadow/详情。根因是 InputSession 旧有限拼音意图表在查询 Rime 前拒绝未知拼音；先前 CI 仅直接测引擎覆盖，漏掉真实会话路由。v0.2.1 修复了中文上下文/中文偏好查询宽词库，明确英文上下文仍保留原文，未知查询无结果保留原文；四个用户试用词新增独立自写 Shadow/详情和会话级验收。Windows CI 38196778580 全部通过，artifact 11723553954 已下载；外层 SHA-256 `38F2395BB262D8252D282D38A6DBAE29682EAE21D00EDFDF7BA6808F914C6CEA`、内层 `AE428C0567B7AC0F8C75F786CF628FFB05B65BFDF0F73783FD049ED677F4995F`，575 项文件/来源审计 PASS。v0.2.0 对这些用户旅程不标 PASS；v0.2.1 真人复测待用户完成。
