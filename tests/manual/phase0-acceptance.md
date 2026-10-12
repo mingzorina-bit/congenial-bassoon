@@ -17,6 +17,10 @@ Record date, tester, Windows version, machine model, CPU/RAM, package SHA-256, a
 | 29 | Microsoft-Pinyin-scale lexicon, system-wide TSF, store/signing and commercial dictionary are out of scope | NOT IN PHASE 0 |
 | 30 | Engineering, UX and Product gates independently decided | PENDING |
 
+### CR-06 keyboard regression for the next trial
+
+In the editor, leave a pinyin composition active and highlight a candidate. Press Tab: Details opens. Press Tab again: it closes and focus returns to the editor. Repeat with Esc instead of the second Tab. Open Details and move focus to its close button; Tab must still close it. In every case check composition, highlighted candidate, editor text and Shadow remain unchanged. Shift+Tab and Ctrl/Alt+Tab must not trigger the new close action. Record result against the v0.1.1 artifact; the alpha result above remains historical evidence.
+
 ## Timing record
 
 Use monotonic timestamps on the same machine. At least 30 synthetic interactions per local path; record P50/P95 in milliseconds, sample count, OS and hardware. Real AI samples must be distinguished from Mock and API failures. Do not invent an SLA or mark unmeasured paths PASS.

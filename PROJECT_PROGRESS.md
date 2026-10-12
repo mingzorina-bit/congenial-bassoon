@@ -1,5 +1,9 @@
 # Project Progress — v0.0.6 AI Expression
 
+2026-10-12: v0.1.1 Tab trial GitHub CI 38188347171 全部成功，artifact 11720875124 已下载。外层 SHA-256 `682159A7986DFA9E89B00A441B02974EBC56B36DB189597FBB5E7EC7A2928D28` 与 GitHub 一致；内层 ZIP SHA-256 `A303D0DEF446A418F60616B5B5B9A03B64180F37F2570185FFEFE7D697BCB42E`，567 个文件全部通过清单/来源审计。用户另明确批准未来试用包使用固定 `rime/rime-luna-pinyin` 提交 `56b934b099dfbeab842320f13aa8b461a6ab3e42`（LGPL-3.0）；本轮未导入。Tab 真人试用与 alpha 剩余 Gate 仍待用户判断，停在 v0.1.1 试用状态。
+
+2026-10-12: 用户已试用 v0.1.0-alpha，提出并直接批准 CR-06：Tab 展开 Details，再按 Tab 也能关闭，Esc 保留；要求尽快推进宽词库与应用外输入。开始 v0.1.1 Tab 交互试用：Root 的预览按键在 Details 已展开时优先关闭并还焦编辑区，编辑区原 Tab 打开路径保持；更新 UI 提示、人工回归清单、打包版本和 GitHub CI artifact 名称。宽词库与 TSF 分开写入后续路线图；本轮没有导入未审批数据或注册系统输入服务。待 Windows CI 与用户试用，不宣称后续两项已实现。
+
 2026-10-08: 用户明确批准向当前 public GitHub 仓库写入已核查的源码、测试和文档。alpha 分支 `codex/integrated-alpha-v0.1.0` 与草稿 PR #7 已建立；Windows CI 37768056066 全部成功。正式 artifact 11546477105 已下载，外层 SHA-256 `DCE0F939BE7CDBABAA53A5BD4BC9C227507C943AEAD55EE8715B5E85D076A558` 与 GitHub digest 相同；内部 ZIP SHA-256 `4C3F413DB73AC8E40D127899DF66AA8660F40FA10CC21305F902EA15CF638DD7`，567 项文件全部通过 inventory/source audit。真实 API 语义及 P50/P95、第二台干净机器、10–20 分钟真人 UX/Product Gates 仍待执行。进程在本机工具会话中存活 12 秒，但互动窗口未暴露，不能算 UI 验收。当前停在可试用 alpha 候选，不宣称 Phase 0 完成。
 
 2026-10-07: 用户要求继续 v0.1.0-alpha，账户 API 无余额。开始 alpha-T1：打包版本改为 v0.1.0-alpha，新增 package 文件哈希、清单与已审核 data 路径复核脚本，CI 在上传前运行；新增完整 AC 人工验收记录与三 Gate 待决文档。未加入新词典、未改冻结输入行为。PowerShell 脚本语法解析通过；以九文件 fixture 验证清单 PASS、额外数据被拒，修正了 Windows 路径分隔符问题。当前环境缺少 dotnet/cmake，C# 与 native 回归以及 WinUI package 尚不能在本机重跑。25 个待提交文件已做密钥样式扫描，三个命中均为文档占位符或测试用虚构值，`.env` 未跟踪；仓库当前为 public。GitHub 写入被自动审批拦下，Windows CI 未运行；真实 API 语义、性能和干净机器验收待测。本条只记录 alpha 候选工作进度，不宣布里程碑通过。

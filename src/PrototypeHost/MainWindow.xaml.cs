@@ -34,7 +34,7 @@ public sealed partial class MainWindow : Window {
   naturalGateway=new(expressionProvider,privacy,OnExpressionResult,diagnostic:code=>System.Diagnostics.Debug.WriteLine(code));
   learning=new(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"BilingualInput","learning-v005.db"),privacy);
   privacy.Set(prefs.PrivateMode?LearningPrivacy.Private:LearningPrivacy.Normal);
-  Title="Bilingual Input — v0.0.6 AI Expression";
+  Title="Bilingual Input — v0.1.1 Tab Trial";
   AppWindow.Resize(new Windows.Graphics.SizeInt32(980,900));
   ThemeChoice.SelectedIndex=prefs.Theme;ApplyTheme();initialized=true;
   Editor.InputScope=new InputScope{Names={new InputScopeName(InputScopeNameValue.AlphanumericHalfWidth)}};
@@ -61,7 +61,7 @@ public sealed partial class MainWindow : Window {
   InputPanel.Visibility=!showGuide||guide.Step==4?Visibility.Visible:Visibility.Collapsed;
   ReplayButton.Visibility=showGuide?Visibility.Collapsed:Visibility.Visible;
   if(!showGuide)return;
-  StepLabel.Text=$"{guide.Step+1} / 5 · v0.0.6";
+  StepLabel.Text=$"{guide.Step+1} / 5 · v0.1.1";
   BackButton.Content=T("上一步","Back");BackButton.Visibility=guide.Step==0?Visibility.Collapsed:Visibility.Visible;
   NextButton.Content=guide.Step==4?T("开始使用","Start using"):T("继续","Continue");
   NextButton.IsEnabled=guide.Step!=4||guide.CanFinish;
