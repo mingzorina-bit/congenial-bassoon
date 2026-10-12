@@ -37,7 +37,7 @@ foreach ($file in $actual) {
   if (-not $listed.Contains($relative)) { throw "Unlisted package file: $relative" }
   if ($relative -match '(^|[\\/])\.env($|[\\/])|OPENAI_API_KEY|project\.assets\.json$') { throw "Sensitive or build-only path: $relative" }
   if ($TsfTrial -and $relative -notin $tsfApproved -and
-      $relative -notmatch '(?i)^(msvcp140(?:_[a-z0-9]+)*|vcruntime140(?:_[0-9]+)*|concrt140)\.dll$') {
+      $relative -notmatch '(?i)^(msvcp140(?:_[a-z0-9]+)*|vcruntime140(?:_[0-9]+)*|concrt140|vccorlib140)\.dll$') {
     throw "Unreviewed file in TSF package: $relative"
   }
 }
