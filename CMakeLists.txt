@@ -45,6 +45,11 @@ if(BI_WITH_RIME)
   add_executable(TsfModuleTests tests/TsfHostTests/TsfModuleTests.cpp)
   target_link_libraries(TsfModuleTests PRIVATE ole32 uuid)
   add_test(NAME TsfModuleTests COMMAND TsfModuleTests "$<TARGET_FILE_DIR:TsfModuleTests>/BilingualTsf.dll")
+  add_library(BilingualTsf SHARED src/TsfHost/TsfModule.cpp src/TsfHost/TsfService.cpp
+    src/TsfHost/TsfComposition.cpp src/TsfHost/TsfKeyRouter.cpp src/TsfHost/TsfEditGate.cpp)
+  target_include_directories(BilingualTsf PRIVATE src/TsfHost)
+  target_link_libraries(BilingualTsf PRIVATE RimeAdapter ole32 oleaut32 uuid user32)
+  add_custom_command(TARGET BilingualTsf POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    "${RIME_ROOT}/lib/rime.dll" "$<TARGET_FILE_DIR:BilingualTsf>/rime.dll")
 endif()
-
 
