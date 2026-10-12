@@ -2,6 +2,7 @@
 #include "TsfComposition.h"
 #include "TsfEditGate.h"
 #include "TsfIdentity.h"
+#include "TsfCandidateWindow.h"
 #include <msctf.h>
 #include <atomic>
 
@@ -38,6 +39,7 @@ class TsfService final : public ITfTextInputProcessorEx,
   ~TsfService();
   bool sensitive(ITfContext* context) const;
   TsfKeyEvent event(WPARAM key) const;
+  void updateCandidates(ITfContext* context,TfEditCookie cookie,const TsfKeyResult& result);
   void clearFocus();
   std::atomic<ULONG> references_{1};
   ITfThreadMgr* manager_=nullptr;
@@ -54,6 +56,6 @@ class TsfService final : public ITfTextInputProcessorEx,
   TsfKeyRouter router_{session_};
   TsfEditGate gate_{router_};
   TsfComposition composition_;
+  TsfCandidateWindow candidates_;
 };
 }
-

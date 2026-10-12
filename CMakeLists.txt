@@ -23,6 +23,7 @@ target_include_directories(TsfKeyRouterTests PRIVATE src/TsfHost)
 add_test(NAME TsfKeyRouterTests COMMAND TsfKeyRouterTests)
 add_executable(TsfCandidateTests tests/TsfHostTests/TsfCandidateTests.cpp src/TsfHost/TsfCandidateState.cpp)
 target_include_directories(TsfCandidateTests PRIVATE src/TsfHost)
+target_link_libraries(TsfCandidateTests PRIVATE BilingualCore)
 add_test(NAME TsfCandidateTests COMMAND TsfCandidateTests)
 add_executable(ShadowTests tests/CoreTests/ShadowTests.cpp)
 target_link_libraries(ShadowTests PRIVATE BilingualCore)
@@ -50,9 +51,10 @@ if(BI_WITH_RIME)
   add_test(NAME TsfModuleTests COMMAND TsfModuleTests "$<TARGET_FILE_DIR:TsfModuleTests>/BilingualTsf.dll")
   add_library(BilingualTsf SHARED src/TsfHost/BilingualTsf.def
     src/TsfHost/TsfModule.cpp src/TsfHost/TsfService.cpp
-    src/TsfHost/TsfComposition.cpp src/TsfHost/TsfKeyRouter.cpp src/TsfHost/TsfEditGate.cpp)
+    src/TsfHost/TsfComposition.cpp src/TsfHost/TsfKeyRouter.cpp src/TsfHost/TsfEditGate.cpp
+    src/TsfHost/TsfCandidateState.cpp src/TsfHost/TsfCandidateWindow.cpp)
   target_include_directories(BilingualTsf PRIVATE src/TsfHost)
-  target_link_libraries(BilingualTsf PRIVATE RimeAdapter ole32 oleaut32 uuid user32)
+  target_link_libraries(BilingualTsf PRIVATE RimeAdapter ole32 oleaut32 uuid user32 gdi32)
   add_custom_command(TARGET BilingualTsf POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different
     "${RIME_ROOT}/lib/rime.dll" "$<TARGET_FILE_DIR:BilingualTsf>/rime.dll")
 endif()

@@ -10,6 +10,7 @@ class TsfComposition {
   HRESULT cancel(ITfContext* context, TfEditCookie cookie);
   void abandon();
   ITfContext* context() const { return context_; }
+  HRESULT currentRange(ITfRange** range) const;
  private:
   HRESULT begin(ITfContext* context, TfEditCookie cookie);
   HRESULT replace(TfEditCookie cookie, const std::wstring& text);

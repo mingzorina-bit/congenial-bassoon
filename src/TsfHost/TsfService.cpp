@@ -97,7 +97,7 @@ HRESULT STDMETHODCALLTYPE TsfService::ActivateEx(ITfThreadMgr* manager,TfClientI
   if(!manager) return E_POINTER;
   if(manager_) Deactivate();
   secureActivation_=(flags & TF_TMAE_SECUREMODE)!=0;
-  if(secureActivation_ || !ensureEngine()) return S_OK;
+  if(secureActivation_ || (flags & TF_TMAE_UIELEMENTENABLEDONLY) || !ensureEngine()) return S_OK;
   manager_=manager; manager_->AddRef();
   clientId_=clientId;
   ready_=true;
@@ -122,6 +122,7 @@ HRESULT STDMETHODCALLTYPE TsfService::ActivateEx(ITfThreadMgr* manager,TfClientI
   return S_OK;
 }
 void TsfService::clearFocus() {
+  candidates_.hide();
   ITfContext* active=composition_.context();
   if(active && clientId_!=TF_CLIENTID_NULL) {
     auto* edit=new(std::nothrow) EditSession([&](TfEditCookie cookie) {
@@ -185,6 +186,36 @@ TsfKeyEvent TsfService::event(WPARAM key) const {
   if(key>='A' && key<='Z') character=static_cast<char>(key+(shift?0:('a'-'A')));
   return {static_cast<unsigned>(key),character,shift,ctrl,alt};
 }
+void TsfService::updateCandidates(ITfContext* context,TfEditCookie cookie,
+    const TsfKeyResult& result) {
+  if(result.raw.empty() || result.candidates.empty()) { candidates_.hide(); return; }
+  ITfContextView* view=nullptr;
+  if(FAILED(context->GetActiveView(&view)) || !view) { candidates_.hide(); return; }
+  HWND host=nullptr;
+  view->GetWnd(&host);
+  RECT caret{};
+  bool valid=false;
+  ITfRange* range=nullptr;
+  if(SUCCEEDED(composition_.currentRange(&range)) && range) {
+    BOOL clipped=FALSE;
+    if(SUCCEEDED(view->GetTextExt(cookie,range,&caret,&clipped)) &&
+       !clipped && (caret.right>caret.left || caret.bottom>caret.top)) valid=true;
+    range->Release();
+  }
+  if(!valid && host) {
+    GUITHREADINFO info{};info.cbSize=sizeof(info);
+    if(GetGUIThreadInfo(0,&info) && info.hwndCaret &&
+       (info.hwndCaret==host || IsChild(host,info.hwndCaret))) {
+      caret=info.rcCaret;
+      POINT a{caret.left,caret.top},b{caret.right,caret.bottom};
+      ClientToScreen(info.hwndCaret,&a);ClientToScreen(info.hwndCaret,&b);
+      caret={a.x,a.y,b.x,b.y};
+      valid=true;
+    }
+  }
+  candidates_.update(result,caret,host,valid);
+  view->Release();
+}
 HRESULT STDMETHODCALLTYPE TsfService::OnSetFocus(BOOL foreground) {
   if(!foreground) clearFocus();
   return S_OK;
@@ -215,6 +246,9 @@ HRESULT STDMETHODCALLTYPE TsfService::OnKeyDown(ITfContext* context,WPARAM key,L
       result.handled=false;
       router_.reset();
       composition_.abandon();
+      candidates_.hide();
+    } else {
+      updateCandidates(context,cookie,result);
     }
     return hr;
   });

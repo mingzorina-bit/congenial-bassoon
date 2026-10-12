@@ -15,6 +15,11 @@ std::wstring toWide(const std::string& text) {
 }
 }
 TsfComposition::~TsfComposition() { abandon(); }
+HRESULT TsfComposition::currentRange(ITfRange** range) const {
+  if(!range) return E_POINTER;
+  *range=nullptr;
+  return composition_ ? composition_->GetRange(range) : E_UNEXPECTED;
+}
 void TsfComposition::abandon() {
   if(composition_) { composition_->Release(); composition_=nullptr; }
   if(context_) { context_->Release(); context_=nullptr; }
