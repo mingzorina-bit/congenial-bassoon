@@ -1,6 +1,5 @@
 #include "TsfComposition.h"
 #include <string>
-#include <utility>
 
 namespace bilingual::tsf {
 namespace {
@@ -16,10 +15,6 @@ std::wstring toWide(const std::string& text) {
 }
 }
 TsfComposition::~TsfComposition() { abandon(); }
-void TsfComposition::swap(TsfComposition& other) noexcept {
-  std::swap(context_,other.context_);
-  std::swap(composition_,other.composition_);
-}
 HRESULT TsfComposition::currentRange(ITfRange** range) const {
   if(!range) return E_POINTER;
   *range=nullptr;

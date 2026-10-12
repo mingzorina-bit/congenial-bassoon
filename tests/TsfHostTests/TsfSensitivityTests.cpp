@@ -5,7 +5,11 @@ using namespace bilingual::tsf;
 void check(bool condition) { if(!condition) throw std::runtime_error("sensitivity assertion"); }
 int main() {
   check(IsSensitiveInputScope(IS_PASSWORD));
-  check(IsSensitiveInputScope(static_cast<InputScope>(63)));
+  check(IsSensitiveInputScope(IS_PRIVATE));
+  check(IsSensitiveInputScope(IS_NUMERIC_PASSWORD));
+  check(IsSensitiveInputScope(IS_NUMERIC_PIN));
+  check(IsSensitiveInputScope(IS_ALPHANUMERIC_PIN));
+  check(IsSensitiveInputScope(IS_ALPHANUMERIC_PIN_SET));
   check(!IsSensitiveInputScope(IS_DEFAULT));
   check(!IsSensitiveInputScope(IS_EMAIL_SMTPEMAILADDRESS));
   HINSTANCE instance=GetModuleHandleW(nullptr);

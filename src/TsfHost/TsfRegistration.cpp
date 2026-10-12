@@ -59,17 +59,48 @@ HRESULT categories(ITfCategoryMgr** output) {
   return CoCreateInstance(CLSID_TF_CategoryMgr,nullptr,CLSCTX_INPROC_SERVER,
     IID_ITfCategoryMgr,reinterpret_cast<void**>(output));
 }
+bool includesGuid(IEnumGUID* items,REFGUID target,bool& present) {
+  if(!items) return false;
+  present=false;
+  GUID value{};
+  ULONG fetched=0;
+  HRESULT hr=S_OK;
+  while((hr=items->Next(1,&value,&fetched))==S_OK) {
+    if(fetched!=1) return false;
+    if(IsEqualGUID(value,target)) { present=true; return true; }
+  }
+  return hr==S_FALSE;
+}
+bool categoryPresent(ITfCategoryMgr* manager,bool& present) {
+  IEnumGUID* items=nullptr;
+  if(FAILED(manager->EnumItemsInCategory(GUID_TFCAT_TIP_KEYBOARD,&items)) || !items)
+    return false;
+  const bool known=includesGuid(items,bilingual::tsf::kServiceClsid,present);
+  items->Release();
+  return known;
+}
+bool profilePresent(ITfInputProcessorProfiles* manager,bool& present) {
+  IEnumGUID* items=nullptr;
+  if(FAILED(manager->EnumInputProcessorInfo(&items)) || !items) return false;
+  const bool known=includesGuid(items,bilingual::tsf::kServiceClsid,present);
+  items->Release();
+  return known;
+}
 bool removeTsf() {
   bool okay=true;
   ITfCategoryMgr* category=nullptr;
   if(SUCCEEDED(categories(&category)) && category) {
-    if(FAILED(category->UnregisterCategory(bilingual::tsf::kServiceClsid,
-      GUID_TFCAT_TIP_KEYBOARD,bilingual::tsf::kServiceClsid))) okay=false;
+    category->UnregisterCategory(bilingual::tsf::kServiceClsid,
+      GUID_TFCAT_TIP_KEYBOARD,bilingual::tsf::kServiceClsid);
+    bool present=true;
+    if(!categoryPresent(category,present) || present) okay=false;
     category->Release();
   } else okay=false;
   ITfInputProcessorProfiles* profile=nullptr;
   if(SUCCEEDED(profiles(&profile)) && profile) {
-    if(FAILED(profile->Unregister(bilingual::tsf::kServiceClsid))) okay=false;
+    profile->Unregister(bilingual::tsf::kServiceClsid);
+    bool present=true;
+    if(!profilePresent(profile,present) || present) okay=false;
     profile->Release();
   } else okay=false;
   return okay;

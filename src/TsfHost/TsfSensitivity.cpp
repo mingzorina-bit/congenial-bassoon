@@ -3,7 +3,9 @@
 
 namespace bilingual::tsf {
 bool IsSensitiveInputScope(InputScope scope) {
-  return scope==IS_PASSWORD || scope==static_cast<InputScope>(63); // IS_NUMERIC_PIN
+  return scope==IS_PASSWORD || scope==IS_PRIVATE ||
+    scope==IS_NUMERIC_PASSWORD || scope==IS_NUMERIC_PIN ||
+    scope==IS_ALPHANUMERIC_PIN || scope==IS_ALPHANUMERIC_PIN_SET;
 }
 bool IsSensitiveWindow(HWND window) {
   return window && (GetWindowLongPtrW(window,GWL_STYLE)&ES_PASSWORD)!=0;

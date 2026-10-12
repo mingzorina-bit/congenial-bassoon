@@ -69,7 +69,7 @@ std::vector<std::string> ServiceEngine::query(const std::string& raw) {
   return sharedEngine ? sharedEngine->query(raw) : std::vector<std::string>{};
 }
 TsfService::TsfService() { ModuleObjectCreated(); }
-TsfService::~TsfService() { Deactivate(); ModuleObjectDestroyed(); }
+TsfService::~TsfService() { destroying_=true; Deactivate(); ModuleObjectDestroyed(); }
 HRESULT STDMETHODCALLTYPE TsfService::QueryInterface(REFIID iid,void** value) {
   if(!value) return E_POINTER;
   *value=nullptr;
@@ -125,7 +125,7 @@ HRESULT STDMETHODCALLTYPE TsfService::ActivateEx(ITfThreadMgr* manager,TfClientI
 void TsfService::clearFocus() {
   candidates_.hide();
   ITfContext* active=composition_.context();
-  if(active && clientId_!=TF_CLIENTID_NULL) {
+  if(active && clientId_!=TF_CLIENTID_NULL && !cleanupQueued_) {
     auto* edit=new(std::nothrow) EditSession([this,active](TfEditCookie cookie) {
       return composition_.cancel(active,cookie);
     });
@@ -136,22 +136,27 @@ void TsfService::clearFocus() {
       edit->Release();
       if(FAILED(requestHr) || FAILED(sessionHr)) recoveryPending_=true;
     }
-    if(composition_.active()) {
-      // TSF can deny a synchronous edit during focus loss. Retain the old
-      // composition in the queued edit session so it can be removed later.
-      auto pending=std::make_shared<TsfComposition>();
-      pending->swap(composition_);
-      auto* deferred=new(std::nothrow) EditSession([pending,active](TfEditCookie cookie) {
-        return pending->cancel(active,cookie);
+    if(composition_.active() && !destroying_) {
+      // A denied synchronous edit must not discard the live composition.
+      // Keep this service alive until TSF completes the queued cleanup.
+      AddRef();
+      std::shared_ptr<TsfService> owner(this,[](TsfService* service){ service->Release(); });
+      recoveryPending_=true;
+      cleanupQueued_=true;
+      auto* deferred=new(std::nothrow) EditSession([owner,active](TfEditCookie cookie) {
+        const HRESULT hr=owner->composition_.cancel(active,cookie);
+        owner->cleanupQueued_=false;
+        owner->recoveryPending_=FAILED(hr) && owner->composition_.active();
+        return hr;
       });
       HRESULT sessionHr=E_FAIL;
       const HRESULT requestHr=deferred ? active->RequestEditSession(clientId_,deferred,
         TF_ES_ASYNC|TF_ES_READWRITE,&sessionHr) : E_OUTOFMEMORY;
       if(deferred) deferred->Release();
-      if(FAILED(requestHr) || FAILED(sessionHr)) pending->swap(composition_);
+      if(FAILED(requestHr) || FAILED(sessionHr)) cleanupQueued_=false;
     }
   }
-  recoveryPending_=composition_.active();
+  recoveryPending_=composition_.active() || cleanupQueued_;
   router_.reset();
   if(focus_) { focus_->Release(); focus_=nullptr; }
 }

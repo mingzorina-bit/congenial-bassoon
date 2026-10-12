@@ -51,7 +51,21 @@ Compare each signature's signer thumbprint with `$thumbprint` for files newly si
 
 ## Complete local rollback, after any actual trial
 
-Switch to a different IME, close editors that loaded the trial DLL, then run `scripts/Unregister-TsfTrial.ps1 -PackageRoot $trialRoot -Apply`. Confirm its exit is successful, the fixed HKCU COM owner marker is gone, and the trial language profile/category are absent. If removal fails, **retain** the binaries and certificates, retry removal or investigate; the helper deliberately preserves its marker on TSF removal failure. Only after successful unregister, remove the exact certificate thumbprint from `Cert:\CurrentUser\TrustedPublisher`, `Cert:\CurrentUser\Root`, then `Cert:\CurrentUser\My`; verify absence from all three stores. Delete the extracted working copy and local `.cer` last. If `rime.dll` carried a pre-existing trusted signature, do not remove that publisher's certificate.
+Switch to a different IME, close editors that loaded the trial DLL, then run `scripts/Unregister-TsfTrial.ps1 -PackageRoot $trialRoot -Apply`. Confirm its exit is successful, the fixed HKCU COM owner marker is gone, and the trial language profile/category are absent. If removal fails, **retain** the binaries and certificates, retry removal or investigate; the helper deliberately preserves its marker on TSF removal failure. Only after successful unregister, remove the exact certificate thumbprint from `Cert:\CurrentUser\TrustedPublisher`, `Cert:\CurrentUser\Root`, then `Cert:\CurrentUser\My`:
+
+```powershell
+foreach ($store in @('TrustedPublisher','Root','My')) {
+  $path = "Cert:\CurrentUser\$store\$thumbprint"
+  $item = Get-Item -LiteralPath $path -ErrorAction SilentlyContinue
+  if ($item) {
+    if ($item.Subject -ne 'CN=BilingualInput Phase1A Local Trial') { throw "Unexpected certificate: $path" }
+    Remove-Item -LiteralPath $path
+  }
+  if (Test-Path -LiteralPath $path) { throw "Certificate still trusted: $path" }
+}
+```
+
+Delete the extracted working copy and local `.cer` last. If `rime.dll` carried a pre-existing trusted signature, do not remove that publisher's certificate.
 
 The current PR has no evidence of actual Notepad, second-editor, password-field, focus-switch, or uninstall behavior. Run those manual checks only after signature, trust, registration and activation are separately approved.
 
