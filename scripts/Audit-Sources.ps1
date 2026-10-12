@@ -13,7 +13,7 @@ foreach ($item in $inventory) {
   if (-not (Test-Path -LiteralPath $file -PathType Leaf)) { throw "Missing package file: $relative" }
   if ((Get-FileHash -LiteralPath $file -Algorithm SHA256).Hash -ne $item.sha256) { throw "Hash mismatch: $relative" }
 }
-$actual = @(Get-ChildItem -LiteralPath $root -Recurse -File | Where-Object Name -ne 'FILES.sha256.json')
+$actual = @(Get-ChildItem -LiteralPath $root -Recurse -File | Where-Object FullName -ne $inventoryPath)
 if ($actual.Count -ne $inventory.Count) { throw "Inventory count mismatch: listed $($inventory.Count), actual $($actual.Count)" }
 foreach ($file in $actual) {
   $relative = [IO.Path]::GetRelativePath($root, $file.FullName).Replace('\','/')
