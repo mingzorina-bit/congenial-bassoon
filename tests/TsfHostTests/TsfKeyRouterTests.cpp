@@ -9,7 +9,7 @@ using namespace bilingual::tsf;
 struct Engine final: PrimaryEngine {
   std::vector<std::string> query(const std::string& raw) override {
     if(raw=="nihao") return {"你好","拟好"};
-    if(raw=="beijing") return {"北京","背景"};
+    if(raw=="beijing") return {"北京","背景","北境","倍镜","背静","悲景","贝京"};
     return {};
   }
 };
@@ -26,7 +26,8 @@ int main() {
   test("EnterCommitsRaw",[]{Engine engine;InputSession session(engine);session.setContext("","ZH");TsfKeyRouter router(session);type(router,"beijing");auto result=router.route({0x0D,0,false,false,false},false);check(result.handled&&result.commit=="beijing");});
   test("ArrowHighlightsSecondCandidate",[]{Engine engine;InputSession session(engine);session.setContext("","ZH");TsfKeyRouter router(session);type(router,"nihao");auto result=router.route({0x27,0,false,false,false},false);check(result.handled&&result.highlighted==1&&result.candidates[1]=="拟好");result=router.route({0x20,' ',false,false,false},false);check(result.commit=="拟好");});
   test("EscapeCancelsWithoutCommit",[]{Engine engine;InputSession session(engine);session.setContext("","ZH");TsfKeyRouter router(session);type(router,"nihao");auto result=router.route({0x1B,0,false,false,false},false);check(result.handled&&result.cancelled&&result.commit.empty()&&result.raw.empty());});
-  test("EnglishWordsCanCommitRaw",[]{Engine engine;InputSession session(engine);session.setContext("","ZH");TsfKeyRouter router(session);type(router,"computer");auto result=router.route({0x20,' ',false,false,false},false);check(result.handled&&result.commit=="computer");});
+  test("EnglishWordsKeepFollowingSpace",[]{Engine engine;InputSession session(engine);session.setContext("","ZH");TsfKeyRouter router(session);type(router,"computer");auto result=router.route({0x20,' ',false,false,false},false);check(result.handled&&result.commit=="computer "&&result.raw.empty());});
+  test("HiddenSixthCandidateCannotBeSelected",[]{Engine engine;InputSession session(engine);session.setContext("","ZH");TsfKeyRouter router(session);type(router,"beijing");TsfKeyResult result;for(int i=0;i<6;++i) result=router.route({0x27,0,false,false,false},false);check(result.handled&&result.candidates.size()==5&&result.highlighted==4&&result.candidates[4]=="背静");result=router.route({0x20,' ',false,false,false},false);check(result.commit=="背静");});
   test("TabAndModifiedKeysPassThrough",[]{Engine engine;InputSession session(engine);session.setContext("","ZH");TsfKeyRouter router(session);check(!router.route({0x09,0,false,false,false},false).handled);check(!router.route({'A','a',false,true,false},false).handled);check(!router.route({0x0D,0,true,false,false},false).handled);});
   test("SensitiveContextNeverQueriesOrRetains",[]{Engine engine;InputSession session(engine);session.setContext("","ZH");TsfKeyRouter router(session);type(router,"nihao");auto result=router.route(letter('a'),true);check(!result.handled&&result.raw.empty()&&result.candidates.empty());});
   test("FocusResetCancelsComposition",[]{Engine engine;InputSession session(engine);session.setContext("","ZH");TsfKeyRouter router(session);type(router,"nihao");router.reset();auto result=router.snapshot();check(result.raw.empty()&&result.candidates.empty()&&result.commit.empty());});
@@ -35,4 +36,3 @@ int main() {
   std::cout<<total<<" tests, "<<failures<<" failures\n";
   return failures?1:0;
 }
-

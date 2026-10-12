@@ -1,4 +1,5 @@
 #include "TsfKeyRouter.h"
+#include <algorithm>
 
 namespace bilingual::tsf {
 namespace {
@@ -10,6 +11,7 @@ TsfKeyResult TsfKeyRouter::snapshot() const {
   TsfKeyResult result;
   result.raw = session_.raw();
   result.candidates = session_.candidates();
+  if(result.candidates.size()>5) result.candidates.resize(5);
   result.highlighted = session_.highlighted();
   return result;
 }
@@ -21,6 +23,13 @@ TsfKeyResult TsfKeyRouter::route(const TsfKeyEvent& event,bool sensitive) {
   if(sensitive) { reset(); return snapshot(); }
   TsfKeyResult result;
   if(event.ctrl || event.alt || event.virtualKey == vkTab || (event.shift && event.virtualKey == vkReturn)) return snapshot();
+  if((event.virtualKey==vkRight || event.virtualKey==vkDown) &&
+     session_.highlighted()>=4 && session_.candidates().size()>5) {
+    result=snapshot();result.handled=true;return result;
+  }
+  const bool rawSpace=event.virtualKey==vkSpace &&
+    (session_.candidates().empty() ||
+     (session_.candidates().size()==1 && session_.candidates()[0]==session_.raw()));
   if((event.character >= 'a' && event.character <= 'z') ||
      (event.character >= 'A' && event.character <= 'Z') || event.character == '\'') {
     session_.type(event.character);
@@ -43,9 +52,10 @@ TsfKeyResult TsfKeyRouter::route(const TsfKeyEvent& event,bool sensitive) {
   }
   result.raw = session_.raw();
   result.candidates = session_.candidates();
+  if(result.candidates.size()>5) result.candidates.resize(5);
   result.highlighted = session_.highlighted();
   result.commit = session_.takeCommit();
+  if(rawSpace && result.handled && !result.commit.empty()) result.commit.push_back(' ');
   return result;
 }
 }
-

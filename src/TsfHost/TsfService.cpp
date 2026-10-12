@@ -1,5 +1,6 @@
 #include "TsfService.h"
 #include "RimeAdapter.h"
+#include "TsfSensitivity.h"
 #include <filesystem>
 #include <functional>
 #include <memory>
@@ -125,16 +126,32 @@ void TsfService::clearFocus() {
   candidates_.hide();
   ITfContext* active=composition_.context();
   if(active && clientId_!=TF_CLIENTID_NULL) {
-    auto* edit=new(std::nothrow) EditSession([&](TfEditCookie cookie) {
+    auto* edit=new(std::nothrow) EditSession([this,active](TfEditCookie cookie) {
       return composition_.cancel(active,cookie);
     });
     if(edit) {
       HRESULT sessionHr=E_FAIL;
-      active->RequestEditSession(clientId_,edit,TF_ES_SYNC|TF_ES_READWRITE,&sessionHr);
+      const HRESULT requestHr=active->RequestEditSession(clientId_,edit,
+        TF_ES_SYNC|TF_ES_READWRITE,&sessionHr);
       edit->Release();
+      if(FAILED(requestHr) || FAILED(sessionHr)) recoveryPending_=true;
+    }
+    if(composition_.active()) {
+      // TSF can deny a synchronous edit during focus loss. Retain the old
+      // composition in the queued edit session so it can be removed later.
+      auto pending=std::make_shared<TsfComposition>();
+      pending->swap(composition_);
+      auto* deferred=new(std::nothrow) EditSession([pending,active](TfEditCookie cookie) {
+        return pending->cancel(active,cookie);
+      });
+      HRESULT sessionHr=E_FAIL;
+      const HRESULT requestHr=deferred ? active->RequestEditSession(clientId_,deferred,
+        TF_ES_ASYNC|TF_ES_READWRITE,&sessionHr) : E_OUTOFMEMORY;
+      if(deferred) deferred->Release();
+      if(FAILED(requestHr) || FAILED(sessionHr)) pending->swap(composition_);
     }
   }
-  composition_.abandon();
+  recoveryPending_=composition_.active();
   router_.reset();
   if(focus_) { focus_->Release(); focus_=nullptr; }
 }
@@ -156,7 +173,8 @@ HRESULT STDMETHODCALLTYPE TsfService::Deactivate() {
   return S_OK;
 }
 bool TsfService::sensitive(ITfContext* context) const {
-  if(!ready_ || secureActivation_ || !context) return true;
+  if(!ready_ || secureActivation_ || !context || recoveryPending_ ||
+     HasSensitiveWindowStyle(context)) return true;
   TF_STATUS status{};
   if(FAILED(context->GetStatus(&status))) return true;
   if(status.dwDynamicFlags & TF_SD_READONLY) return true;
@@ -239,14 +257,21 @@ HRESULT STDMETHODCALLTYPE TsfService::OnKeyDown(ITfContext* context,WPARAM key,L
   if(!gate_.interested(keyEvent,false)) return S_OK;
   TsfKeyResult result;
   auto* edit=new(std::nothrow) EditSession([&](TfEditCookie cookie) {
+    if(HasSensitiveInputScope(context,cookie)) {
+      candidates_.hide();
+      router_.reset();
+      const HRESULT cancelled=composition_.cancel(context,cookie);
+      if(FAILED(cancelled)) recoveryPending_=true;
+      return cancelled;
+    }
     result=router_.route(keyEvent,false);
     if(!result.handled) return S_OK;
     const HRESULT hr=composition_.apply(context,cookie,result);
     if(FAILED(hr)) {
       result.handled=false;
       router_.reset();
-      composition_.abandon();
       candidates_.hide();
+      if(FAILED(composition_.cancel(context,cookie))) recoveryPending_=true;
     } else {
       updateCandidates(context,cookie,result);
     }

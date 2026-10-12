@@ -1,5 +1,7 @@
 # BilingualInput project progress
 
+2026-10-12: 用户批准 PR #10 Phase 1-A 安全/一致性修复、Windows CI、独立复核与构建包审计，并要求准备免费单机开发签名方案，证书信任导入、系统设置及 TSF 注册/激活须另行确认。修复候选已补输入范围/密码窗口识别、焦点切换或编辑失败后的组合输入清理、英文空格与五候选一致性；新增相应原生回归。核查卸载帮助程序只在 TSF 清理成功后删除自有 COM 标记。`docs/tsf/LOCAL_TEST_SIGNING.md` 为尚未执行的方案。最新 Windows CI、签名、外部编辑器实测与最终审计仍待完成；不得将现有 CI 视作外部体验 PASS。
+
 2026-10-12: 用户批准 Phase 1-A TSF 分步实现。独立外部编辑器试用分支已实现本地拼音输入路由、TSF COM/编辑会话、五候选桌面弹窗，以及默认只预览的注册/卸载脚本和独立来源审计包。Windows CI 38222256758 构建、Core/Host 回归、TSF 原生测试、真实 Rime 测试和打包审计全部成功；TSF artifact 11735770561 为未签名审阅包，不能据此宣称外部编辑器已可试用。微软要求第三方 IME 有有效数字签名，注册脚本在三项核心二进制文件未受信任签名时阻止 Apply。本机 CurrentUser/My 未发现可用签名证书；签名、安装/回滚审查、Notepad/第二编辑器及密码框真人负测仍待完成。详见 `docs/releases/v0.2.2-tsf-phase1a.md`。冻结的 WinUI v0.2.1 行为未改。
 
 2026-10-12: 用户提供八张 v0.2.1 实际试用截图，确认 `beijing`、`shanghai`、`diannao`、`beijingdiqu` 已可输入，前缀 `beij`、`beijingdiq` 也能预测；英文 Shadow 和有限详情可见。将 v0.2.0/1 词库交互回归按此用户旅程记录为已复测。用户提出省写拼音、候选翻页和更广详情覆盖，按 `docs/USER_FEEDBACK_V021.md` 列为后续独立迭代，现有五候选和有限详情符合本次冻结/审批准则。用户指示进入下一阶段；开始 Phase 1-A TSF 可行性设计，见 `docs/tsf/PHASE1A_DESIGN.md`。尚未注册系统输入法或宣称外部应用可用。

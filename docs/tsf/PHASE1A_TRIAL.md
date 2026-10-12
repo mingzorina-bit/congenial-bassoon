@@ -10,9 +10,11 @@ Do not use `-Apply` until the separate registration/signing and rollback review 
 
 After the TSF DLL, Rime engine and registration helper are signed with a trusted code-signing certificate, run `./scripts/Seal-SignedTsfTrial.ps1 -PackageRoot .` from the extracted folder to rebuild and audit the hash inventory, then complete the installation review. Registration requires an explicit `-Apply` switch and may need elevation depending on Windows TSF policy. Registration enables a zh-CN language profile but does not select it automatically. Keep the signed ZIP so the matching removal helper remains available. The inverse command is `./scripts/Unregister-TsfTrial.ps1 -Apply`; it targets only the trial CLSID/profile and the marked trial COM registry key.
 
+The proposed free one-machine signing procedure is in `docs/tsf/LOCAL_TEST_SIGNING.md`. It has not been executed and requires separate approval before certificate trust import.
+
 ## Manual host trial after registration
 
-Select “Bilingual Input TSF Trial” in Windows language settings. In Notepad and one other named desktop editor, type `nihao` and `beijing`, navigate the five-candidate list, commit with Space, use Enter for raw text, cancel with Esc, switch focus mid-composition, then unregister and restore the prior keyboard. Separately check a password field: it must show no candidates and retain no text. A failed secure-field check blocks Phase 1-A acceptance.
+Select “Bilingual Input TSF Trial” in Windows language settings. In Notepad and one other named desktop editor, type `nihao` and `beijing`; confirm the highlighted candidate equals the actual Space commit, including the fifth option. Type an English word followed by Space and confirm the separator remains. Use Enter for raw text and Esc to cancel. Switch focus mid-composition, including to another editor; no raw composition or candidate popup may remain in the old editor. Repeat after a forced or observed edit failure. Separately check a native password field and a browser password field: no candidates, no retained composition, no text disclosure. Finally unregister, reopen both editors, verify the previous keyboard works and the trial profile is absent. Any failed secure-field or cleanup check blocks Phase 1-A acceptance.
 
 The popup is shown only when TSF exposes a visible desktop host and usable caret location. UI-less and app-container hosts are outside this trial. Host-level behavior, signing, and clean-machine installation are pending human validation; passing CI only confirms build and module-level contracts.
 

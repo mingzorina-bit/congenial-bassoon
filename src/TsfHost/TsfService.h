@@ -51,6 +51,7 @@ class TsfService final : public ITfTextInputProcessorEx,
   bool keysAdvised_=false;
   bool secureActivation_=false;
   bool ready_=false;
+  bool recoveryPending_=false;
   ServiceEngine engine_;
   InputSession session_{engine_};
   TsfKeyRouter router_{session_};

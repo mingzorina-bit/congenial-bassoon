@@ -1,5 +1,6 @@
 #include "TsfComposition.h"
 #include <string>
+#include <utility>
 
 namespace bilingual::tsf {
 namespace {
@@ -15,6 +16,10 @@ std::wstring toWide(const std::string& text) {
 }
 }
 TsfComposition::~TsfComposition() { abandon(); }
+void TsfComposition::swap(TsfComposition& other) noexcept {
+  std::swap(context_,other.context_);
+  std::swap(composition_,other.composition_);
+}
 HRESULT TsfComposition::currentRange(ITfRange** range) const {
   if(!range) return E_POINTER;
   *range=nullptr;
@@ -60,9 +65,10 @@ HRESULT TsfComposition::replace(TfEditCookie cookie,const std::wstring& text) {
 HRESULT TsfComposition::finish(TfEditCookie cookie,const std::wstring& text) {
   if(!composition_) return E_UNEXPECTED;
   const HRESULT hr=replace(cookie,text);
+  if(FAILED(hr)) return hr;
   const HRESULT end=composition_->EndComposition(cookie);
-  abandon();
-  return FAILED(hr)?hr:end;
+  if(SUCCEEDED(end)) abandon();
+  return end;
 }
 HRESULT TsfComposition::cancel(ITfContext* context,TfEditCookie cookie) {
   if(!composition_) return S_OK;

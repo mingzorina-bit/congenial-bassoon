@@ -26,6 +26,10 @@ target_include_directories(TsfCandidateTests PRIVATE src/TsfHost)
 target_link_libraries(TsfCandidateTests PRIVATE BilingualCore)
 add_test(NAME TsfCandidateTests COMMAND TsfCandidateTests)
 if(WIN32)
+  add_executable(TsfSensitivityTests tests/TsfHostTests/TsfSensitivityTests.cpp src/TsfHost/TsfSensitivity.cpp)
+  target_include_directories(TsfSensitivityTests PRIVATE src/TsfHost)
+  target_link_libraries(TsfSensitivityTests PRIVATE ole32 oleaut32 uuid user32)
+  add_test(NAME TsfSensitivityTests COMMAND TsfSensitivityTests)
   add_executable(TsfTrialRegistration src/TsfHost/TsfRegistration.cpp)
   target_include_directories(TsfTrialRegistration PRIVATE src/TsfHost)
   target_link_libraries(TsfTrialRegistration PRIVATE ole32 uuid advapi32)
@@ -58,7 +62,8 @@ if(BI_WITH_RIME)
   add_library(BilingualTsf SHARED src/TsfHost/BilingualTsf.def
     src/TsfHost/TsfModule.cpp src/TsfHost/TsfService.cpp
     src/TsfHost/TsfComposition.cpp src/TsfHost/TsfKeyRouter.cpp src/TsfHost/TsfEditGate.cpp
-    src/TsfHost/TsfCandidateState.cpp src/TsfHost/TsfCandidateWindow.cpp)
+    src/TsfHost/TsfCandidateState.cpp src/TsfHost/TsfCandidateWindow.cpp
+    src/TsfHost/TsfSensitivity.cpp)
   target_include_directories(BilingualTsf PRIVATE src/TsfHost)
   target_link_libraries(BilingualTsf PRIVATE RimeAdapter ole32 oleaut32 uuid user32 gdi32)
   add_custom_command(TARGET BilingualTsf POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different

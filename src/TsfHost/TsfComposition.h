@@ -8,6 +8,8 @@ class TsfComposition {
   ~TsfComposition();
   HRESULT apply(ITfContext* context, TfEditCookie cookie, const TsfKeyResult& result);
   HRESULT cancel(ITfContext* context, TfEditCookie cookie);
+  void swap(TsfComposition& other) noexcept;
+  bool active() const { return composition_ != nullptr; }
   void abandon();
   ITfContext* context() const { return context_; }
   HRESULT currentRange(ITfRange** range) const;
