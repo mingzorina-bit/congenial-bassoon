@@ -1,5 +1,6 @@
 #include "RimeAdapter.h"
 #include <algorithm>
+#include <chrono>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -18,6 +19,27 @@ int main(int argc,char** argv) {
    }
   }
   auto words=engine.query("youhua");
+  if(words.empty() || words.front()!="优化") {
+    std::cerr<<"FAIL authored candidate ranking\n"; return 1;
+  }
+  // Imported Luna entries are stored in traditional script. The UI profile
+  // expects simplified candidates without adding an unreviewed OpenCC table.
+  auto imported=engine.query("beijingdiqu");
+  if(std::find(imported.begin(),imported.end(),"北京地区")==imported.end()) {
+    std::cerr<<"FAIL imported simplified phrase\n"; return 1;
+  }
+  auto started=std::chrono::steady_clock::now();
+  for(const auto& pair:std::vector<std::pair<std::string,std::string>>{
+      {"beijing","北京"},{"shanghai","上海"},{"diannao","电脑"},
+      {"nihao","你好"},{"tianqi","天气"},{"beijingdiqu","北京地区"}}) {
+    auto candidates=engine.query(pair.first);
+    if(std::find(candidates.begin(),candidates.end(),pair.second)==candidates.end()) {
+      std::cerr<<"FAIL common-word coverage: "<<pair.first<<"\n"; return 1;
+    }
+  }
+  auto elapsed=std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now()-started).count();
+  if(elapsed>6000) { std::cerr<<"FAIL common-word latency: "<<elapsed<<"ms\n"; return 1; }
+  std::cout<<"Common-word fixture: 6/6, total "<<elapsed<<"ms\n";
   for(const auto& word:engine.query("nihaozzz")) {
     if(word.find("zzz")==std::string::npos) {
       std::cerr<<"FAIL partial candidate would discard raw suffix\n"; return 1;

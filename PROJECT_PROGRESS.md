@@ -1,5 +1,7 @@
 # Project Progress — v0.0.6 AI Expression
 
+2026-10-12: 用户确认 v0.1.1 Tab 手感，授权进入 v0.2.0 离线词库试用。文件级审计发现 Luna 致谢多个来源且常用词依赖独立 Rime Essay；用户分别批准保留 Luna 原始致谢与 LGPL 试用，以及 `rime/rime-essay` 固定提交 `054920de4f54c9e5994276a96a4fc2a35cb51aa3` 仅供试用。实现中：固定 SHA-256 下载/校验、独立来源与作者记录、Luna import + Essay 词频、Windows 简体输出、常用词/原文/优先级真实引擎测试、试用包版本与来源审计。源码尚待 Windows CI，商业发布与 TSF 仍独立待审。
+
 2026-10-12: v0.1.1 Tab trial GitHub CI 38188347171 全部成功，artifact 11720875124 已下载。外层 SHA-256 `682159A7986DFA9E89B00A441B02974EBC56B36DB189597FBB5E7EC7A2928D28` 与 GitHub 一致；内层 ZIP SHA-256 `A303D0DEF446A418F60616B5B5B9A03B64180F37F2570185FFEFE7D697BCB42E`，567 个文件全部通过清单/来源审计。用户另明确批准未来试用包使用固定 `rime/rime-luna-pinyin` 提交 `56b934b099dfbeab842320f13aa8b461a6ab3e42`（LGPL-3.0）；本轮未导入。Tab 真人试用与 alpha 剩余 Gate 仍待用户判断，停在 v0.1.1 试用状态。
 
 2026-10-12: 用户已试用 v0.1.0-alpha，提出并直接批准 CR-06：Tab 展开 Details，再按 Tab 也能关闭，Esc 保留；要求尽快推进宽词库与应用外输入。开始 v0.1.1 Tab 交互试用：Root 的预览按键在 Details 已展开时优先关闭并还焦编辑区，编辑区原 Tab 打开路径保持；更新 UI 提示、人工回归清单、打包版本和 GitHub CI artifact 名称。宽词库与 TSF 分开写入后续路线图；本轮没有导入未审批数据或注册系统输入服务。待 Windows CI 与用户试用，不宣称后续两项已实现。

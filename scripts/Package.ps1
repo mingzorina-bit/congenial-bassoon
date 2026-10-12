@@ -1,6 +1,7 @@
-param([string]$ReleaseVersion = 'v0.1.1-tab-trial')
+param([string]$ReleaseVersion = 'v0.2.0-lexicon-trial')
 $ErrorActionPreference = 'Stop'
 $repo = Split-Path $PSScriptRoot -Parent
+& "$PSScriptRoot/Prepare-Lexicon.ps1"
 $out = Join-Path $repo "artifacts/BilingualInput-$ReleaseVersion-win-x64"
 New-Item -ItemType Directory -Path $out -Force | Out-Null
 dotnet publish "$repo/src/PrototypeHost/PrototypeHost.csproj" -c Release -r win-x64 --self-contained true -o $out

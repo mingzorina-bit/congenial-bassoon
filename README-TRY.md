@@ -1,10 +1,12 @@
-# Bilingual Input v0.1.1 — Tab 交互试用
+# Bilingual Input v0.2.0 — 离线宽词库试用
 
 Windows 10 2004+ / Windows 11 x64。完整解压后运行 `BilingualInput.exe`。没有 API Key 时，本地候选、Shadow、详情、发音和收藏仍可试用。
 
-[在 Windows 构建页面取得最新 v0.1.1-tab-trial 试用包](https://github.com/mingzorina-bit/congenial-bassoon/actions/workflows/windows.yml)。GitHub 下载的是外层 ZIP；解压后再解压其中的 `BilingualInput-v0.1.1-tab-trial-win-x64.zip`，运行 `BilingualInput.exe`。本版保留项目级 `.env` 配置和明确标注的 AI 演示模式；正式包运行时请用系统 `OPENAI_API_KEY` 环境变量配置真实 API。
+[在 Windows 构建页面取得最新 v0.2.0-lexicon-trial 试用包](https://github.com/mingzorina-bit/congenial-bassoon/actions/workflows/windows.yml)。GitHub 下载的是外层 ZIP；解压后再解压其中的 `BilingualInput-v0.2.0-lexicon-trial-win-x64.zip`，运行 `BilingualInput.exe`。本版保留项目级 `.env` 配置和明确标注的 AI 演示模式；正式包运行时请用系统 `OPENAI_API_KEY` 环境变量配置真实 API。
 
 在编辑区按 Tab 展开 Details，再按一次 Tab 可关闭；Esc 也可关闭。关闭后继续输入，原文和候选不应改变。
+
+本版新增离线拼音词库。可连续试 `beijing`→“北京”、`shanghai`→“上海”、`diannao`→“电脑”、`nihao`→“你好”、`youhua`→“优化”，再试 `beijingdiqu`→“北京地区”；选择候选用 Space，按 Enter 提交未转换的原文。请留意候选排序和输入延迟，并把不自然的例子记下来。词库来自已固定版本的 Rime Luna Pinyin 与 Rime Essay，随试用包离线提供；不会因输入这些词而请求网络。中文候选经过系统简体转换，个别词形仍可能需要调整。
 
 ## 完整句子的云端辅助
 
@@ -19,4 +21,4 @@ Windows 10 2004+ / Windows 11 x64。完整解压后运行 `BilingualInput.exe`�
 
 在“详情设置 / Settings”开启“AI 演示模式（Mock，不联网、不收费）”。演示模式不需要开启“云端辅助”，不会发送句子或使用 API Key；Private Mode 仍会阻断这条链路，以便继续验证隐私行为。当前仅支持有限固定句子：`我觉得这个方案还可以继续优化。`、`这个设计让双语输入更加自然。`、`我们需要进一步优化这个功能。`。结果区域会明确标注“AI 演示结果（Mock，不联网）”，不能把它当成真实模型语义验收。
 
-本试用仍是 WinUI 原型编辑区，不是全系统输入法。有限自有词表、美式 CMUdict、系统已安装声线的边界延续 v0.0.5。英式音标未覆盖；系统没有目标声线时会提示。中文 Shadow 拼音、未提交混输识别、`youh` 提前预测及不完整英文提示仍留待后续迭代；宽词库与系统级输入的阶段及许可门槛见[仓库路线图](https://github.com/mingzorina-bit/congenial-bassoon/blob/codex/tab-trial-v0.1.1/docs/POST_ALPHA_ROADMAP.md)。
+本试用仍是 WinUI 原型编辑区，不是全系统输入法。英文 Shadow、详情释义和音标仍只覆盖已审核的有限数据，宽拼音词库不等于完整双语词典；系统声线依安装情况提供，美式 CMUdict 有限，英式音标未覆盖。中文 Shadow 拼音、未提交混输识别、`youh` 提前预测及不完整英文提示仍留待后续迭代；应用外输入需经过独立 TSF 阶段，见仓库 `docs/POST_ALPHA_ROADMAP.md`。本版词典仅获试用批准，商业发布另审。

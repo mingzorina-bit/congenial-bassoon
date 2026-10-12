@@ -1,9 +1,11 @@
-# Project-authored prototype mappings. No imported third-party dictionary.
+# Project-authored high-priority mappings; imported Luna Pinyin remains a separate table.
 ---
 name: bilingual
-version: "0.0.3"
+version: "0.2.0"
 sort: by_weight
-use_preset_vocabulary: false
+use_preset_vocabulary: true
+import_tables:
+  - luna_pinyin
 ...
 优化	you hua	1000
 油画	you hua	900

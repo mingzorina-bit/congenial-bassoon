@@ -1,7 +1,7 @@
 schema:
   schema_id: bilingual
   name: BilingualInput Prototype
-  version: "0.0.1"
+  version: "0.2.0"
 switches:
   - name: ascii_mode
     reset: 0
